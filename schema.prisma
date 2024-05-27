@@ -1,0 +1,171 @@
+datasource db {
+    provider = "mysql"
+    url      = "mysql://root:intern@s3cretPWD@159.223.78.24:3306/intership"
+}
+
+generator client {
+    provider = "go run github.com/steebchen/prisma-client-go"
+}
+
+model Account {
+    id                Int               @id @default(autoincrement())
+    name              String
+    password          String
+    phone             String?
+    location          String?
+    email             String            @unique
+    role              Role              @default(CUSTOMER)
+    status            Boolean           @default(true)
+    imageAvatar       String            @default("https://www.nasco.co.th/wp-content/uploads/2022/06/placeholder.png")
+    storeName         String?
+    storeLocation     String?
+    permissionId      Int?              @unique
+    files             File[]            @relation("AccountFile")
+    adminPermission   AdminPermission?  @relation(fields: [permissionId], references: [id])
+    logs              Log[]
+    products          Product[]         @relation("StoreProduct")
+    productCategories ProductCategory[] @relation("StoreProductCategory")
+    banks             Bank[]            @relation("StoreBank")
+    orders            Order[]           @relation("CustomerOrder")
+    Order             Order[]
+    createdAt         DateTime          @default(now())
+    updatedAt         DateTime          @updatedAt
+
+    @@index([email])
+}
+
+model Product {
+    id            Int             @id @default(autoincrement())
+    name          String
+    price         Decimal
+    stock         Int
+    detail        String?
+    status        Boolean
+    categoryId    Int
+    storeId       Int
+    productAvatar String          @default("https://www.nasco.co.th/wp-content/uploads/2022/06/placeholder.png")
+    category      ProductCategory @relation(fields: [categoryId], references: [id])
+    store         Account         @relation(fields: [storeId], references: [id], "StoreProduct")
+    files         File[]          @relation("ProductFile")
+    orderProducts OrderProduct[]
+    createdAt     DateTime        @default(now())
+    updatedAt     DateTime        @updatedAt
+}
+
+model ProductCategory {
+    id            Int       @id @default(autoincrement())
+    name          String
+    status        Boolean
+    code          String?
+    detail        String?
+    products      Product[]
+    storeAccounts Account[] @relation("StoreProductCategory")
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+}
+
+model Order {
+    id            Int            @id @default(autoincrement())
+    orderId       String         @unique
+    totalAmount   Decimal
+    topic         String?
+    sumPrice      Float
+    state         OrderState     @default(PENDING)
+    deliveryType  String?
+    parcelNumber  String?
+    sentDate      DateTime?
+    customerId    Int
+    storeId       Int
+    bankId        Int
+    customer      Account        @relation(fields: [customerId], references: [id], "CustomerOrder")
+    store         Account        @relation(fields: [storeId], references: [id])
+    bank          Bank           @relation(fields: [bankId], references: [id])
+    files         File[]         @relation("OrderFile")
+    orderProducts OrderProduct[]
+    File          File[]
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+}
+
+model OrderProduct {
+    orderId   Int
+    productId Int
+    quantity  Int
+    order     Order    @relation(fields: [orderId], references: [id])
+    product   Product  @relation(fields: [productId], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@id([orderId, productId])
+}
+
+model Bank {
+    id        Int      @id @default(autoincrement())
+    name      String
+    accNumber String
+    accName   String
+    status    String
+    avatarUrl String   @default("https://www.nasco.co.th/wp-content/uploads/2022/06/placeholder.png")
+    storeId   Int
+    store     Account  @relation(fields: [storeId], references: [id], "StoreBank")
+    orders    Order[]
+    files     File[]   @relation("BankFile")
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model AdminPermission {
+    id             Int      @id @default(autoincrement())
+    menuPermission Json
+    account        Account?
+}
+
+model File {
+    id         Int        @id @default(autoincrement())
+    name       String
+    pathUrl    String
+    type       String
+    entityType EntityType
+    entityId   Int
+    account    Account?   @relation(name: "AccountFile", fields: [entityId], references: [id], map: "AccountFileRelation")
+    order      Order?     @relation(name: "OrderFile", fields: [entityId], references: [id], map: "OrderFileRelation")
+    product    Product?   @relation(name: "ProductFile", fields: [entityId], references: [id], map: "ProductFileRelation")
+    bank       Bank?      @relation(name: "BankFile", fields: [entityId], references: [id], map: "BankFileRelation")
+    accountId  Int?
+    Order      Order?     @relation(fields: [orderId], references: [id])
+    orderId    Int?
+    createdAt  DateTime   @default(now())
+    updatedAt  DateTime   @updatedAt
+}
+
+model Log {
+    id            Int      @id @default(autoincrement())
+    fullName      String
+    menuRequest   String
+    actionRequest String
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    accountId     Int
+    account       Account  @relation(fields: [accountId], references: [id])
+}
+
+enum Role {
+    ADMIN
+    STORE
+    CUSTOMER
+}
+
+enum OrderState {
+    PENDING
+    PREPARED
+    SEND
+    SUCCEED
+    REJECTED
+}
+
+enum EntityType {
+    ACCOUNT
+    ORDER
+    PRODUCT
+    BANK
+}
