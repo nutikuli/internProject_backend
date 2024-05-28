@@ -1,5 +1,5 @@
 package entities
-type Store struct {
+type StoreAccount struct {
 	StoreName  string `db:"storeName"`
 	StoreLocation  string `db:"storeLocation"`
 	Account
