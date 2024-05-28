@@ -19,12 +19,12 @@ import (
 )
 
 type File struct {
-	Id         int    `json:"id" db:"id"`
+	Id         int64  `json:"id" db:"id"`
 	Name       string `json:"file_name" db:"name"`
 	PathUrl    string `json:"file_data" db:"pathUrl"`
 	Type       string `json:"file_type" db:"type"`
 	EntityType string `json:"entity_type" db:"entityType"`
-	EntityId   int    `json:"entity_id" db:"entityId"` //- id ไว้ใช้อิงตาม model ที่เกี่ยวข้อง
+	EntityId   int64  `json:"entity_id" db:"entityId"` //- id ไว้ใช้อิงตาม model ที่เกี่ยวข้อง
 	CreatedAt  string `json:"created_at" db:"createdAt"`
 	UpdatedAt  string `json:"updated_at" db:"updatedAt"`
 }
