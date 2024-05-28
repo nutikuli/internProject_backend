@@ -20,22 +20,26 @@ func NewFileRepository(db *sqlx.DB) file.FileRepository {
 	}
 }
 
-func (f *fileRepo) CreateFileByEntityAndId(ctx context.Context, file *entities.FileUploaderReq) (*entities.File, error) {
-	var newFile entities.File
+func (f *fileRepo) CreateFileByEntityAndId(ctx context.Context, file *entities.FileUploaderReq, fileEntity *entities.FileEntityReq) (*int64, error) {
 	args := utils.Array{
 		file.FileName,
 		file.FileData,
 		file.FileType,
-		file.EntityType,
-		file.EntityId,
+		fileEntity.EntityType,
+		fileEntity.EntityId,
 	}
 
-	err := f.db.GetContext(ctx, &newFile, repository_query.FileInsertByEntityAndId, args...)
+	result, err := f.db.ExecContext(ctx, repository_query.FileInsertByEntityAndId, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	return &newFile, nil
+	newFileID, err := result.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	return &newFileID, nil
 
 }
 
@@ -50,20 +54,20 @@ func (f *fileRepo) GetFiles(ctx context.Context) ([]*entities.File, error) {
 	return files, nil
 }
 
-func (f *fileRepo) GetFileByIdAndEntity(ctx context.Context, req *entities.FileEntityReq) (*entities.File, error) {
-	var file entities.File
+func (f *fileRepo) GetFilesByIdAndEntity(ctx context.Context, req *entities.FileEntityReq) ([]*entities.File, error) {
+	var files []*entities.File
 
 	args := utils.Array{
 		req.EntityType,
 		req.EntityId,
 	}
 
-	err := f.db.GetContext(ctx, &file, repository_query.QueryFileSelectByIdAndEntity, args...)
+	err := f.db.SelectContext(ctx, &files, repository_query.QueryFileSelectByIdAndEntity, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	return &file, nil
+	return files, nil
 }
 
 func (f *fileRepo) DeleteFileByIdAndEntity(ctx context.Context, req *entities.FileEntityReq) error {
