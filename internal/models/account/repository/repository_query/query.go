@@ -9,7 +9,7 @@ var SQL_get_account_storeaccount = `SELECT id,name,password,phone,location,email
 // get admin account
 var SQL_get_account_admin = `SELECT id,name,password,phone,location,email,status,permissionId FROM Account WHERE role = ?;`
 
-// get customer account by id
+//get customer account by id
 var SQL_get_account_customer_by_id = `SELECT id,name,password,phone,location,email,status FROM Account WHERE role = ? and id = ?;`
 
 // get store account by id
