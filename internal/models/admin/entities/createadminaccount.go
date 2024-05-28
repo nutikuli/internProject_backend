@@ -2,14 +2,12 @@ package entities
 
 //TODO:นำตัวไปใช้ใน Log Model
 type AdminCreatedReq struct {
-	Id           int64  `db:"id"`
-	Name         string `db:"name"`
-	Password     string `db:"password"`
-	Phone        string `db:"phone"`
-	Location     string `db:"location"`
-	Email        string `db:"email"`
-	ImageAvatar  string `db:"imageAvatar"`
-	Role         string `db:"role"`
-	Status       bool   `db:"status"`
-	PermissionID string `db:"permissionId"`
+	Name         string `json:"name" from:"name" binding:"required"`
+	Password     string `json:"password" from:"password" binding:"required"`
+	Phone        string `json:"phone" from:"phone" binding:"required"`
+	Location     string `json:"location" from:"location" binding:"required"`
+	Email        string `json:"email" from:"email" binding:"required"`
+	Role         string `json:"role" from:"role" binding:"required"`
+	Status       bool   `json:"status" from:"status" binding:"required"`
+	PermissionID string `json:"permissino_id" from:"permissino_id" binding:"required"`
 }
