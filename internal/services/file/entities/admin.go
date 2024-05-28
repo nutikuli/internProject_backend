@@ -1,6 +1,6 @@
 package entities
 
 type Admin struct {
-	PermissionID  string `json:"permissionId" db:"permissionId"`
+	PermissionID  string `db:"permissionId"`
 	Account
 }
