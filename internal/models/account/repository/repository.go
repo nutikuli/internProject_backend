@@ -1,13 +1,13 @@
 package repository
-import(
+
+import (
 	"context"
 
-	"github.com/jmoiron/sqlx"
-	"github.com/textures1245/go-template/internal/models/account"
-	"github.com/textures1245/go-template/internal/models/account/entities"
-	"github.com/textures1245/go-template/internal/models/account/repository/repository_query"
 	"github.com/gofiber/fiber/v2/log"
-	
+	"github.com/jmoiron/sqlx"
+	"github.com/nutikuli/internProject_backend/internal/models/account"
+	"github.com/nutikuli/internProject_backend/internal/models/account/entities"
+	"github.com/nutikuli/internProject_backend/internal/models/account/repository/repository_query"
 )
 
 type AccountRepo struct {
