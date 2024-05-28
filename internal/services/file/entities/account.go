@@ -11,5 +11,5 @@ type Account struct {
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 	Role string `json:"role"`
-	Status bool `json:"role"`
+	Status bool `json:"status"`
 }
