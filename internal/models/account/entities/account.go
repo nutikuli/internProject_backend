@@ -1,5 +1,7 @@
 package entities
 
+import "time"
+
 type Account struct {
 	Id          int64  `db:"id"`
 	Name        string `db:"name"`
@@ -9,8 +11,8 @@ type Account struct {
 	Email       string `db:"email"`
 	ImageAvatar string `db:"imageAvatar"`
 	// TODO: เพิ่ม file entites ที่เป็น array
-	CreatedAt string `db:"createdAt"`
-	UpdatedAt string `db:"updatedAt"`
-	Role      string `db:"role"`
-	Status    bool   `db:"status"`
+	CreatedAt time.Time `db:"createdAt"`
+	UpdatedAt time.Time `db:"updatedAt"`
+	Role      string    `db:"role"`
+	Status    bool      `db:"status"`
 }
