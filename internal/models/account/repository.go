@@ -7,7 +7,10 @@ import (
 )
 
 type AccountRepository interface {
-	GetAccountCustomer(ctx context.Context) (*entities.Account, error)
-	GetAccountStore(ctx context.Context) (*entities.Account, error)
-	GetAccountAdmin(ctx context.Context) (*entities.Account, error)
+	GetAccountCustomers(ctx context.Context) (*entities.Account, error)
+	GetAccountStores(ctx context.Context) (*entities.StoreAccount, error)
+	GetAccountAdmins(ctx context.Context) (*entities.Admin, error)
+	GetAccountAdminById(ctx context.Context, id *int64) (*entities.Admin, error)
+	GetAccountStoreById(ctx context.Context, id *int64) (*entities.StoreAccount, error)
+	GetAccountCustomerById(ctx context.Context, id *int64) (*entities.Account, error)
 }

@@ -21,10 +21,10 @@ func NewFileRepository(db *sqlx.DB) account.AccountRepository {
 }
 
 
-func (a *AccountRepo) GetAccountCustomer(ctx context.Context) (*entities.Account, error) {
+func (a *AccountRepo) GetAccountCustomers(ctx context.Context) (*entities.Account, error) {
 	var customer entities.Account
 
-	err := a.db.GetContext(ctx, &customer, repository_query.SQL_get_account, "customer")
+	err := a.db.GetContext(ctx, &customer, repository_query.SQL_get_account_customer, "customer")
 	if err != nil {
 		log.Info(err)
 		return nil, err
@@ -33,10 +33,10 @@ func (a *AccountRepo) GetAccountCustomer(ctx context.Context) (*entities.Account
 	return &customer, nil
 }
 
-func (a *AccountRepo) GetAccountStore(ctx context.Context) (*entities.Account, error) {
-	var store entities.Account
+func (a *AccountRepo) GetAccountStores(ctx context.Context) (*entities.StoreAccount, error) {
+	var store entities.StoreAccount
 
-	err := a.db.GetContext(ctx, &store, repository_query.SQL_get_account, "store")
+	err := a.db.GetContext(ctx, &store, repository_query.SQL_get_account_storeaccount, "store")
 	if err != nil {
 		log.Info(err)
 		return nil, err
@@ -45,10 +45,10 @@ func (a *AccountRepo) GetAccountStore(ctx context.Context) (*entities.Account, e
 	return &store, nil
 }
 
-func (a *AccountRepo) GetAccountAdmin(ctx context.Context) (*entities.Account, error) {
-	var admin entities.Account
+func (a *AccountRepo) GetAccountAdmins(ctx context.Context) (*entities.Admin, error) {
+	var admin entities.Admin
 
-	err := a.db.GetContext(ctx, &admin, repository_query.SQL_get_account, "admin")
+	err := a.db.GetContext(ctx, &admin, repository_query.SQL_get_account_admin, "admin")
 	if err != nil {
 		log.Info(err)
 		return nil, err
@@ -57,14 +57,38 @@ func (a *AccountRepo) GetAccountAdmin(ctx context.Context) (*entities.Account, e
 	return &admin, nil
 }
 
-func (a *AccountRepo) GetFileById(ctx context.Context, id *int64) (*entities.Account, error) {
+func (a *AccountRepo) GetAccountCustomerById(ctx context.Context, id *int64) (*entities.Account, error) {
 	var accountbyid entities.Account
 
-	err := a.db.GetContext(ctx, &accountbyid, repository_query.SQL_get_account, *id)
+	err := a.db.GetContext(ctx, &accountbyid, repository_query.SQL_get_account_customer_by_id, "customer",*id)
 	if err != nil {
 		log.Info(err)
 		return nil, err
 	}
 
 	return &accountbyid, nil
+}
+
+func (a *AccountRepo) GetAccountStoreById(ctx context.Context, id *int64) (*entities.StoreAccount, error) {
+	var accountbyid entities.StoreAccount
+
+	err := a.db.GetContext(ctx, &accountbyid, repository_query.SQL_get_account_storeaccount_by_id,"store", *id)
+	if err != nil {
+		log.Info(err)
+		return nil, err
+	}
+
+	return &accountbyid, nil
+}
+
+func (a *AccountRepo) GetAccountAdminById(ctx context.Context, id *int64) (*entities.Admin, error) {
+	var admin entities.Admin
+
+	err := a.db.GetContext(ctx, &admin, repository_query.SQL_get_account_admin_by_id, "admin", *id)
+	if err != nil {
+		log.Info(err)
+		return nil, err
+	}
+
+	return &admin, nil
 }
