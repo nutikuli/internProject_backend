@@ -1,20 +1,41 @@
 package main
 
 import (
-	"fmt"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
+	"github.com/joho/godotenv"
+	"github.com/nutikuli/internProject_backend/pkg/datasource"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	app := fiber.New()
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
+	port := os.Getenv("SERVER_PORT")
 
-	err := app.Listen(":3000")
-	if err != nil {
-		fmt.Println(err)
+	if port == "" {
+		port = "8080"
+		log.Info("Defaulting to port", port)
 	}
+
+	// routes definition
+	api := app.Group("/api/v1")
+	db := datasource.DbConnection()
+	defer func() {
+		if err := db.Close(); err != nil {
+			panic(err)
+		}
+	}()
+
+	datasource.InitRoute(db, &api)
+	app.Static("/public/image", "./public/image")
+
+	log.Info("Listening on port", port)
+	log.Info(app.Listen(":" + port))
 }
