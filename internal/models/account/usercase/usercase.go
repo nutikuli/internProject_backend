@@ -2,15 +2,20 @@ package usercase
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
-	
+
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/nutikuli/internProject_backend/internal/models/account"
 	_accDtos "github.com/nutikuli/internProject_backend/internal/models/account/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/account/entities"
+	"github.com/nutikuli/internProject_backend/internal/models/admin"
 	_adminDtos "github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
+	"github.com/nutikuli/internProject_backend/internal/models/customer"
 	"github.com/nutikuli/internProject_backend/internal/models/customer/dtos"
+	"github.com/nutikuli/internProject_backend/internal/models/store"
 	_storeDtos "github.com/nutikuli/internProject_backend/internal/models/store/dtos"
 	"github.com/nutikuli/internProject_backend/internal/services/file"
 	_fileEntities "github.com/nutikuli/internProject_backend/internal/services/file/entities"
@@ -20,12 +25,23 @@ import (
 type AccountUsecase struct {
 	accountRepo account.AccountRepository
 	fileRepo    file.FileRepository
+	adminUse    admin.AdminUseCase
+	customerUse customer.CustomerUsecase
+	storeUse    store.StoreUsecase
 }
 
-func NewFileUsecase(accountRepo account.AccountRepository, filesRepo file.FileRepository) account.AccountUsecase {
+func NewFileUsecase(
+	accountRepo account.AccountRepository,
+	filesRepo file.FileRepository,
+	adminUse admin.AdminUseCase,
+	customerUse customer.CustomerUsecase,
+	storeUse store.StoreUsecase) account.AccountUsecase {
 	return &AccountUsecase{
 		accountRepo: accountRepo,
 		fileRepo:    filesRepo,
+		adminUse:    adminUse,
+		customerUse: customerUse,
+		storeUse:    storeUse,
 	}
 }
 
@@ -118,56 +134,76 @@ func (a *AccountUsecase) AccountAdminfile(ctx context.Context) ([]*_adminDtos.Ad
 
 }
 
-func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersLogin) (*_accDtos.UserToken, int, error) {
+func (a *AccountUsecase) Login(c *fiber.Ctx, ctx context.Context, req *entities.UsersCredential) (*_accDtos.UserToken, interface{}, int, error) {
 
 	user, err := a.accountRepo.FindUserAsPassport(ctx, req.Email)
 
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		return nil, nil, http.StatusInternalServerError, err
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		fmt.Println(err.Error())
-		return nil, http.StatusInternalServerError, err
+		return nil, nil, http.StatusInternalServerError, err
 	}
 
 	userToken, err := a.accountRepo.SignUsersAccessToken(&entities.UserSignToken{
-		Id:       user.Id,
+		Id:    user.Id,
 		Email: req.Email,
 	})
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		return nil, nil, http.StatusInternalServerError, err
 	}
 
-	return userToken, http.StatusOK, nil
+	var roleAccount interface{}
+	switch user.Role {
+	case "CUSTOMER":
+		acc, status, err := a.customerUse.OnGetCustomerById(c, ctx, &user.Id)
+		if err != nil {
+			return nil, nil, status, err
+		}
+		roleAccount = acc
+	case "STORE":
+		acc, status, err := a.storeUse.OnGetStoreById(c, ctx, &user.Id)
+		if err != nil {
+			return nil, nil, status, err
+		}
+		roleAccount = acc
+	case "ADMIN":
+		acc, status, err := a.adminUse.OnGetAdminById(c, ctx, &user.Id)
+		if err != nil {
+			return nil, nil, status, err
+		}
+		roleAccount = acc
+	default:
+		return nil, nil, http.StatusInternalServerError, errors.New("Can't query the Account Table, Invalid role")
+	}
+
+	return userToken, roleAccount, http.StatusOK, nil
 }
 
-func (a *AccountUsecase) Register(ctx context.Context, req *entities.UserCreatedReq) (*_accDtos.UsersRegisteredRes, int, error) {
+func (a *AccountUsecase) Register(ctx context.Context, req entities.AccountCredentialGetter) (*_accDtos.UsersRegisteredRes, *entities.UsersCredential, int, error) {
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, http.StatusInternalServerError, err
+	if req.GetEmail() == nil || req.GetPassword() == nil || req.GetId() == nil {
+		return nil, nil, http.StatusBadRequest, errors.New("Invalid request, not found AccountCredential when registering Account.")
 	}
 
-	cred := entities.UserCreatedReq{
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*req.GetPassword()), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, nil, http.StatusInternalServerError, err
+	}
+
+	cred := &entities.UsersCredential{
 		Password: string(hashedPassword),
-		Email: req.Email,
-		
+		Email:    *req.GetEmail(),
 	}
-	req.Password = cred.Password
-	log.Info("req", req)
-	user, err := a.accountRepo.CreateUser(ctx, req)
-	if err != nil {
-		return nil, http.StatusInternalServerError, err
-	}
-
-	log.Info("res", user)
 
 	userToken, err := a.accountRepo.SignUsersAccessToken(&entities.UserSignToken{
-		Id:       *user,
-		Email: req.Email,
+		Id:    *req.GetId(),
+		Email: *req.GetEmail(),
 	})
+
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		return nil, nil, http.StatusInternalServerError, err
 	}
 	// //Receiver email address.
 	//   to := req.Email // <-------------- (3) แก้ไขอีเมลของผู้รับ หากใส่หลายเมล จะไปอยู่ที่ cc
@@ -187,6 +223,6 @@ func (a *AccountUsecase) Register(ctx context.Context, req *entities.UserCreated
 		ExpiredAt:   userToken.ExpiresIn,
 	}
 
-	return res, http.StatusOK, nil
+	return res, cred, http.StatusOK, nil
 
 }

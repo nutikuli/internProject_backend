@@ -10,5 +10,5 @@ import (
 
 type CustomerUsecase interface {
 	OnCreateCustomerAccount(c *fiber.Ctx, ctx context.Context, customerDatReq *_customerEntities.CustomerRegister) (*_customerDtos.CustomerAccountFileRes, int, error)
-	OnGetStoreById(c *fiber.Ctx, ctx context.Context, Id *int64) (*_customerDtos.CustomerAccountFileRes, int, error)
+	OnGetCustomerById(c *fiber.Ctx, ctx context.Context, Id *int64) (*_customerDtos.CustomerAccountFileRes, int, error)
 }

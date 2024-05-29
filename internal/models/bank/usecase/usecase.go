@@ -44,9 +44,9 @@ func (a *bankUseCase) OnCreateBank(c *fiber.Ctx, ctx context.Context, bankDatReq
 			EntityId:   *newBankId,
 		}
 
-		_, fUrl, errOnCreatedFile := file.Base64toFile(c, true)
+		_, fUrl, status, errOnCreatedFile := file.EncodeBase64toFile(c, true)
 		if errOnCreatedFile != nil {
-			return nil, http.StatusConflict, errOnCreatedFile
+			return nil, status, errOnCreatedFile
 		}
 
 		fDatReq.FileData = *fUrl
