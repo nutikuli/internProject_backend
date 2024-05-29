@@ -6,12 +6,11 @@ import (
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/nutikuli/internProject_backend/internal/models/account"
+	_adminDtos "github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/customer/dtos"
 	_storeDtos "github.com/nutikuli/internProject_backend/internal/models/store/dtos"
-	_adminDtos "github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
 	"github.com/nutikuli/internProject_backend/internal/services/file"
 	_fileEntities "github.com/nutikuli/internProject_backend/internal/services/file/entities"
-	
 )
 
 type AccountUsecase struct {
@@ -25,7 +24,6 @@ func NewFileUsecase(accountRepo account.AccountRepository, filesRepo file.FileRe
 		fileRepo:    filesRepo,
 	}
 }
-
 
 func (a *AccountUsecase) AccountCustomerfile(ctx context.Context) ([]*dtos.CustomerAccountFileRes, int, error) {
 
@@ -41,7 +39,7 @@ func (a *AccountUsecase) AccountCustomerfile(ctx context.Context) ([]*dtos.Custo
 	for _, customer := range customers {
 		fileEntity := &_fileEntities.FileEntityReq{
 			EntityType: "CUSTOMER",
-			EntityId:   *&customer.Id,
+			EntityId:   customer.Id,
 		}
 
 		filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
@@ -57,7 +55,6 @@ func (a *AccountUsecase) AccountCustomerfile(ctx context.Context) ([]*dtos.Custo
 		res = append(res, cFile)
 	}
 	return res, http.StatusOK, nil
-
 
 }
 
@@ -75,7 +72,7 @@ func (a *AccountUsecase) AccountStorefile(ctx context.Context) ([]*_storeDtos.St
 	for _, store := range stores {
 		fileEntity := &_fileEntities.FileEntityReq{
 			EntityType: "STORE",
-			EntityId:   *&store.Id,
+			EntityId:   store.Id,
 		}
 
 		filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
@@ -91,7 +88,6 @@ func (a *AccountUsecase) AccountStorefile(ctx context.Context) ([]*_storeDtos.St
 		res = append(res, sFile)
 	}
 	return res, http.StatusOK, nil
-
 
 }
 
@@ -109,7 +105,7 @@ func (a *AccountUsecase) AccountAdminfile(ctx context.Context) ([]*_adminDtos.Ad
 	for _, admin := range admins {
 		fileEntity := &_fileEntities.FileEntityReq{
 			EntityType: "ADMIN",
-			EntityId:   *&admin.Id,
+			EntityId:   admin.Id,
 		}
 
 		filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
@@ -126,6 +122,4 @@ func (a *AccountUsecase) AccountAdminfile(ctx context.Context) ([]*_adminDtos.Ad
 	}
 	return res, http.StatusOK, nil
 
-
 }
-
