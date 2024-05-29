@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/nutikuli/internProject_backend/internal/models/account"
 	_accDtos "github.com/nutikuli/internProject_backend/internal/models/account/dtos"
@@ -29,7 +30,8 @@ type AccountUsecase struct {
 	storeUse    store.StoreUsecase
 }
 
-func NewFileUsecase(accountRepo account.AccountRepository,
+func NewFileUsecase(
+	accountRepo account.AccountRepository,
 	filesRepo file.FileRepository,
 	adminUse admin.AdminUseCase,
 	customerUse customer.CustomerUsecase,
@@ -37,6 +39,9 @@ func NewFileUsecase(accountRepo account.AccountRepository,
 	return &AccountUsecase{
 		accountRepo: accountRepo,
 		fileRepo:    filesRepo,
+		adminUse:    adminUse,
+		customerUse: customerUse,
+		storeUse:    storeUse,
 	}
 }
 
@@ -129,16 +134,16 @@ func (a *AccountUsecase) AccountAdminfile(ctx context.Context) ([]*_adminDtos.Ad
 
 }
 
-func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersCredential) (*_accDtos.UserToken, int, error) {
+func (a *AccountUsecase) Login(c *fiber.Ctx, ctx context.Context, req *entities.UsersCredential) (*_accDtos.UserToken, interface{}, int, error) {
 
 	user, err := a.accountRepo.FindUserAsPassport(ctx, req.Email)
 
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		return nil, nil, http.StatusInternalServerError, err
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		fmt.Println(err.Error())
-		return nil, http.StatusInternalServerError, err
+		return nil, nil, http.StatusInternalServerError, err
 	}
 
 	userToken, err := a.accountRepo.SignUsersAccessToken(&entities.UserSignToken{
@@ -146,15 +151,34 @@ func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersCredentia
 		Email: req.Email,
 	})
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		return nil, nil, http.StatusInternalServerError, err
 	}
 
+	var roleAccount interface{}
 	switch user.Role {
-		case "CUSTOMER":
-		_, _, err := a.customerUse.
+	case "CUSTOMER":
+		acc, status, err := a.customerUse.OnGetCustomerById(c, ctx, &user.Id)
+		if err != nil {
+			return nil, nil, status, err
+		}
+		roleAccount = acc
+	case "STORE":
+		acc, status, err := a.storeUse.OnGetStoreById(c, ctx, &user.Id)
+		if err != nil {
+			return nil, nil, status, err
+		}
+		roleAccount = acc
+	case "ADMIN":
+		acc, status, err := a.adminUse.OnGetAdminById(c, ctx, &user.Id)
+		if err != nil {
+			return nil, nil, status, err
+		}
+		roleAccount = acc
+	default:
+		return nil, nil, http.StatusInternalServerError, errors.New("Can't query the Account Table, Invalid role")
 	}
 
-	return userToken, http.StatusOK, nil
+	return userToken, roleAccount, http.StatusOK, nil
 }
 
 func (a *AccountUsecase) Register(ctx context.Context, req entities.AccountCredentialGetter) (*_accDtos.UsersRegisteredRes, *entities.UsersCredential, int, error) {
