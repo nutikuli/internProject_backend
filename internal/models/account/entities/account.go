@@ -16,3 +16,9 @@ type Account struct {
 	Role      string    `json:"role" db:"role"`
 	Status    bool      `json:"status" db:"status"`
 }
+
+type AccountCredentialGetter interface {
+	GetId() *int64
+	GetEmail() *string
+	GetPassword() *string
+}
