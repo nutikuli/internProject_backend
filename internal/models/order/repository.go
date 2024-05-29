@@ -7,6 +7,7 @@ import (
 )
 
 type OrderRepository interface {
-	GetOrder(ctx context.Context) (*entities.Order, error)
-	GetOrderByStoreId(ctx context.Context, id *int64) (*entities.Order, error)
+	GetOrderByCustomer(ctx context.Context) (*entities.Order, error)
+	GetOrderById(ctx context.Context, Id *int64) (*entities.Order, error)
+	CreateOrder(ctx context.Context, order *entities.OrderCreate) (*int64, error)
 }
