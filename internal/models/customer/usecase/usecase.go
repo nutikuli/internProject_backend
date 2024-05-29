@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/nutikuli/internProject_backend/internal/models/account"
+	_accDtos "github.com/nutikuli/internProject_backend/internal/models/account/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/customer"
 	_customerDtos "github.com/nutikuli/internProject_backend/internal/models/customer/dtos"
 	_customerEntities "github.com/nutikuli/internProject_backend/internal/models/customer/entities"
@@ -12,29 +14,38 @@ import (
 
 type customerUsecase struct {
 	customerRepo customer.CustomerRepository
+	accUsecase   account.AccountUsecase
 }
 
-func NewStoreUsecase(customerRepo customer.CustomerRepository) customer.CustomerUsecase {
+func NewStoreUsecase(customerRepo customer.CustomerRepository, accUsecase account.AccountUsecase) customer.CustomerUsecase {
 	return &customerUsecase{
 		customerRepo: customerRepo,
+		accUsecase:   accUsecase,
 	}
 }
 
-func (s *customerUsecase) OnCreateCustomerAccount(c *fiber.Ctx, ctx context.Context, customerDatReq *_customerEntities.CustomerRegister) (*_customerDtos.CustomerAccountFileRes, int, error) {
+func (s *customerUsecase) OnCreateCustomerAccount(c *fiber.Ctx, ctx context.Context, customerDatReq *_customerEntities.CustomerRegisterReq) (*_customerDtos.CustomerAccountFileRes, *_accDtos.UsersRegisteredRes, int, error) {
+
+	accRegister, usrCred, status, errOnRegister := s.accUsecase.Register(ctx, customerDatReq)
+	if errOnRegister != nil {
+		return nil, nil, status, errOnRegister
+	}
+
+	customerDatReq.Password = usrCred.Password
 
 	newCustomerId, err := s.customerRepo.CreateCustomerAccount(ctx, customerDatReq)
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		return nil, nil, http.StatusInternalServerError, err
 	}
 
 	customerRes, errOnGetCustomer := s.customerRepo.GetCustomerById(ctx, newCustomerId)
 	if errOnGetCustomer != nil {
-		return nil, http.StatusInternalServerError, errOnGetCustomer
+		return nil, nil, http.StatusInternalServerError, errOnGetCustomer
 	}
 
 	return &_customerDtos.CustomerAccountFileRes{
 		Customer: *customerRes,
-	}, http.StatusOK, nil
+	}, accRegister, http.StatusOK, nil
 
 }
 
