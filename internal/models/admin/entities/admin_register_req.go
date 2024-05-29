@@ -17,10 +17,10 @@ func (a *AdminRegisterReq) GetEmail() *string {
 	return &a.Email
 }
 
-func (a * AdminRegisterReq) GetPassword() *string {
+func (a *AdminRegisterReq) GetPassword() *string {
 	return &a.Password
 }
 
-func (a* AdminRegisterReq) GetRole() *string {
+func (a *AdminRegisterReq) GetRole() *string {
 	return &a.Role
 }
