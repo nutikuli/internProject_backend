@@ -205,6 +205,17 @@ func (a *AccountUsecase) Register(ctx context.Context, req entities.AccountCrede
 	if err != nil {
 		return nil, nil, http.StatusInternalServerError, err
 	}
+	// //Receiver email address.
+	//   to := req.Email // <-------------- (3) แก้ไขอีเมลของผู้รับ หากใส่หลายเมล จะไปอยู่ที่ cc
+
+	// //Message.
+	//   message := []byte("Register Success")
+
+	//   // Authentication.
+	//   auth := smtp.PlainAuth("",viper.GetString("emailFrom"), viper.GetString("passwordMail"), viper.GetString("smtpHost"))
+	//   log.Debug("+++++++++++++++**********-----------------",auth)
+	//   // Sending email.
+	//   err = smtp.SendMail(viper.GetString("smtpHost")+":"+viper.GetString("smtpPort"), auth, viper.GetString("emailFrom"),[]string{to}, message)
 
 	res := &_accDtos.UsersRegisteredRes{
 		AccessToken: userToken.AccessToken,
