@@ -66,7 +66,6 @@ model ProductCategory {
 
 model Order {
     id            Int            @id @default(autoincrement())
-    orderId       String         @unique
     totalAmount   Decimal
     topic         String?
     sumPrice      Float
