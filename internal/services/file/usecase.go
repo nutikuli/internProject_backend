@@ -8,7 +8,7 @@ import (
 )
 
 type FileUsecase interface {
-	OnUploadFile(c *fiber.Ctx, ctx context.Context, req *entities.FileUploaderReq) (*entities.File, int, error)
+	OnUploadFile(c *fiber.Ctx, ctx context.Context, fileReq *entities.FileUploaderReq, fileEntityReq *entities.FileEntityReq) (*int64, int, error)
 	OnGetSourceFiles(c *fiber.Ctx, ctx context.Context) ([]*entities.File, int, error)
 	OnDeleteFileByIdAndEntity(c *fiber.Ctx, ctx context.Context, req *entities.FileEntityReq) (int, error)
 }

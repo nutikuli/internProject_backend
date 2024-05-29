@@ -29,11 +29,11 @@ func (f *fileUse) OnGetSourceFiles(c *fiber.Ctx, ctx context.Context) ([]*entiti
 	return files, http.StatusOK, nil
 }
 
-func (f *fileUse) OnUploadFile(c *fiber.Ctx, ctx context.Context, req *entities.FileUploaderReq) (*entities.File, int, error) {
+func (f *fileUse) OnUploadFile(c *fiber.Ctx, ctx context.Context, fileReq *entities.FileUploaderReq, fileEntityReq *entities.FileEntityReq) (*int64, int, error) {
 	file := entities.File{
-		Name:    req.FileName,
-		Type:    req.FileType,
-		PathUrl: req.FileData,
+		Name:    fileReq.FileName,
+		Type:    fileReq.FileType,
+		PathUrl: fileReq.FileData,
 	}
 
 	_, fPathDat, status, errOnDecode := file.EncodeBase64toFile(c, true)
@@ -41,9 +41,9 @@ func (f *fileUse) OnUploadFile(c *fiber.Ctx, ctx context.Context, req *entities.
 		return nil, status, errOnDecode
 	}
 
-	req.FileData = *fPathDat
+	fileReq.FileData = *fPathDat
 
-	fileModel, err := f.fileRepo.CreateFileByEntityAndId(ctx, req)
+	fileModel, err := f.fileRepo.CreateFileByEntityAndId(ctx, fileReq, fileEntityReq)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
