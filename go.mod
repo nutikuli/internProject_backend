@@ -2,13 +2,14 @@ module github.com/nutikuli/internProject_backend
 
 go 1.21.6
 
-require github.com/gofiber/fiber/v2 v2.52.4
+require (
+	github.com/gofiber/fiber/v2 v2.52.4
+	github.com/shopspring/decimal v1.4.0
+	github.com/steebchen/prisma-client-go v0.37.0
+)
 
 require (
-	(
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/steebchen/prisma-client-go v0.37.0 // indirect
-)
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
