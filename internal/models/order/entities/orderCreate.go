@@ -16,6 +16,6 @@ type OrderCreate struct {
 	CustomerId   int64     `json:"customer_id" form:"customer_id" binding:"required"`
 	StoreId      int64     `json:"store_id" form:"store_id" binding:"required"`
 	BankId       int64     `json:"bank_id" form:"bank_id" binding:"required"`
-	createdAt    time.Time `json:"created_at" form:"created_at" binding:"required"`
-	updatedAt    time.Time `json:"updated_at" form:"updated_at" binding:"required"`
+	CreatedAt    time.Time `json:"created_at" form:"created_at" binding:"required"`
+	UpdatedAt    time.Time `json:"updated_at" form:"updated_at" binding:"required"`
 }

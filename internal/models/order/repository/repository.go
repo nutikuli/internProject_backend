@@ -59,6 +59,8 @@ func (c *OrderRepo) CreateOrder(ctx context.Context, order *entities.OrderCreate
 		order.CustomerId,
 		order.StoreId,
 		order.BankId,
+		order.CreatedAt,
+		order.UpdatedAt,
 	}
 
 	log.Info(args)

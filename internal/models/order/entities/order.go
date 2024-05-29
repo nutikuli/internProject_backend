@@ -17,6 +17,6 @@ type Order struct {
 	CustomerId   int64     `db:"customerId"`
 	StoreId      int64     `db:"storeId"`
 	BankId       int64     `db:"bankId"`
-	createdAt    time.Time `db:"createdAt"`
-	updatedAt    time.Time `db:"UpdatedAt"`
+	CreatedAt    time.Time `db:"createdAt"`
+	UpdatedAt    time.Time `db:"UpdatedAt"`
 }
