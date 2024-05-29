@@ -1,5 +1,6 @@
 package repository_query
 
+
 // get customer account
 var SQL_get_account_customer = `SELECT id,name,password,phone,location,email,status FROM Account WHERE role = ?;`
 
