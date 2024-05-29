@@ -1,11 +1,13 @@
-package entities
+package dtos
 
 import (
-	_accEntities "github.com/nutikuli/internProject_backend/internal/models/account/entities"
+	_accCustomerEntities "github.com/nutikuli/internProject_backend/internal/models/customer/entities"
 	_fileEntities "github.com/nutikuli/internProject_backend/internal/services/file/entities"
 )
 
-type AccountFileRes struct {
-	files []_fileEntities.File
-	_accEntities.Account
+
+
+type AccountAdminFileRes struct {
+	Files []_fileEntities.File
+	_accCustomerEntities.Customer
 }

@@ -6,6 +6,6 @@ import (
 )
 
 type AdminFileRes struct {
-	files []_fileEntities.File
-	_adminEntities.Admin
+	AdminData *_adminEntities.Admin `json:"admin_data"`
+	FilesData []*_fileEntities.File `json:"files_data"`
 }
