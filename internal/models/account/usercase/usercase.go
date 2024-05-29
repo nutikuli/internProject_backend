@@ -37,22 +37,12 @@ func (a *AccountUsecase) AccountCustomerfile(ctx context.Context) ([]*dtos.Custo
 	var res []*dtos.CustomerAccountFileRes
 
 	for _, customer := range customers {
-		fileEntity := &_fileEntities.FileEntityReq{
-			EntityType: "CUSTOMER",
-			EntityId:   customer.Id,
-		}
 
-		filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
-		if errOnGetFiles != nil {
-			return nil, http.StatusInternalServerError, errOnGetFiles
-		}
-
-		cFile := &dtos.CustomerAccountFileRes{
+		c := &dtos.CustomerAccountFileRes{
 			Customer: *customer,
-			Files:    filesRes,
 		}
 
-		res = append(res, cFile)
+		res = append(res, c)
 	}
 	return res, http.StatusOK, nil
 

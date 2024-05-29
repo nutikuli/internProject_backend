@@ -1,6 +1,4 @@
-//
 package repository
-
 
 import (
 	"context"
@@ -62,5 +60,3 @@ func (a *AccountRepo) GetAccountAdmins(ctx context.Context) ([]*adminstruct.Admi
 
 	return admin, nil
 }
-
-
