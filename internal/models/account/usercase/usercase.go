@@ -2,15 +2,19 @@ package usercase
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/nutikuli/internProject_backend/internal/models/account"
+	_accDtos "github.com/nutikuli/internProject_backend/internal/models/account/dtos"
+	"github.com/nutikuli/internProject_backend/internal/models/account/entities"
 	_adminDtos "github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/customer/dtos"
 	_storeDtos "github.com/nutikuli/internProject_backend/internal/models/store/dtos"
 	"github.com/nutikuli/internProject_backend/internal/services/file"
 	_fileEntities "github.com/nutikuli/internProject_backend/internal/services/file/entities"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AccountUsecase struct {
@@ -110,6 +114,68 @@ func (a *AccountUsecase) AccountAdminfile(ctx context.Context) ([]*_adminDtos.Ad
 
 		res = append(res, aFile)
 	}
+	return res, http.StatusOK, nil
+
+}
+
+func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersLogin) (*_accDtos.UserToken, int, error) {
+
+	user, err := a.accountRepo.FindUserAsPassport(ctx, req.Email)
+
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		fmt.Println(err.Error())
+		return nil, http.StatusInternalServerError, err
+	}
+
+	userToken, err := a.accountRepo.SignUsersAccessToken(&entities.UserSignToken{
+		Id:       user.Id,
+		Email: req.Email,
+	})
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	return userToken, http.StatusOK, nil
+}
+
+func (a *AccountUsecase) Register(ctx context.Context, req *entities.UserCreatedReq) (*_accDtos.UsersRegisteredRes, int, error) {
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	cred := entities.UserCreatedReq{
+		Password: string(hashedPassword),
+		Email: req.Email,
+		
+	}
+	req.Password = cred.Password
+	log.Info("req", req)
+	user, err := a.accountRepo.CreateUser(ctx, req)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	log.Info("res", user)
+
+	userToken, err := a.accountRepo.SignUsersAccessToken(&entities.UserSignToken{
+		Id:       *user,
+		Email: req.Email,
+	})
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	res := &_accDtos.UsersRegisteredRes{
+		AccessToken: userToken.AccessToken,
+		CreatedAt:   userToken.IssuedAt,
+		ExpiredAt:   userToken.ExpiresIn,
+	}
+
 	return res, http.StatusOK, nil
 
 }
