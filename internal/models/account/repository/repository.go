@@ -6,12 +6,14 @@ import (
 	"errors"
 	"time"
 
+	"os"
+
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/spf13/viper"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+
 	//
 	"github.com/nutikuli/internProject_backend/internal/models/account"
 
@@ -101,7 +103,7 @@ func (a *AccountRepo) FindUserAsPassport(ctx context.Context, email string) (*en
 
 func (a *AccountRepo) SignUsersAccessToken(req *entities.UserSignToken) (*dtos.UserToken, error) {
 	claims := entities.UsersClaims{
-		Id:    req.Id,
+		Role:  req.Role,
 		Email: req.Email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
@@ -114,7 +116,7 @@ func (a *AccountRepo) SignUsersAccessToken(req *entities.UserSignToken) (*dtos.U
 		},
 	}
 
-	mySigningKey := viper.GetString("JWT_SECRET_TOKEN")
+	mySigningKey := os.Getenv("JWT_SECRET_TOKEN")
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	ss, err := token.SignedString([]byte(mySigningKey))

@@ -1,6 +1,6 @@
 package entities
 
 type UserSignToken struct {
-	Id    int64
-	Email string
+	Role  string `json:"role"`
+	Email string `json:"email"`
 }

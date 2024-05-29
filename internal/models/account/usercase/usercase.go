@@ -147,7 +147,7 @@ func (a *AccountUsecase) Login(c *fiber.Ctx, ctx context.Context, req *entities.
 	}
 
 	userToken, err := a.accountRepo.SignUsersAccessToken(&entities.UserSignToken{
-		Id:    user.Id,
+		Role:  user.Role,
 		Email: req.Email,
 	})
 	if err != nil {
@@ -183,7 +183,7 @@ func (a *AccountUsecase) Login(c *fiber.Ctx, ctx context.Context, req *entities.
 
 func (a *AccountUsecase) Register(ctx context.Context, req entities.AccountCredentialGetter) (*_accDtos.UsersRegisteredRes, *entities.UsersCredential, int, error) {
 
-	if req.GetEmail() == nil || req.GetPassword() == nil || req.GetId() == nil {
+	if req.GetEmail() == nil || req.GetPassword() == nil || req.GetRole() == nil {
 		return nil, nil, http.StatusBadRequest, errors.New("Invalid request, not found AccountCredential when registering Account.")
 	}
 
@@ -198,13 +198,14 @@ func (a *AccountUsecase) Register(ctx context.Context, req entities.AccountCrede
 	}
 
 	userToken, err := a.accountRepo.SignUsersAccessToken(&entities.UserSignToken{
-		Id:    *req.GetId(),
+		Role:  *req.GetRole(),
 		Email: *req.GetEmail(),
 	})
 
 	if err != nil {
 		return nil, nil, http.StatusInternalServerError, err
 	}
+
 	// //Receiver email address.
 	//   to := req.Email // <-------------- (3) แก้ไขอีเมลของผู้รับ หากใส่หลายเมล จะไปอยู่ที่ cc
 
