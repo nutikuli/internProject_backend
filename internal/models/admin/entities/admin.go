@@ -9,3 +9,4 @@ type Admin struct {
 	PermissionID  string `db:"permissionId"`
 	entities.Account
 }
+

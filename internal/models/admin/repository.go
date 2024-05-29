@@ -10,5 +10,9 @@ import (
 type AdminRepository interface {
 	GetAccountAdmins(ctx context.Context) (*entities.Admin, error)
 	GetAccountAdminById(ctx context.Context, id *int64) (*entities.Admin, error)
-	//INSERT
-	CreateAdmin(ctx context.Context, admindata *entities.AdminCreatedReq) (*int64, error)}
+	//INSERT ADMIN
+	CreateAdmin(ctx context.Context, admindata *entities.AdminCreatedReq) (*int64, error)
+
+	
+
+}
