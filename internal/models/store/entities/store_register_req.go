@@ -11,3 +11,15 @@ type StoreRegisterReq struct {
 	Role          string ` json:"acc_role" form:"acc_role" binding:"required"`
 	Status        bool   ` json:"acc_status" form:"acc_status" binding:"required"`
 }
+
+func (u *StoreRegisterReq) GetEmail() *string {
+	return &u.Email
+}
+
+func (u *StoreRegisterReq) GetPassword() *string {
+	return &u.Password
+}
+
+func (u *StoreRegisterReq) GetRole() *string {
+	return &u.Role
+}

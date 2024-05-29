@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/nutikuli/internProject_backend/internal/models/account"
+	_accDtos "github.com/nutikuli/internProject_backend/internal/models/account/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/store"
 	_storeDtos "github.com/nutikuli/internProject_backend/internal/models/store/dtos"
 	_storeEntities "github.com/nutikuli/internProject_backend/internal/models/store/entities"
@@ -13,22 +15,31 @@ import (
 )
 
 type storeUsecase struct {
-	storeRepo store.StoreRepository
-	fileRepo  file.FileRepository
+	storeRepo  store.StoreRepository
+	fileRepo   file.FileRepository
+	accUsecase account.AccountUsecase
 }
 
-func NewUsecase(storeRepo store.StoreRepository, fileRepo file.FileRepository) store.StoreUsecase {
+func NewUsecase(storeRepo store.StoreRepository, fileRepo file.FileRepository, accUsecase account.AccountUsecase) store.StoreUsecase {
 	return &storeUsecase{
-		storeRepo: storeRepo,
-		fileRepo:  fileRepo,
+		storeRepo:  storeRepo,
+		fileRepo:   fileRepo,
+		accUsecase: accUsecase,
 	}
 }
 
-func (s *storeUsecase) OnCreateStoreAccount(c *fiber.Ctx, ctx context.Context, storeDatReq *_storeEntities.StoreRegisterReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_storeDtos.StoreWithFileRes, int, error) {
+func (s *storeUsecase) OnCreateStoreAccount(c *fiber.Ctx, ctx context.Context, storeDatReq *_storeEntities.StoreRegisterReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_storeDtos.StoreWithFileRes, *_accDtos.UsersRegisteredRes, int, error) {
+
+	accRegister, usrCred, status, errOnRegister := s.accUsecase.Register(ctx, storeDatReq)
+	if errOnRegister != nil {
+		return nil, nil, status, errOnRegister
+	}
+
+	storeDatReq.Password = usrCred.Password
 
 	newStoreId, err := s.storeRepo.CreateStoreAccount(ctx, *storeDatReq)
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		return nil, nil, http.StatusInternalServerError, err
 	}
 	fileEntity := &_fileEntities.FileEntityReq{
 		EntityType: "STORE",
@@ -46,29 +57,29 @@ func (s *storeUsecase) OnCreateStoreAccount(c *fiber.Ctx, ctx context.Context, s
 
 		_, fUrl, status, errOnCreatedFile := file.EncodeBase64toFile(c, true)
 		if errOnCreatedFile != nil {
-			return nil, status, errOnCreatedFile
+			return nil, nil, status, errOnCreatedFile
 		}
 
 		fDatReq.FileData = *fUrl
 		_, errOnInsertFile := s.fileRepo.CreateFileByEntityAndId(ctx, fDatReq, fileEntity)
 		if errOnInsertFile != nil {
-			return nil, http.StatusInternalServerError, errOnInsertFile
+			return nil, nil, http.StatusInternalServerError, errOnInsertFile
 		}
 	}
 	filesRes, errOnGetFiles := s.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
 	if errOnGetFiles != nil {
-		return nil, http.StatusInternalServerError, errOnGetFiles
+		return nil, nil, http.StatusInternalServerError, errOnGetFiles
 	}
 
 	storeRes, errOnGetStore := s.storeRepo.GetStoreById(ctx, newStoreId)
 	if errOnGetStore != nil {
-		return nil, http.StatusInternalServerError, errOnGetStore
+		return nil, nil, http.StatusInternalServerError, errOnGetStore
 	}
 
 	return &_storeDtos.StoreWithFileRes{
 		StoreData: storeRes,
 		FilesData: filesRes,
-	}, http.StatusOK, nil
+	}, accRegister, http.StatusOK, nil
 
 }
 

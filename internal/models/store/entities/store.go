@@ -1,4 +1,4 @@
- package entities
+package entities
 
 import (
 	"github.com/nutikuli/internProject_backend/internal/models/account/entities"
