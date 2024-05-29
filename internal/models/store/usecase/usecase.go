@@ -17,7 +17,7 @@ type storeUsecase struct {
 	fileRepo  file.FileRepository
 }
 
-func NewStoreUsecase(storeRepo store.StoreRepository, fileRepo file.FileRepository) store.StoreUsecase {
+func NewUsecase(storeRepo store.StoreRepository, fileRepo file.FileRepository) store.StoreUsecase {
 	return &storeUsecase{
 		storeRepo: storeRepo,
 		fileRepo:  fileRepo,
@@ -44,9 +44,9 @@ func (s *storeUsecase) OnCreateStoreAccount(c *fiber.Ctx, ctx context.Context, s
 			EntityId:   *newStoreId,
 		}
 
-		_, fUrl, errOnCreatedFile := file.Base64toFile(c, true)
+		_, fUrl, status, errOnCreatedFile := file.EncodeBase64toFile(c, true)
 		if errOnCreatedFile != nil {
-			return nil, http.StatusConflict, errOnCreatedFile
+			return nil, status, errOnCreatedFile
 		}
 
 		fDatReq.FileData = *fUrl
