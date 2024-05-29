@@ -8,4 +8,6 @@ var SQL_get_account_admin_by_id = `SELECT id,name,password,phone,location,email,
 
 //insert admin account
 
-var SQL_insert_account_admin = `INSERT INTO Account (name,password,phone,location,email,status,permissionId,createAt) VALUE(?,?,?,?,?,?,?,?) ;` 
+var SQL_insert_account_admin = `INSERT INTO Account (name,password,phone,location,email,status,permissionId,createAt) VALUE(?,?,?,?,?,?,?,?) ;`
+
+

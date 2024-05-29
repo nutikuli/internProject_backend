@@ -6,7 +6,6 @@ import (
 
 type Order struct {
 	Id           int64     `db:"id"`
-	OrderId      string    `db:"orderId"`
 	TotalAmount  float64   `db:"totalAmount"`
 	Topic        string    `db:"topic"`
 	SumPrice     float64   `db:"sumPrice"`

@@ -45,11 +45,11 @@ func (a *AdminRepo) GetAccountAdminById(ctx context.Context, id *int64) (*entiti
 }
 
 func (a *AdminRepo) CreateAdmin(ctx context.Context, admindata *entities.AdminCreatedReq) (*int64, error) {
-	
+
 	adminrole := "ADMIN"
 	adminstatus := 1
-	res, err := a.db.ExecContext(ctx, repository_query.SQL_insert_account_admin, admindata.Name, admindata.Password, 
-		admindata.Phone, admindata.Location, admindata.Email,  adminrole, adminstatus, admindata.PermissionID)
+	res, err := a.db.ExecContext(ctx, repository_query.SQL_insert_account_admin, admindata.Name, admindata.Password,
+		admindata.Phone, admindata.Location, admindata.Email, adminrole, adminstatus, admindata.PermissionID)
 	if err != nil {
 		log.Info(err)
 		return nil, err
@@ -62,3 +62,5 @@ func (a *AdminRepo) CreateAdmin(ctx context.Context, admindata *entities.AdminCr
 
 	return &createdId, nil
 }
+
+

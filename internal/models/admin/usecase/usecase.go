@@ -62,9 +62,9 @@ func (a *adminUseCase) OnCreateAdminAccount(c *fiber.Ctx, ctx context.Context, a
 		return nil, http.StatusInternalServerError, errOnGetFiles
 	}
 
-	adminRes, errOnGetStore := a.adminRepo.GetAccountAdminById(ctx, newAdminId)
-	if errOnGetStore != nil {
-		return nil, http.StatusInternalServerError, errOnGetStore
+	adminRes, errOnGetAdmin := a.adminRepo.GetAccountAdminById(ctx, newAdminId)
+	if errOnGetAdmin != nil {
+		return nil, http.StatusInternalServerError, errOnGetAdmin
 	}
 
 	return &_adminDtos.AdminFileRes{
@@ -87,9 +87,9 @@ func (a *adminUseCase) OnGetAdminById(c *fiber.Ctx, ctx context.Context, adminId
 		return nil, http.StatusInternalServerError, errOnGetFiles
 	}
 
-	adminRes, errOnGetStore := a.adminRepo.GetAccountAdminById(ctx , adminId)
-	if errOnGetStore != nil {
-		return nil, http.StatusInternalServerError, errOnGetStore
+	adminRes, errOnGetAdmin := a.adminRepo.GetAccountAdminById(ctx , adminId)
+	if errOnGetAdmin != nil {
+		return nil, http.StatusInternalServerError, errOnGetAdmin
 	}
 
 	return &_adminDtos.AdminFileRes{
