@@ -33,7 +33,7 @@ func (c *CustomerRepo) GetAccountCustomers(ctx context.Context) (*entities.Custo
 	return &customer, nil
 }
 
-func (c *CustomerRepo) GetAccountCustomerById(ctx context.Context, id *int64) (*entities.Customer, error) {
+func (c *CustomerRepo) GetCustomerById(ctx context.Context, id *int64) (*entities.Customer, error) {
 	var accountbyid entities.Customer
 
 	err := c.db.GetContext(ctx, &accountbyid, repository_query.SQL_get_account_customer_by_id, "customer", *id)
@@ -45,7 +45,7 @@ func (c *CustomerRepo) GetAccountCustomerById(ctx context.Context, id *int64) (*
 	return &accountbyid, nil
 }
 
-func (c *CustomerRepo) CreateAccountCustomer(ctx context.Context, user *entities.CustomerRegister) (*int64, error) {
+func (c *CustomerRepo) CreateCustomerAccount(ctx context.Context, user *entities.CustomerRegister) (*int64, error) {
 
 	args := utils.Array{
 		user.Id,
