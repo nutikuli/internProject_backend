@@ -18,7 +18,7 @@ type Account struct {
 }
 
 type AccountCredentialGetter interface {
-	GetId() *int64
+	GetRole() *string
 	GetEmail() *string
 	GetPassword() *string
 }
