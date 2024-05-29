@@ -48,7 +48,7 @@ func (c *OrderRepo) GetOrderById(ctx context.Context, Id *int64) (*entities.Orde
 func (c *OrderRepo) CreateOrder(ctx context.Context, order *entities.OrderCreate) (*int64, error) {
 
 	args := utils.Array{
-		order.OrderId,
+		order.Id,
 		order.TotalAmount,
 		order.Topic,
 		order.SumPrice,

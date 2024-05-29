@@ -6,7 +6,6 @@ import (
 
 type OrderCreate struct {
 	Id           int64     `json:"order_id" form:"order_id" binding:"required"`
-	OrderId      string    `json:"order_orderid" form:"order_orderid" binding:"required"`
 	TotalAmount  float64   `json:"total_amount" form:"total_amount" binding:"required"`
 	Topic        string    `json:"order_topic" form:"order_topic" binding:"required"`
 	SumPrice     float64   `json:"sum_price" form:"sum_price" binding:"required"`
