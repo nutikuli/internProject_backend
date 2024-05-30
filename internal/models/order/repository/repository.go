@@ -45,16 +45,16 @@ func (c *OrderRepo) GetOrderById(ctx context.Context, Id *int64) (*entities.Orde
 	return order, nil
 }
 
-func (c *OrderRepo) GetOrderByStoreId(ctx context.Context, Id *int64) (*entities.Order, error) {
-	order := &entities.Order{}
+func (c *OrderRepo) GetOrdersByStoreId(ctx context.Context, Id *int64) ([]*entities.Order, error) {
+	orders := make([]*entities.Order, 0)
 
-	err := c.db.SelectContext(ctx, order, repository_query.SQL_get_order_by_storeId, *Id)
+	err := c.db.SelectContext(ctx, orders, repository_query.SQL_get_order_by_storeId, *Id)
 	if err != nil {
 		log.Info(err)
 		return nil, err
 	}
 
-	return order, nil
+	return orders, nil
 }
 
 func (c *OrderRepo) CreateOrder(ctx context.Context, order *entities.OrderCreate) (*int64, error) {
