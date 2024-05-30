@@ -32,8 +32,11 @@ type AccountUsecase struct {
 	accountRepo account.AccountRepository
 	fileRepo    file.FileRepository
 	adminUse    admin.AdminUseCase
+	adminUseRepo    admin.AdminRepository
+	customerUseRepo customer.CustomerRepository
 	customerUse customer.CustomerUsecase
 	storeUse    store.StoreUsecase
+	storeUseRepo    store.StoreRepository
 }
 
 func NewFileUsecase(
@@ -41,6 +44,9 @@ func NewFileUsecase(
 	filesRepo file.FileRepository,
 	adminUse admin.AdminUseCase,
 	customerUse customer.CustomerUsecase,
+	adminUseRepo    admin.AdminRepository,
+	customerUseRepo customer.CustomerRepository,
+	storeUseRepo    store.StoreRepository,
 	storeUse store.StoreUsecase) account.AccountUsecase {
 	return &AccountUsecase{
 		accountRepo: accountRepo,
@@ -48,6 +54,9 @@ func NewFileUsecase(
 		adminUse:    adminUse,
 		customerUse: customerUse,
 		storeUse:    storeUse,
+		adminUseRepo: adminUseRepo,
+		customerUseRepo: customerUseRepo,
+		storeUseRepo : storeUseRepo,
 	}
 }
 
@@ -290,10 +299,10 @@ var otpStore = struct {
 
 
 
-func (a *AccountUsecase) ResetPassword(ctx context.Context, req *entities.UsersCredential) (*entities.UpdatePass,int, error) {
+func (a *AccountUsecase) ResetPassword(ctx context.Context, req *entities.UsersCredential) (*entities.UpdatePass,interface{},int, error) {
 	user, err := a.accountRepo.FindUserAsPassport(ctx, req.Email)
 	if err != nil {
-		return  nil,http.StatusInternalServerError, err
+		return  nil,nil,http.StatusInternalServerError, err
 	}
 	log.Debug(user.Email)
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
@@ -305,5 +314,26 @@ func (a *AccountUsecase) ResetPassword(ctx context.Context, req *entities.UsersC
 
 	}
 
-	return repassRes,http.StatusOK,err
+	var roleAccount interface{}
+	switch user.Role {
+	case "CUSTOMER":
+		err:= a.customerUseRepo.UpdateCustomerPasswordById(ctx,repassRes)
+		if err != nil {
+			return nil, nil, http.StatusInternalServerError, err
+		}
+	case "STORE":
+		err:= a.storeUseRepo.UpdateStoreAccountPassword(ctx,*repassRes)
+		if err != nil {
+			return nil, nil, http.StatusInternalServerError, err
+		}
+	case "ADMIN":
+		err := a.adminUseRepo.UpdateAdminPasswordById(ctx,repassRes)
+		if err != nil {
+			return nil, nil, http.StatusInternalServerError, err
+		}
+	default:
+		return nil, nil, http.StatusInternalServerError, errors.New("Can't query the Account Table, Invalid role")
+	}
+
+	return repassRes,roleAccount,http.StatusOK,err
 }

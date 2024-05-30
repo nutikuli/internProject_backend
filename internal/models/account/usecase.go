@@ -18,5 +18,5 @@ type AccountUsecase interface {
 	Login(ctx context.Context, req *entities.UsersCredential) (*_accDtos.UserToken, interface{}, int, error)
 	Register(ctx context.Context, req entities.AccountCredentialGetter) (*_accDtos.UsersRegisteredRes, *entities.UsersCredential, int, error)
 	CheckOTP(c *fiber.Ctx, ctx context.Context, req *entities.UsersCredential) (*_accDtos.OTPres, int, error)
-	ResetPassword(ctx context.Context, req *entities.UsersCredential) (*entities.UpdatePass,int, error)
+	ResetPassword(ctx context.Context, req *entities.UsersCredential) (*entities.UpdatePass,interface{},int, error)
 }
