@@ -110,4 +110,16 @@ func (a *adminUseCase) OnUpdateUserById(ctx context.Context, Id int64, req *enti
 	}
 
 	return http.StatusOK, nil
+} 
+
+
+func (a *adminUseCase) AdminDeleted(ctx context.Context, Id int64) (int,error) {
+
+	err := a.adminRepo.DeleteAdminById(ctx, Id)
+
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("failed to delete admin by ID: %w", err)
+	}
+
+	return http.StatusOK, nil
 }
