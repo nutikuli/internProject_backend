@@ -28,7 +28,7 @@ func NewUsecase(storeRepo store.StoreRepository, fileRepo file.FileRepository, a
 	}
 }
 
-func (s *storeUsecase) OnCreateStoreAccount(c *fiber.Ctx, ctx context.Context, storeDatReq *_storeEntities.StoreRegisterReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_storeDtos.StoreWithFileRes, *_accDtos.UsersRegisteredRes, int, error) {
+func (s *storeUsecase) OnCreateStoreAccount(c *fiber.Ctx, ctx context.Context, storeDatReq *_storeEntities.StoreRegisterReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_storeDtos.StoreWithFileRes, *_accDtos.UserToken, int, error) {
 
 	accRegister, usrCred, status, errOnRegister := s.accUsecase.Register(ctx, storeDatReq)
 	if errOnRegister != nil {
