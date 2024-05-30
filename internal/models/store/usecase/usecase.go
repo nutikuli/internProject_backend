@@ -83,7 +83,7 @@ func (s *storeUsecase) OnCreateStoreAccount(c *fiber.Ctx, ctx context.Context, s
 
 }
 
-func (s *storeUsecase) OnGetStoreById(c *fiber.Ctx, ctx context.Context, storeId *int64) (*_storeDtos.StoreWithFileRes, int, error) {
+func (s *storeUsecase) OnGetStoreById(ctx context.Context, storeId *int64) (*_storeDtos.StoreWithFileRes, int, error) {
 	fileEntity := &_fileEntities.FileEntityReq{
 		EntityType: "STORE",
 		EntityId:   *storeId,

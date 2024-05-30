@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jmoiron/sqlx"
+	_accEntities "github.com/nutikuli/internProject_backend/internal/models/account/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/store"
 	"github.com/nutikuli/internProject_backend/internal/models/store/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/store/repository/repository_query"
@@ -50,4 +51,18 @@ func (s *storeRepo) GetStoreById(ctx context.Context, storeId *int64) (*entities
 	}
 
 	return store, nil
+}
+
+func (s *storeRepo) UpdateStoreAccountPassword(ctx context.Context, req _accEntities.UpdatePass) error {
+	args := utils.Array{
+		req.Password,
+		req.Id,
+	}
+
+	_, err := s.db.ExecContext(ctx, repository_query.UpdateStoreAccountPassword, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
