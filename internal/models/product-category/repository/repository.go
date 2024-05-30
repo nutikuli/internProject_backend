@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jmoiron/sqlx"
 	product_category "github.com/nutikuli/internProject_backend/internal/models/product-category"
@@ -59,4 +60,23 @@ func (s *productCategoryRepo) GetProductCategoriesByStoreId(ctx context.Context,
 	}
 
 	return categories, nil
+}
+
+// DeleteProductCategoryById implements product_category.ProductCategoryRepository.
+func (s *productCategoryRepo) DeleteProductCategoryById(ctx context.Context, categoryId *int64) error {
+	res, err := s.db.ExecContext(ctx, repository_query.DeleteProductCategoryById, categoryId)
+	if err != nil {
+		return err
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if affected == 0 {
+		return errors.New("Error on deleting product category, category not found")
+	}
+
+	return nil
 }
