@@ -93,3 +93,28 @@ func (c *CustomerRepo) UpdateCustomerPasswordById(ctx context.Context, admindata
 
 	return nil
 }
+
+func (r *CustomerRepo) UpdateCustomerById(ctx context.Context, userId int64, user *entities.CustomerUpdateReq) error {
+	args := utils.Array{
+		user.Name,
+		user.Password,
+		user.Phone,
+		user.Location,
+		user.Email,
+		user.Role,
+		user.Status,
+	}
+
+	log.Info(args)
+
+	res, err := r.db.ExecContext(ctx, repository_query.SQL_update_account_customer, args...)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	if affected, _ := res.RowsAffected(); affected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
