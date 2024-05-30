@@ -78,7 +78,7 @@ func (a *adminUseCase) OnCreateAdminAccount(c *fiber.Ctx, ctx context.Context, a
 
 
 
-func (a *adminUseCase) OnGetAdminById(c *fiber.Ctx, ctx context.Context, adminId *int64) (*_adminDtos.AdminFileRes, int, error) {
+func (a *adminUseCase) OnGetAdminById( ctx context.Context, adminId *int64) (*_adminDtos.AdminFileRes, int, error) {
 	fileEntity := &_fileEntities.FileEntityReq{
 		EntityType: "ADMIN",
 		EntityId:   *adminId,

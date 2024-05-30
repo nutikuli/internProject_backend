@@ -8,6 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/nutikuli/internProject_backend/internal/models/admin"
 	"github.com/nutikuli/internProject_backend/internal/models/admin/entities"
+	_accountEntities "github.com/nutikuli/internProject_backend/internal/models/account/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/admin/repository/repository_query"
 	"github.com/nutikuli/internProject_backend/pkg/utils"
 )
@@ -104,6 +105,34 @@ func (a *AdminRepo) DeleteAdminById(ctx context.Context, Id int64) error {
 	}
 
 	return nil
-}
+} 
+
+
+
+
+func (a * AdminRepo) UpdateAdminPasswordById(ctx context.Context,  admindata *_accountEntities.UpdatePass) error {
+	args := utils.Array{
+		admindata.Id,
+		admindata.Password,
+		admindata.Role,
+		
+		
+	}
+
+	log.Info(args)
+
+	res, err := a.db.ExecContext(ctx, repository_query.SQL_update_password_account_admin, args...)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	if affected, _ := res.RowsAffected(); affected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+} 
+
+
 
 

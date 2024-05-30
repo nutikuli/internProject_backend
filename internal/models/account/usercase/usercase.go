@@ -140,7 +140,7 @@ func (a *AccountUsecase) AccountAdminfile(ctx context.Context) ([]*_adminDtos.Ad
 
 }
 
-func (a *AccountUsecase) Login(c *fiber.Ctx, ctx context.Context, req *entities.UsersCredential) (*_accDtos.UserToken, interface{}, int, error) {
+func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersCredential) (*_accDtos.UserToken, interface{}, int, error) {
 
 	user, err := a.accountRepo.FindUserAsPassport(ctx, req.Email)
 
@@ -163,19 +163,19 @@ func (a *AccountUsecase) Login(c *fiber.Ctx, ctx context.Context, req *entities.
 	var roleAccount interface{}
 	switch user.Role {
 	case "CUSTOMER":
-		acc, status, err := a.customerUse.OnGetCustomerById(c, ctx, &user.Id)
+		acc, status, err := a.customerUse.OnGetCustomerById(ctx, &user.Id)
 		if err != nil {
 			return nil, nil, status, err
 		}
 		roleAccount = acc
 	case "STORE":
-		acc, status, err := a.storeUse.OnGetStoreById(c, ctx, &user.Id)
+		acc, status, err := a.storeUse.OnGetStoreById(ctx, &user.Id)
 		if err != nil {
 			return nil, nil, status, err
 		}
 		roleAccount = acc
 	case "ADMIN":
-		acc, status, err := a.adminUse.OnGetAdminById(c, ctx, &user.Id)
+		acc, status, err := a.adminUse.OnGetAdminById( ctx, &user.Id)
 		if err != nil {
 			return nil, nil, status, err
 		}

@@ -49,7 +49,7 @@ func (s *customerUsecase) OnCreateCustomerAccount(c *fiber.Ctx, ctx context.Cont
 
 }
 
-func (s *customerUsecase) OnGetCustomerById(c *fiber.Ctx, ctx context.Context, Id *int64) (*_customerDtos.CustomerAccountFileRes, int, error) {
+func (s *customerUsecase) OnGetCustomerById(ctx context.Context, Id *int64) (*_customerDtos.CustomerAccountFileRes, int, error) {
 
 	customerRes, errOnGetCustomer := s.customerRepo.GetCustomerById(ctx, Id)
 	if errOnGetCustomer != nil {
