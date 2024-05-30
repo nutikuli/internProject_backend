@@ -124,3 +124,13 @@ func (p *productUsecase) OnGetProductsByStoreId(ctx context.Context, storeId int
 
 	return productsFileRes, http.StatusInternalServerError, nil
 }
+
+// OnDeleteProductById implements product.ProductUsecase.
+func (p *productUsecase) OnDeleteProductById(ctx context.Context, productId int64) (int, error) {
+	err := p.productRepo.DeleteProductById(ctx, &productId)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}

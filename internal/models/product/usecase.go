@@ -13,4 +13,5 @@ type ProductUsecase interface {
 	OnGetProductsByStoreId(ctx context.Context, storeId int64) ([]*dtos.ProductFileRes, int, error)
 	OnGetProductById(ctx context.Context, productId int64) (*dtos.ProductFileRes, int, error)
 	OnCreateProduct(c *fiber.Ctx, ctx context.Context, productDatReq *entities.ProductCreateReq, fileDatReq []*_fileEntities.FileUploaderReq) (*dtos.ProductFileRes, int, error)
+	OnDeleteProductById(ctx context.Context, productId int64) (int, error)
 }
