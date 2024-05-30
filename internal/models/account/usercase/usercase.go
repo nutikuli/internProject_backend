@@ -296,10 +296,11 @@ func (a *AccountUsecase) ResetPassword(ctx context.Context, req *entities.UsersC
 		return  nil,http.StatusInternalServerError, err
 	}
 	log.Debug(user.Email)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 
 	repassRes := &entities.UpdatePass{
 		Id: user.Id,
-		Password: user.Password,
+		Password: string(hashedPassword),
 		Role: user.Role,
 
 	}
