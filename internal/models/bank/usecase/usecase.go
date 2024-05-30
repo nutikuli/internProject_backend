@@ -55,12 +55,13 @@ func (a *bankUseCase) OnCreateBank(c *fiber.Ctx, ctx context.Context, bankDatReq
 			return nil, http.StatusInternalServerError, errOnInsertFile
 		}
 	}
+
 	filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
 	if errOnGetFiles != nil {
 		return nil, http.StatusInternalServerError, errOnGetFiles
 	}
 
-	bankRes, errOnGetStore := a.bankRepo.GetBanksById(ctx, newBankId)
+	bankRes, errOnGetStore := a.bankRepo.GetBankById(ctx, newBankId)
 	if errOnGetStore != nil {
 		return nil, http.StatusInternalServerError, errOnGetStore
 	}
@@ -72,26 +73,33 @@ func (a *bankUseCase) OnCreateBank(c *fiber.Ctx, ctx context.Context, bankDatReq
 
 }
 
-func (a *bankUseCase) OnGetBanksById(c *fiber.Ctx, ctx context.Context, bankId *int64) ([]*_bankDtos.BankFileRes, int, error) {
-	fileEntity := &_fileEntities.FileEntityReq{
-		EntityType: "BANK",
-		EntityId:   *bankId,
-	}
+func (a *bankUseCase) OnGetBanksByStoreId(ctx context.Context, storeId *int64) ([]*_bankDtos.BankFileRes, int, error) {
 
-	filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
-	if errOnGetFiles != nil {
-		return nil, http.StatusInternalServerError, errOnGetFiles
-	}
-
-	bankRes, errOnGetStore := a.bankRepo.GetBanksByStoreId(ctx, bankId)
+	bankRes, errOnGetStore := a.bankRepo.GetBanksByStoreId(ctx, storeId)
 	if errOnGetStore != nil {
 		return nil, http.StatusInternalServerError, errOnGetStore
 	}
 
-	singleRes := &_bankDtos.BankFileRes{
-		BankData:  bankRes,
-		FilesData: filesRes,
+	var bankWithFileRes = make([]*_bankDtos.BankFileRes, 0)
+
+	for _, b := range bankRes {
+		fileEntity := &_fileEntities.FileEntityReq{
+			EntityType: "BANK",
+			EntityId:   b.Id,
+		}
+
+		filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
+		if errOnGetFiles != nil {
+			return nil, http.StatusInternalServerError, errOnGetFiles
+		}
+
+		res := &_bankDtos.BankFileRes{
+			BankData:  b,
+			FilesData: filesRes,
+		}
+
+		bankWithFileRes = append(bankWithFileRes, res)
 	}
 
-	return []*_bankDtos.BankFileRes{singleRes}, http.StatusOK, nil
+	return bankWithFileRes, http.StatusOK, nil
 }
