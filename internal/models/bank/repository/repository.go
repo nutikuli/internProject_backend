@@ -32,7 +32,19 @@ func (a *BankRepo) GetBanks(ctx context.Context) (*entities.Bank, error) {
 	return &bank, nil
 }
 
-func (a *BankRepo) GetBankById(ctx context.Context, id *int64) (*entities.Bank, error) {
+func (a *BankRepo) GetBanksByStoreId(ctx context.Context, storeId *int64) (*entities.Bank, error) {
+	var bank entities.Bank
+
+	err := a.db.GetContext(ctx, &bank, repository_query.SQL_get_bank_by_store_id, *storeId)
+	if err != nil {
+		log.Info(err)
+		return nil, err
+	}
+
+	return &bank, nil
+}
+
+func (a *BankRepo) GetBanksById(ctx context.Context, id *int64) (*entities.Bank, error) {
 	var bank entities.Bank
 
 	err := a.db.GetContext(ctx, &bank, repository_query.SQL_get_bank_by_id, *id)

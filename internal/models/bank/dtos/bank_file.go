@@ -1,4 +1,4 @@
-package entities
+package dtos
 
 import (
 	_bankEntities "github.com/nutikuli/internProject_backend/internal/models/bank/entities"
