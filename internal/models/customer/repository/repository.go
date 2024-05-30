@@ -2,9 +2,11 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/jmoiron/sqlx"
+	_accountEntities "github.com/nutikuli/internProject_backend/internal/models/account/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/customer"
 	"github.com/nutikuli/internProject_backend/internal/models/customer/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/customer/repository/repository_query"
@@ -69,4 +71,25 @@ func (c *CustomerRepo) CreateCustomerAccount(ctx context.Context, user *entities
 	userId, _ := res.RowsAffected()
 
 	return &userId, nil
+}
+
+func (c *CustomerRepo) UpdateCustomerPasswordById(ctx context.Context, admindata *_accountEntities.UpdatePass) error {
+	args := utils.Array{
+		admindata.Id,
+		admindata.Password,
+		admindata.Role,
+	}
+
+	log.Info(args)
+
+	res, err := c.db.ExecContext(ctx, repository_query.SQL_update_password_account_customer, args...)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	if affected, _ := res.RowsAffected(); affected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
 }
