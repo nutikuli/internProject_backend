@@ -125,6 +125,7 @@ func (a *AccountRepo) SignUsersAccessToken(req *entities.UserSignToken) (*dtos.U
 	return &dtos.UserToken{
 		AccessToken: ss,
 		TokenType:   "Authorization",
+		Role:        claims.Role,
 		ExpiresIn:   claims.ExpiresAt.String(),
 		IssuedAt:    claims.IssuedAt.String(),
 	}, nil
