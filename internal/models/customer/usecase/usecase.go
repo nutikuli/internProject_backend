@@ -26,7 +26,7 @@ func NewStoreUsecase(customerRepo customer.CustomerRepository, accUsecase accoun
 	}
 }
 
-func (s *customerUsecase) OnCreateCustomerAccount(c *fiber.Ctx, ctx context.Context, customerDatReq *_customerEntities.CustomerRegisterReq) (*_customerDtos.CustomerAccountFileRes, *_accDtos.UsersRegisteredRes, int, error) {
+func (s *customerUsecase) OnCreateCustomerAccount(c *fiber.Ctx, ctx context.Context, customerDatReq *_customerEntities.CustomerRegisterReq) (*_customerDtos.CustomerAccountFileRes, *_accDtos.UserToken, int, error) {
 
 	accRegister, usrCred, status, errOnRegister := s.accUsecase.Register(ctx, customerDatReq)
 	if errOnRegister != nil {
