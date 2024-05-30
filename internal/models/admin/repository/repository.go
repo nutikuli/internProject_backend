@@ -2,12 +2,14 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/jmoiron/sqlx"
 	"github.com/nutikuli/internProject_backend/internal/models/admin"
 	"github.com/nutikuli/internProject_backend/internal/models/admin/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/admin/repository/repository_query"
+	"github.com/nutikuli/internProject_backend/pkg/utils"
 )
 
 type AdminRepo struct {
@@ -61,6 +63,33 @@ func (a *AdminRepo) CreateAdmin(ctx context.Context, admindata *entities.AdminCr
 	}
 
 	return &createdId, nil
+} 
+
+
+func (a * AdminRepo) UpdateAdminById(ctx context.Context, Id int64, admindata *entities.AdminUpdateReq) error {
+	args := utils.Array{
+		admindata.Name,
+		admindata.Password,
+		admindata.Phone,
+		admindata.Location,
+		admindata.Role,
+		admindata.Status,
+		admindata.PermissionID,
+		Id,
+	}
+
+	log.Info(args)
+
+	res, err := a.db.ExecContext(ctx, repository_query.SQL_update_account_admin, args...)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	if affected, _ := res.RowsAffected(); affected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
 }
 
 
