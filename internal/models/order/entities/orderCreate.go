@@ -5,7 +5,6 @@ import (
 )
 
 type OrderCreate struct {
-	Id           int64     `json:"order_id" form:"order_id" binding:"required"`
 	TotalAmount  float64   `json:"total_amount" form:"total_amount" binding:"required"`
 	Topic        string    `json:"order_topic" form:"order_topic" binding:"required"`
 	SumPrice     float64   `json:"sum_price" form:"sum_price" binding:"required"`
@@ -16,6 +15,4 @@ type OrderCreate struct {
 	CustomerId   int64     `json:"customer_id" form:"customer_id" binding:"required"`
 	StoreId      int64     `json:"store_id" form:"store_id" binding:"required"`
 	BankId       int64     `json:"bank_id" form:"bank_id" binding:"required"`
-	CreatedAt    time.Time `json:"created_at" form:"created_at" binding:"required"`
-	UpdatedAt    time.Time `json:"updated_at" form:"updated_at" binding:"required"`
 }
