@@ -44,16 +44,17 @@ func (ld *LogRepo) CreateLogData(ctx context.Context, logdata *entities.LogCreat
 }  
 
 
-func (ld *LogRepo) GetLogData(ctx context.Context) (*entities.LogGetReq, error) {
-	var logdata entities.LogGetReq
+func (ld *LogRepo) GetLogDatas(ctx context.Context) ([]entities.LogGetReq, error) {
 
-	err := ld.db.GetContext(ctx, &logdata, repository_query.SQL_get_logdata)
+	var logdata []entities.LogGetReq
+
+	err := ld.db.SelectContext(ctx, &logdata, repository_query.SQL_get_logdata)
 	if err != nil {
 		log.Info(err)
 		return nil, err
 	}
 
-	return &logdata, nil
+	return logdata, nil
 }
 
 
