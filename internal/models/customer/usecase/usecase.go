@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -9,6 +10,7 @@ import (
 	_accDtos "github.com/nutikuli/internProject_backend/internal/models/account/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/customer"
 	_customerDtos "github.com/nutikuli/internProject_backend/internal/models/customer/dtos"
+	"github.com/nutikuli/internProject_backend/internal/models/customer/entities"
 	_customerEntities "github.com/nutikuli/internProject_backend/internal/models/customer/entities"
 )
 
@@ -58,4 +60,15 @@ func (s *customerUsecase) OnGetCustomerById(ctx context.Context, Id *int64) (*_c
 	return &_customerDtos.CustomerAccountFileRes{
 		Customer: *customerRes,
 	}, http.StatusOK, nil
+}
+
+func (u *customerUsecase) OnUpdateCustomerById(ctx context.Context, userId int64, req *entities.CustomerUpdateReq) (int, error) {
+
+	err := u.customerRepo.UpdateCustomerById(ctx, userId, req)
+
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("failed to update user by ID: %w", err)
+	}
+
+	return http.StatusOK, nil
 }

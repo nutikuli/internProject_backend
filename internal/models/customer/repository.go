@@ -12,4 +12,5 @@ type CustomerRepository interface {
 	GetCustomerById(ctx context.Context, id *int64) (*entities.Customer, error)
 	CreateCustomerAccount(ctx context.Context, user *entities.CustomerRegisterReq) (*int64, error)
 	UpdateCustomerPasswordById(ctx context.Context, admindata *_accountEntities.UpdatePass) error
+	UpdateCustomerById(ctx context.Context, userId int64, user *entities.CustomerUpdateReq) error
 }
