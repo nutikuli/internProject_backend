@@ -11,5 +11,5 @@ import (
 
 type BankUseCase interface {
 	OnCreateBank(c *fiber.Ctx, ctx context.Context, bankDatReq *_bankEntities.BankCreatedReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_bankDtos.BankFileRes, int, error)
-	OnGetBankById(c *fiber.Ctx, ctx context.Context, bankId *int64) (*_bankDtos.BankFileRes, int, error)
+	OnGetBanksById(c *fiber.Ctx, ctx context.Context, bankId *int64) ([]*_bankDtos.BankFileRes, int, error)
 }
