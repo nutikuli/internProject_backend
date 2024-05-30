@@ -1,35 +1,32 @@
 package middlewares
 
 import (
-	"context"
+	
 	"net/http"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"github.com/nutikuli/internProject_backend/internal/models/logdata/repository"
+	"github.com/nutikuli/internProject_backend/internal/models/logdata/entities"
 )
 
 type logger struct {
 	logRepo repository.LogRepo
 }
 
-func NewLogger(logRepo repository.LogRepo) *logger {
+func NewLogger(logRepo repository.LogRepo) *logger { 
 	return &logger{logRepo: logRepo}
 }
 
-func (l *logger) LogRequest() fiber.Handler {
-	// นำข้อมูลจาก log created req ไปสร้าง Record เพิ่มใน Log table
+func (l *logger) LogRequest(c *fiber.Ctx) error {
 
-	ctx := context.Background()
-	newLog, err := l.logRepo.CreateLogData(ctx)
-	if err != nil {
-		return c.Status(http.StatusForbidden).JSON(fiber.Map{
-			"status":      http.StatusText(http.StatusForbidden),
-			"status_code": http.StatusForbidden,
-			"message":     "You don't have permission to access this resource",
-			"raw_message": "",
+    req := new(entities.LogGetReq)
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":      http.StatusText(http.StatusBadRequest),
+			"status_code": http.StatusBadRequest,
+			"message":     "error, invalid request body",
 			"result":      nil,
 		})
 	}
-
 	return c.Next()
 }
