@@ -2,11 +2,13 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/nutikuli/internProject_backend/internal/models/admin"
 	_adminDtos "github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
+	"github.com/nutikuli/internProject_backend/internal/models/admin/entities"
 	_adminEntities "github.com/nutikuli/internProject_backend/internal/models/admin/entities"
 	"github.com/nutikuli/internProject_backend/internal/services/file"
 	_fileEntities "github.com/nutikuli/internProject_backend/internal/services/file/entities"
@@ -96,4 +98,28 @@ func (a *adminUseCase) OnGetAdminById(c *fiber.Ctx, ctx context.Context, adminId
 		AdminData: adminRes,
 		FilesData: filesRes,
 	}, http.StatusOK, nil
+}
+
+
+func (a *adminUseCase) OnUpdateUserById(ctx context.Context, Id int64, req *entities.AdminUpdateReq) (int, error) {
+
+	err := a.adminRepo.UpdateAdminById(ctx, Id, req)
+
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("failed to update user by ID: %w", err)
+	}
+
+	return http.StatusOK, nil
+} 
+
+
+func (a *adminUseCase) AdminDeleted(ctx context.Context, Id int64) (int,error) {
+
+	err := a.adminRepo.DeleteAdminById(ctx, Id)
+
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("failed to delete admin by ID: %w", err)
+	}
+
+	return http.StatusOK, nil
 }

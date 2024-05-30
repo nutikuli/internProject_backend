@@ -22,3 +22,5 @@ var SQL_find_email = `select id, password, role from Account where email = ?;`
 
 var SQL_insert_user = `INSERT INTO Account (name,password,phone,location,email,role,status) 
 	VALUES(?,?,?,?,?,?,?);`
+
+	var SQL__update_password = `UPDATE Userlog SET  password = ? WHERE email = ?`
