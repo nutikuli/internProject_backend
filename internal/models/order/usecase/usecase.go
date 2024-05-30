@@ -6,7 +6,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/nutikuli/internProject_backend/internal/models/bank"
-	_bankEntities "github.com/nutikuli/internProject_backend/internal/models/bank/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/order"
 	_orderDtos "github.com/nutikuli/internProject_backend/internal/models/order/dtos"
 	_orderEntities "github.com/nutikuli/internProject_backend/internal/models/order/entities"
@@ -17,18 +16,18 @@ import (
 type orderUsecase struct {
 	orderRepo order.OrderRepository
 	fileRepo  file.FileRepository
-	bankRepo  bank.BankRepository
+	bankUse   bank.BankUseCase
 }
 
-func NewStoreUsecase(orderRepo order.OrderRepository, fileRepo file.FileRepository, bankRepo bank.BankRepository) order.OrderUsecase {
+func NewOrderUsecase(orderRepo order.OrderRepository, fileRepo file.FileRepository, bankUse bank.BankUseCase) order.OrderUsecase {
 	return &orderUsecase{
 		orderRepo: orderRepo,
 		fileRepo:  fileRepo,
-		bankRepo:  bankRepo,
+		bankUse:   bankUse,
 	}
 }
 
-func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, orderDatReq *_orderEntities.OrderCreate, filesDatReq []*_fileEntities.FileUploaderReq) (*_orderDtos.OrderWithFileRes, int, error) {
+func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, orderDatReq *_orderEntities.OrderCreate, filesDatReq []*_fileEntities.FileUploaderReq) (*_orderDtos.OrderBanksFilesRes, int, error) {
 	newOrderId, err := s.orderRepo.CreateOrder(ctx, orderDatReq)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
@@ -70,21 +69,16 @@ func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, orderDat
 		return nil, http.StatusInternalServerError, errOnGetOrder
 	}
 
-	return &_orderDtos.OrderWithFileRes{
+	return &_orderDtos.OrderBanksFilesRes{
 		OrderData: orderRes,
 		FilesData: filesRes,
 	}, http.StatusOK, nil
 }
 
-func (s *orderUsecase) OnGetOrderById(ctx context.Context, Id *int64) (*_orderDtos.OrderWithFileRes, int, error) {
+func (s *orderUsecase) OnGetOrderById(ctx context.Context, req _orderEntities.StoreAndOrderIdReq) (*_orderDtos.OrderBanksFilesRes, int, error) {
 	fileEntity := &_fileEntities.FileEntityReq{
 		EntityType: "Order",
-		EntityId:   *Id,
-	}
-
-	bankEntity := &_bankEntities.Bank{
-		EntityType: "Order",
-		EntityId:   *Id,
+		EntityId:   *&req.OrderId,
 	}
 
 	filesRes, errOnGetFiles := s.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
@@ -92,17 +86,17 @@ func (s *orderUsecase) OnGetOrderById(ctx context.Context, Id *int64) (*_orderDt
 		return nil, http.StatusInternalServerError, errOnGetFiles
 	}
 
-	orderRes, errOnGetOrder := s.orderRepo.GetOrderById(ctx, Id)
+	orderRes, errOnGetOrder := s.orderRepo.GetOrderById(ctx, &req.OrderId)
 	if errOnGetOrder != nil {
 		return nil, http.StatusInternalServerError, errOnGetOrder
 	}
 
-	banksRes, errOnGetBanks := s.bankRepo.GetBanksByStoreId(ctx, bankEntity)
+	banksRes, status, errOnGetBanks := s.bankUse.OnGetBanksByStoreId(ctx, &req.StoreId)
 	if errOnGetBanks != nil {
-		return nil, http.StatusInternalServerError, errOnGetBanks
+		return nil, status, errOnGetBanks
 	}
 
-	return &_orderDtos.OrderWithFileRes{
+	return &_orderDtos.OrderBanksFilesRes{
 		OrderData: orderRes,
 		FilesData: filesRes,
 		BanksData: banksRes,

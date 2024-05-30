@@ -10,6 +10,6 @@ import (
 )
 
 type OrderUsecase interface {
-	OnGetOrderById(ctx context.Context, Id *int64) (*_orderDtos.OrderWithFileRes, int, error)
-	OnCreateOrder(c *fiber.Ctx, ctx context.Context, orderDatReq *_orderEntities.OrderCreate, filesDatReq []*_fileEntities.FileUploaderReq) (*_orderDtos.OrderWithFileRes, int, error)
+	OnGetOrderById(ctx context.Context, req _orderEntities.StoreAndOrderIdReq) (*_orderDtos.OrderBanksFilesRes, int, error)
+	OnCreateOrder(c *fiber.Ctx, ctx context.Context, orderDatReq *_orderEntities.OrderCreate, filesDatReq []*_fileEntities.FileUploaderReq) (*_orderDtos.OrderBanksFilesRes, int, error)
 }
