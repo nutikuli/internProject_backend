@@ -47,7 +47,7 @@ func (a *AdminRepo) GetAccountAdminById(ctx context.Context, id *int64) (*entiti
 	return &admin, nil
 }
 
-func (a *AdminRepo) CreateAdmin(ctx context.Context, admindata *entities.AdminCreatedReq) (*int64, error) {
+func (a *AdminRepo) CreateAdmin(ctx context.Context, admindata *entities.AdminRegisterReq) (*int64, error) {
 
 	adminrole := "ADMIN"
 	adminstatus := 1
