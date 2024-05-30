@@ -12,7 +12,11 @@ var SQL_insert_account_admin = `INSERT INTO Account (name,password,phone,locatio
 
 //update admin account 
 
-var SQL_update_account_admin = `UPDATE  Account SET name= ?, password = ? ,phone = ?,location = ?,email = ?,status = ?,permissionId = ?,createAt=? WHERE id = ? ;` 
+var SQL_update_account_admin = `UPDATE  Account SET name= ?, password = ? ,phone = ?,location = ?,email = ?,status = ?,permissionId = ?,createAt=? WHERE id = ? ;`
+
+//update password account admin
+
+var SQL_update_password_account_admin = `UPDATE Account SET password = ?  WHERE id = ? ;`
 
 //delete admin account 
 
