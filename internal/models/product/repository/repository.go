@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/nutikuli/internProject_backend/internal/models/product"
@@ -64,4 +65,22 @@ func (s *productRepo) GetProductsByStoreId(ctx context.Context, storeId *int64) 
 	}
 
 	return products, nil
+}
+
+// DeleteProductById implements product.ProductRepository.
+func (s *productRepo) DeleteProductById(ctx context.Context, productId *int64) error {
+	res, err := s.db.ExecContext(ctx, repository_query.DeleteProductById, productId)
+	if err != nil {
+		return err
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		return errors.New("Can't Delete, Product not found")
+	}
+
+	return nil
 }
