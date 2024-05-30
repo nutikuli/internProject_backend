@@ -17,4 +17,5 @@ type AccountUsecase interface {
 	AccountAdminfile(ctx context.Context) ([]*_adminDtos.AdminFileRes, int, error)
 	Login(c *fiber.Ctx, ctx context.Context, req *entities.UsersCredential) (*_accDtos.UserToken, interface{}, int, error)
 	Register(ctx context.Context, req entities.AccountCredentialGetter) (*_accDtos.UsersRegisteredRes, *entities.UsersCredential, int, error)
+	CheckOTP(c *fiber.Ctx, ctx context.Context, req *entities.UsersCredential) (*_accDtos.OTPres, int, error)
 }

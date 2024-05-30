@@ -4,9 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
-
 	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/golang-jwt/jwt/v4"
@@ -15,8 +14,7 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	//
-	"github.com/nutikuli/internProject_backend/internal/models/account"
-
+	"github.com/nutikuli/internProject_backend/internal/models/account" //
 	"github.com/nutikuli/internProject_backend/internal/models/account/entities"
 	"github.com/nutikuli/internProject_backend/pkg/utils"
 
@@ -96,6 +94,7 @@ func (a *AccountRepo) FindUserAsPassport(ctx context.Context, email string) (*en
 		Id:       userData.Id,
 		Email:    userData.Email,
 		Password: userData.Password,
+		Role:     userData.Role,
 	}
 
 	return userPassport, nil
