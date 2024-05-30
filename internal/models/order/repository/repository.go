@@ -15,40 +15,51 @@ type OrderRepo struct {
 	db *sqlx.DB
 }
 
-func NewFileRepository(db *sqlx.DB) order.OrderRepository {
+func NewOrderRepository(db *sqlx.DB) order.OrderRepository {
 	return &OrderRepo{
 		db: db,
 	}
 }
 
-func (c *OrderRepo) GetOrderByCustomer(ctx context.Context) (*entities.Order, error) {
-	var orderbycustomer entities.Order
+func (c *OrderRepo) GetOrderByCustomerId(ctx context.Context, id *int64) (*entities.Order, error) {
+	var order = &entities.Order{}
 
-	err := c.db.GetContext(ctx, &orderbycustomer, repository_query.SQL_get_order_by_customer, "order_bycustomer")
+	err := c.db.GetContext(ctx, order, repository_query.SQL_get_order_by_customerId, id)
 	if err != nil {
 		log.Info(err)
 		return nil, err
 	}
 
-	return &orderbycustomer, nil
+	return order, nil
 }
 
 func (c *OrderRepo) GetOrderById(ctx context.Context, Id *int64) (*entities.Order, error) {
-	var orderbyid entities.Order
+	order := &entities.Order{}
 
-	err := c.db.GetContext(ctx, &orderbyid, repository_query.SQL_get_order_by_Id, "order", *Id)
+	err := c.db.SelectContext(ctx, order, repository_query.SQL_get_order_by_Id, *Id)
 	if err != nil {
 		log.Info(err)
 		return nil, err
 	}
 
-	return &orderbyid, nil
+	return order, nil
+}
+
+func (c *OrderRepo) GetOrderByStoreId(ctx context.Context, Id *int64) (*entities.Order, error) {
+	order := &entities.Order{}
+
+	err := c.db.SelectContext(ctx, order, repository_query.SQL_get_order_by_storeId, *Id)
+	if err != nil {
+		log.Info(err)
+		return nil, err
+	}
+
+	return order, nil
 }
 
 func (c *OrderRepo) CreateOrder(ctx context.Context, order *entities.OrderCreate) (*int64, error) {
 
 	args := utils.Array{
-		order.Id,
 		order.TotalAmount,
 		order.Topic,
 		order.SumPrice,
@@ -59,8 +70,6 @@ func (c *OrderRepo) CreateOrder(ctx context.Context, order *entities.OrderCreate
 		order.CustomerId,
 		order.StoreId,
 		order.BankId,
-		order.CreatedAt,
-		order.UpdatedAt,
 	}
 
 	log.Info(args)
