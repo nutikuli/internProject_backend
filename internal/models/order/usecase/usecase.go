@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/nutikuli/internProject_backend/internal/models/bank"
+	_bankEntities "github.com/nutikuli/internProject_backend/internal/models/bank/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/order"
 	_orderDtos "github.com/nutikuli/internProject_backend/internal/models/order/dtos"
 	_orderEntities "github.com/nutikuli/internProject_backend/internal/models/order/entities"
@@ -15,12 +17,14 @@ import (
 type orderUsecase struct {
 	orderRepo order.OrderRepository
 	fileRepo  file.FileRepository
+	bankRepo  bank.BankRepository
 }
 
-func NewStoreUsecase(orderRepo order.OrderRepository, fileRepo file.FileRepository) order.OrderUsecase {
+func NewStoreUsecase(orderRepo order.OrderRepository, fileRepo file.FileRepository, bankRepo bank.BankRepository) order.OrderUsecase {
 	return &orderUsecase{
 		orderRepo: orderRepo,
 		fileRepo:  fileRepo,
+		bankRepo:  bankRepo,
 	}
 }
 
@@ -44,9 +48,9 @@ func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, orderDat
 			EntityId:   *newOrderId,
 		}
 
-		_, fUrl, errOnCreatedFile := file.Base64toFile(c, true)
+		_, fUrl, status, errOnCreatedFile := file.EncodeBase64toFile(c, true)
 		if errOnCreatedFile != nil {
-			return nil, http.StatusConflict, errOnCreatedFile
+			return nil, status, errOnCreatedFile
 		}
 
 		fDatReq.FileData = *fUrl
@@ -72,8 +76,13 @@ func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, orderDat
 	}, http.StatusOK, nil
 }
 
-func (s *orderUsecase) OnGetOrderById(c *fiber.Ctx, ctx context.Context, Id *int64) (*_orderDtos.OrderWithFileRes, int, error) {
+func (s *orderUsecase) OnGetOrderById(ctx context.Context, Id *int64) (*_orderDtos.OrderWithFileRes, int, error) {
 	fileEntity := &_fileEntities.FileEntityReq{
+		EntityType: "Order",
+		EntityId:   *Id,
+	}
+
+	bankEntity := &_bankEntities.Bank{
 		EntityType: "Order",
 		EntityId:   *Id,
 	}
@@ -88,8 +97,14 @@ func (s *orderUsecase) OnGetOrderById(c *fiber.Ctx, ctx context.Context, Id *int
 		return nil, http.StatusInternalServerError, errOnGetOrder
 	}
 
+	banksRes, errOnGetBanks := s.bankRepo.GetBanksByStoreId(ctx, bankEntity)
+	if errOnGetBanks != nil {
+		return nil, http.StatusInternalServerError, errOnGetBanks
+	}
+
 	return &_orderDtos.OrderWithFileRes{
 		OrderData: orderRes,
 		FilesData: filesRes,
+		BanksData: banksRes,
 	}, http.StatusOK, nil
 }
