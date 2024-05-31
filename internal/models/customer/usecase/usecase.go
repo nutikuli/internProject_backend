@@ -40,7 +40,7 @@ func (s *customerUsecase) OnCreateCustomerAccount(c *fiber.Ctx, ctx context.Cont
 		return nil, nil, http.StatusInternalServerError, err
 	}
 
-	customerRes, errOnGetCustomer := s.customerRepo.GetCustomerById(ctx, newCustomerId)
+	customerRes, errOnGetCustomer := s.customerRepo.GetCustomerById(ctx, *newCustomerId)
 	if errOnGetCustomer != nil {
 		return nil, nil, http.StatusInternalServerError, errOnGetCustomer
 	}
@@ -51,7 +51,7 @@ func (s *customerUsecase) OnCreateCustomerAccount(c *fiber.Ctx, ctx context.Cont
 
 }
 
-func (s *customerUsecase) OnGetCustomerById(ctx context.Context, Id *int64) (*_customerDtos.CustomerAccountFileRes, int, error) {
+func (s *customerUsecase) OnGetCustomerById(ctx context.Context, Id int64) (*_customerDtos.CustomerAccountFileRes, int, error) {
 
 	customerRes, errOnGetCustomer := s.customerRepo.GetCustomerById(ctx, Id)
 	if errOnGetCustomer != nil {
@@ -68,6 +68,17 @@ func (u *customerUsecase) OnUpdateCustomerById(ctx context.Context, userId int64
 
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("failed to update user by ID: %w", err)
+	}
+
+	return http.StatusOK, nil
+}
+
+func (u *customerUsecase) OnDeletedCustomer(ctx context.Context, Id int64) (int, error) {
+
+	err := u.customerRepo.DeleteCustomerById(ctx, Id)
+
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("failed to delete user by ID: %w", err)
 	}
 
 	return http.StatusOK, nil

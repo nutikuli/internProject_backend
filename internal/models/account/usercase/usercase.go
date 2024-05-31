@@ -172,7 +172,7 @@ func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersCredentia
 	var roleAccount interface{}
 	switch user.Role {
 	case "CUSTOMER":
-		acc, status, err := a.customerUse.OnGetCustomerById(ctx, &user.Id)
+		acc, status, err := a.customerUse.OnGetCustomerById(ctx, user.Id)
 		if err != nil {
 			return nil, nil, status, err
 		}
