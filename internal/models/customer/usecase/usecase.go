@@ -72,3 +72,14 @@ func (u *customerUsecase) OnUpdateCustomerById(ctx context.Context, userId int64
 
 	return http.StatusOK, nil
 }
+
+func (u *customerUsecase) OnDeletedCustomer(ctx context.Context, Id int64) (int, error) {
+
+	err := u.customerRepo.DeleteCustomerById(ctx, Id)
+
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("failed to delete user by ID: %w", err)
+	}
+
+	return http.StatusOK, nil
+}

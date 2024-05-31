@@ -118,3 +118,16 @@ func (r *CustomerRepo) UpdateCustomerById(ctx context.Context, userId int64, use
 
 	return nil
 }
+
+func (a *CustomerRepo) DeleteCustomerById(ctx context.Context, Id int64) error {
+	res, err := a.db.ExecContext(ctx, repository_query.SQL_delete_account_customer, Id)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+	if affected, _ := res.RowsAffected(); affected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
