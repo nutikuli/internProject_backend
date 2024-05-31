@@ -32,10 +32,10 @@ func (a *BankRepo) GetBanks(ctx context.Context) ([]*entities.Bank, error) {
 	return banks, nil
 }
 
-func (a *BankRepo) GetBanksByStoreId(ctx context.Context, storeId *int64) ([]*entities.Bank, error) {
+func (a *BankRepo) GetBanksByStoreId(ctx context.Context, storeId int64) ([]*entities.Bank, error) {
 	var banks = make([]*entities.Bank, 0)
 
-	err := a.db.SelectContext(ctx, banks, repository_query.SQL_get_banks_by_store_id, *storeId)
+	err := a.db.SelectContext(ctx, banks, repository_query.SQL_get_banks_by_store_id, storeId)
 	if err != nil {
 		log.Info(err)
 		return nil, err
@@ -44,10 +44,10 @@ func (a *BankRepo) GetBanksByStoreId(ctx context.Context, storeId *int64) ([]*en
 	return banks, nil
 }
 
-func (a *BankRepo) GetBankById(ctx context.Context, id *int64) (*entities.Bank, error) {
+func (a *BankRepo) GetBankById(ctx context.Context, id int64) (*entities.Bank, error) {
 	var bank entities.Bank
 
-	err := a.db.GetContext(ctx, &bank, repository_query.SQL_get_bank_by_id, *id)
+	err := a.db.GetContext(ctx, &bank, repository_query.SQL_get_bank_by_id, id)
 	if err != nil {
 		log.Info(err)
 		return nil, err
