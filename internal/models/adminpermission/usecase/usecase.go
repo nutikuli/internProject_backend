@@ -1,4 +1,4 @@
-package usecase 
+package usecase
 
 import (
 	"context"
@@ -10,25 +10,23 @@ import (
 	_adminpermissionEntities "github.com/nutikuli/internProject_backend/internal/models/adminpermission/entities"
 	"github.com/nutikuli/internProject_backend/internal/services/file"
 	_fileEntities "github.com/nutikuli/internProject_backend/internal/services/file/entities"
-) 
+)
 
 type adminpermissionUseCase struct {
 	adminpermissionRepo adminpermission.AdminPermissionRepository
-	fileRepo file.FileRepository
-} 
-
+	fileRepo            file.FileRepository
+}
 
 func NewAdminpermissionUsecase(adminpermissionRepo adminpermission.AdminPermissionRepository, fileRepo file.FileRepository) adminpermission.AdminpermissionUseCase {
 	return &adminpermissionUseCase{
 		adminpermissionRepo: adminpermissionRepo,
-		fileRepo:  fileRepo,
+		fileRepo:            fileRepo,
 	}
 }
 
-
 func (a *adminpermissionUseCase) OnCreateAdminpermissionAccount(c *fiber.Ctx, ctx context.Context, adminpermissionDatReq *_adminpermissionEntities.AdminPermissionCreatedReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_adminpermissionDtos.AdminPermissionFileRes, int, error) {
 
-	newAdminpermissionId, err := a.adminpermissionRepo.CreateAdminPermission(ctx , adminpermissionDatReq)
+	newAdminpermissionId, err := a.adminpermissionRepo.CreateAdminPermission(ctx, adminpermissionDatReq)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
@@ -62,21 +60,17 @@ func (a *adminpermissionUseCase) OnCreateAdminpermissionAccount(c *fiber.Ctx, ct
 		return nil, http.StatusInternalServerError, errOnGetFiles
 	}
 
-	adminpermissionRes, errOnGetAdminpermission := a.adminpermissionRepo.GetAdminpermissiomById(ctx , newAdminpermissionId)
+	adminpermissionRes, errOnGetAdminpermission := a.adminpermissionRepo.GetAdminpermissiomById(ctx, *newAdminpermissionId)
 	if errOnGetAdminpermission != nil {
 		return nil, http.StatusInternalServerError, errOnGetAdminpermission
 	}
 
 	return &_adminpermissionDtos.AdminPermissionFileRes{
 		AdminpermissionData: adminpermissionRes,
-		FilesData: filesRes,
+		FilesData:           filesRes,
 	}, http.StatusOK, nil
 
 }
-
-
-
-
 
 func (a *adminpermissionUseCase) OnGetAdminpermissionById(c *fiber.Ctx, ctx context.Context, adminpermissionId *int64) (*_adminpermissionDtos.AdminPermissionFileRes, int, error) {
 	fileEntity := &_fileEntities.FileEntityReq{
@@ -89,13 +83,13 @@ func (a *adminpermissionUseCase) OnGetAdminpermissionById(c *fiber.Ctx, ctx cont
 		return nil, http.StatusInternalServerError, errOnGetFiles
 	}
 
-	adminpermissionRes, errOnGetAdminpermission := a.adminpermissionRepo.GetAdminpermissiomById(ctx , adminpermissionId)
+	adminpermissionRes, errOnGetAdminpermission := a.adminpermissionRepo.GetAdminpermissiomById(ctx, *adminpermissionId)
 	if errOnGetAdminpermission != nil {
 		return nil, http.StatusInternalServerError, errOnGetAdminpermission
 	}
 
 	return &_adminpermissionDtos.AdminPermissionFileRes{
 		AdminpermissionData: adminpermissionRes,
-		FilesData: filesRes,
+		FilesData:           filesRes,
 	}, http.StatusOK, nil
 }
