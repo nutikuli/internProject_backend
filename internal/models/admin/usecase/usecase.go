@@ -7,26 +7,29 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/nutikuli/internProject_backend/internal/models/account"
+	_accDtos "github.com/nutikuli/internProject_backend/internal/models/account/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/admin"
 	_adminDtos "github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/admin/entities"
 	_adminEntities "github.com/nutikuli/internProject_backend/internal/models/admin/entities"
+	"github.com/nutikuli/internProject_backend/internal/models/adminpermission"
 	"github.com/nutikuli/internProject_backend/internal/services/file"
 	_fileEntities "github.com/nutikuli/internProject_backend/internal/services/file/entities"
-	_accDtos "github.com/nutikuli/internProject_backend/internal/models/account/dtos"
 )
 
 type adminUseCase struct {
 	adminRepo admin.AdminRepository
 	fileRepo file.FileRepository
 	accUsecase account.AccountUsecase
+	adminpermissionRepo adminpermission.AdminPermissionRepository
 }
 
 
-func NewAdminUsecase(adminRepo admin.AdminRepository, fileRepo file.FileRepository,accUsecase account.AccountUsecase) admin.AdminUseCase {
+func NewAdminUsecase(adminRepo admin.AdminRepository, fileRepo file.FileRepository,accUsecase account.AccountUsecase , adminpermissionRepo adminpermission.AdminPermissionRepository) admin.AdminUseCase {
 	return &adminUseCase{
 		adminRepo: adminRepo,
 		fileRepo:  fileRepo,
+		adminpermissionRepo: adminpermissionRepo,
 		accUsecase: accUsecase,
 	}
 }
@@ -107,10 +110,17 @@ func (a *adminUseCase) OnGetAdminById( ctx context.Context, adminId *int64) (*_a
 	adminRes, errOnGetAdmin := a.adminRepo.GetAccountAdminById(ctx , adminId)
 	if errOnGetAdmin != nil {
 		return nil, http.StatusInternalServerError, errOnGetAdmin
-	}
+	} 
+
+	adminPermissionRes, errOnGetAdminPermission := a.adminpermissionRepo.GetAdminpermissiomById(ctx ,adminId)
+	if errOnGetAdmin != nil {
+		return nil, http.StatusInternalServerError, errOnGetAdminPermission
+	} 
+
 
 	return &_adminDtos.AdminFileRes{
 		AdminData: adminRes,
+		AdminpermissionData : adminPermissionRes,
 		FilesData: filesRes,
 	}, http.StatusOK, nil
 }

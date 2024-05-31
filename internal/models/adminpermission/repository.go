@@ -15,5 +15,11 @@ type AdminPermissionRepository interface {
 	GetAdminPermissions(ctx context.Context) (*entities.AdminPermissionCreatedReq, error)
 
 	// GET ADMIN PERMISSION BY ID
-	GetAdminpermissiomById(ctx context.Context, id *int64) (*entities.Adminpermission, error)
+	GetAdminpermissiomById(ctx context.Context, id *int64) (*entities.Adminpermission, error) 
+
+	//UPDATE 
+	UpdateAdminPermissionById(ctx context.Context, Id int64, adminpermissiondata *entities.AdminPermissionUpdatedReq) error
+
+	//DELETE
+	 DeleteAdminPermissionById(ctx context.Context, Id int64) error
 }
