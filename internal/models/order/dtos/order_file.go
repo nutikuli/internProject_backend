@@ -11,5 +11,5 @@ type OrderBanksFilesRes struct {
 	OrderData         *_orderEntities.Order                 `json:"order_data"`
 	FilesData         []*_fileEntities.File                 `json:"files_data"`
 	BanksData         []*_bankDtos.BankFileRes              `json:"banks_data"`
-	OrdersProductData []*_orderProductEntities.OrderProduct `json:"orderproduct_data"`
+	OrdersProductData []*_orderProductEntities.OrderProduct `json:"order_product_data"`
 }
