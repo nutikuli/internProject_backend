@@ -17,13 +17,13 @@ type customerConn struct {
 	CustomerUse customer.CustomerUsecase
 }
 
-func NewOrderHandler(CustomerUse customer.CustomerUsecase) *customerConn {
+func NewCustomerHandler(CustomerUse customer.CustomerUsecase) *customerConn {
 	return &customerConn{
 		CustomerUse: CustomerUse,
 	}
 }
 
-func (o *customerConn) GetOrdersByStoreId(c *fiber.Ctx) error {
+func (o *customerConn) GetCustomerById(c *fiber.Ctx) error {
 	req, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
