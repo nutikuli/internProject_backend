@@ -31,7 +31,7 @@ type AccountRepo struct {
 	db *sqlx.DB
 }
 
-func NewFileRepository(db *sqlx.DB) account.AccountRepository {
+func NewAccountRepository(db *sqlx.DB) account.AccountRepository {
 	return &AccountRepo{
 		db: db,
 	}

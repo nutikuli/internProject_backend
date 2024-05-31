@@ -1,4 +1,4 @@
-package usercase
+package usecase
 
 import (
 	"context"
@@ -31,29 +31,22 @@ import (
 type AccountUsecase struct {
 	accountRepo     account.AccountRepository
 	fileRepo        file.FileRepository
-	adminUse        admin.AdminUseCase
 	adminUseRepo    admin.AdminRepository
 	customerUseRepo customer.CustomerRepository
-	customerUse     customer.CustomerUsecase
-	storeUse        store.StoreUsecase
 	storeUseRepo    store.StoreRepository
 }
 
-func NewFileUsecase(
+func NewAccountUsecase(
 	accountRepo account.AccountRepository,
 	filesRepo file.FileRepository,
-	adminUse admin.AdminUseCase,
-	customerUse customer.CustomerUsecase,
 	adminUseRepo admin.AdminRepository,
 	customerUseRepo customer.CustomerRepository,
 	storeUseRepo store.StoreRepository,
-	storeUse store.StoreUsecase) account.AccountUsecase {
+) account.AccountUsecase {
 	return &AccountUsecase{
-		accountRepo:     accountRepo,
-		fileRepo:        filesRepo,
-		adminUse:        adminUse,
-		customerUse:     customerUse,
-		storeUse:        storeUse,
+		accountRepo: accountRepo,
+		fileRepo:    filesRepo,
+
 		adminUseRepo:    adminUseRepo,
 		customerUseRepo: customerUseRepo,
 		storeUseRepo:    storeUseRepo,
