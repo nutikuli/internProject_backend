@@ -12,17 +12,17 @@ type order_productUsecase struct {
 	order_productRepo order_product.OrderProductRepository
 }
 
-func NewOrderUsecase(order_productRepo order_product.OrderProductRepository) order_product.OrderProductUsecase {
+func NewOrderProductUsecase(order_productRepo order_product.OrderProductRepository) order_product.OrderProductUsecase {
 	return &order_productUsecase{
 		order_productRepo: order_productRepo,
 	}
 }
 
-func (s *order_productUsecase) OnCreateOrderProduct(ctx context.Context, orders []*entities.OrderProductCreateReq) ([]*int64, int, error) {
+func (s *order_productUsecase) OnCreateOrderProduct(ctx context.Context, orderId int64, orders []*entities.OrderProductCreateReq) ([]*int64, int, error) {
 	var createdOrderIDs = make([]*int64, 0)
 
 	for _, order := range orders {
-		newOrderID, err := s.order_productRepo.CreateOrder(ctx, order)
+		newOrderID, err := s.order_productRepo.CreateOrderProduct(ctx, orderId, order)
 		if err != nil {
 			return nil, http.StatusInternalServerError, err
 		}

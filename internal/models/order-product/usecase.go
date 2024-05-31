@@ -7,5 +7,5 @@ import (
 )
 
 type OrderProductUsecase interface {
-	OnCreateOrderProduct(ctx context.Context, orders []*entities.OrderProductCreateReq) ([]*int64, int, error)
+	OnCreateOrderProduct(ctx context.Context, orderId int64, orderProducts []*entities.OrderProductCreateReq) ([]*int64, int, error)
 }
