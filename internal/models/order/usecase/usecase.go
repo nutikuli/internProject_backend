@@ -75,10 +75,10 @@ func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, orderDat
 	}, http.StatusOK, nil
 }
 
-func (s *orderUsecase) OnGetOrderById(ctx context.Context, req _orderEntities.StoreAndOrderIdReq) (*_orderDtos.OrderBanksFilesRes, int, error) {
+func (s *orderUsecase) OnGetOrderById(ctx context.Context, req *_orderEntities.StoreAndOrderIdReq) (*_orderDtos.OrderBanksFilesRes, int, error) {
 	fileEntity := &_fileEntities.FileEntityReq{
 		EntityType: "Order",
-		EntityId:   *&req.OrderId,
+		EntityId:   req.OrderId,
 	}
 
 	filesRes, errOnGetFiles := s.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
