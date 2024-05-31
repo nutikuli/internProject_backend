@@ -6,31 +6,41 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/nutikuli/internProject_backend/internal/models/bank"
+	_bankDtos "github.com/nutikuli/internProject_backend/internal/models/bank/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/order"
 	order_product "github.com/nutikuli/internProject_backend/internal/models/order-product"
+	_orderProductEntities "github.com/nutikuli/internProject_backend/internal/models/order-product/entities"
 	_orderDtos "github.com/nutikuli/internProject_backend/internal/models/order/dtos"
 	_orderEntities "github.com/nutikuli/internProject_backend/internal/models/order/entities"
+	"github.com/nutikuli/internProject_backend/internal/models/product"
 	"github.com/nutikuli/internProject_backend/internal/services/file"
 	_fileEntities "github.com/nutikuli/internProject_backend/internal/services/file/entities"
 )
 
 type orderUsecase struct {
-	orderRepo         order.OrderRepository
-	fileRepo          file.FileRepository
-	bankUse           bank.BankUseCase
-	ordersProductRepo order_product.OrderProductRepository
+	orderRepo        order.OrderRepository
+	fileRepo         file.FileRepository
+	bankUse          bank.BankUseCase
+	productUse       product.ProductUsecase
+	ordersProductUse order_product.OrderProductUsecase
 }
 
-func NewOrderUsecase(orderRepo order.OrderRepository, fileRepo file.FileRepository, bankUse bank.BankUseCase, ordersProductRepo order_product.OrderProductRepository) order.OrderUsecase {
+func NewOrderUsecase(
+	orderRepo order.OrderRepository,
+	fileRepo file.FileRepository,
+	bankUse bank.BankUseCase,
+	productUse product.ProductUsecase,
+	ordersProductUse order_product.OrderProductUsecase) order.OrderUsecase {
 	return &orderUsecase{
-		orderRepo:         orderRepo,
-		fileRepo:          fileRepo,
-		bankUse:           bankUse,
-		ordersProductRepo: ordersProductRepo,
+		orderRepo:        orderRepo,
+		fileRepo:         fileRepo,
+		bankUse:          bankUse,
+		productUse:       productUse,
+		ordersProductUse: ordersProductUse,
 	}
 }
 
-func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, orderDatReq *_orderEntities.OrderCreate, filesDatReq []*_fileEntities.FileUploaderReq) (*_orderDtos.OrderBanksFilesRes, int, error) {
+func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, bankId int64, orderDatReq *_orderEntities.OrderCreate, filesDatReq []*_fileEntities.FileUploaderReq, orderProductsReq []*_orderProductEntities.OrderProductCreateReq) (*_orderDtos.OrderBanksFilesRes, int, error) {
 	newOrderId, err := s.orderRepo.CreateOrder(ctx, orderDatReq)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
@@ -62,6 +72,18 @@ func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, orderDat
 		}
 	}
 
+	_, status, err := s.ordersProductUse.OnCreateOrderProduct(ctx, *newOrderId, orderProductsReq)
+	if err != nil {
+		return nil, status, err
+	}
+
+	prodRes, status, err := s.productUse.OnGetProductsByOrderId(ctx, *newOrderId)
+	if err != nil {
+		return nil, status, err
+	}
+
+	bankRes, status, err := s.bankUse.OnGetBankByBankId(ctx, bankId)
+
 	filesRes, errOnGetFiles := s.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
 	if errOnGetFiles != nil {
 		return nil, http.StatusInternalServerError, errOnGetFiles
@@ -73,8 +95,10 @@ func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, orderDat
 	}
 
 	return &_orderDtos.OrderBanksFilesRes{
-		OrderData: orderRes,
-		FilesData: filesRes,
+		OrderData:         orderRes,
+		FilesData:         filesRes,
+		BanksData:         []*_bankDtos.BankFileRes{bankRes},
+		OrdersProductData: prodRes,
 	}, http.StatusOK, nil
 }
 
@@ -94,15 +118,21 @@ func (s *orderUsecase) OnGetOrderById(ctx context.Context, req *_orderEntities.S
 		return nil, http.StatusInternalServerError, errOnGetOrder
 	}
 
-	banksRes, status, errOnGetBanks := s.bankUse.OnGetBanksByStoreId(ctx, &req.StoreId)
+	banksRes, status, errOnGetBanks := s.bankUse.OnGetBanksByStoreId(ctx, req.StoreId)
 	if errOnGetBanks != nil {
 		return nil, status, errOnGetBanks
 	}
 
+	ordersProductRes, status, errOnGetOrdersProduct := s.productUse.OnGetProductsByOrderId(ctx, req.OrderId)
+	if errOnGetOrdersProduct != nil {
+		return nil, status, errOnGetOrdersProduct
+	}
+
 	return &_orderDtos.OrderBanksFilesRes{
-		OrderData: orderRes,
-		FilesData: filesRes,
-		BanksData: banksRes,
+		OrderData:         orderRes,
+		FilesData:         filesRes,
+		BanksData:         banksRes,
+		OrdersProductData: ordersProductRes,
 	}, http.StatusOK, nil
 }
 
@@ -125,14 +155,14 @@ func (s *orderUsecase) OnGetOrdersByStoreId(ctx context.Context, storeId *int64)
 			return nil, http.StatusInternalServerError, errOnGetFiles
 		}
 
-		banksRes, status, errOnGetBanks := s.bankUse.OnGetBanksByStoreId(ctx, &o.StoreId)
+		banksRes, status, errOnGetBanks := s.bankUse.OnGetBanksByStoreId(ctx, o.StoreId)
 		if errOnGetBanks != nil {
 			return nil, status, errOnGetBanks
 		}
 
-		ordersProductRes, errOnGetOrdersProduct := s.ordersProductRepo.GetOrderProductByOrderId(ctx, &o.Id)
+		ordersProductRes, status, errOnGetOrdersProduct := s.productUse.OnGetProductsByOrderId(ctx, o.Id)
 		if errOnGetOrdersProduct != nil {
-			return nil, 0, errOnGetOrdersProduct
+			return nil, status, errOnGetOrdersProduct
 		}
 
 		res := &_orderDtos.OrderBanksFilesRes{
@@ -167,14 +197,14 @@ func (s *orderUsecase) OnGetOrdersByCustomerId(ctx context.Context, customerId *
 			return nil, http.StatusInternalServerError, errOnGetFiles
 		}
 
-		banksRes, status, errOnGetBanks := s.bankUse.OnGetBanksByStoreId(ctx, &o.StoreId)
+		banksRes, status, errOnGetBanks := s.bankUse.OnGetBanksByStoreId(ctx, o.StoreId)
 		if errOnGetBanks != nil {
 			return nil, status, errOnGetBanks
 		}
 
-		ordersProductRes, errOnGetOrdersProduct := s.ordersProductRepo.GetOrderProductByOrderId(ctx, &o.Id)
+		ordersProductRes, status, errOnGetOrdersProduct := s.productUse.OnGetProductsByOrderId(ctx, o.Id)
 		if errOnGetOrdersProduct != nil {
-			return nil, 0, errOnGetOrdersProduct
+			return nil, status, errOnGetOrdersProduct
 		}
 
 		res := &_orderDtos.OrderBanksFilesRes{
