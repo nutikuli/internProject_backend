@@ -41,7 +41,7 @@ func (o *bankConn) GetBanksByStoreId(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	customer, status, err := o.BankUse.OnGetBanksByStoreId(ctx, &req)
+	customer, status, err := o.BankUse.OnGetBanksByStoreId(ctx, req)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
@@ -97,6 +97,41 @@ func (o *bankConn) CreateBank(c *fiber.Ctx) error {
 
 	// Call OnCreateBank with all four arguments
 	bank, status, err := o.BankUse.OnCreateBank(c, ctx, bankReq, fileReqs)
+	if err != nil {
+		return c.Status(status).JSON(fiber.Map{
+			"status":      http.StatusText(status),
+			"status_code": status,
+			"message":     err.Error(),
+			"result":      nil,
+		})
+	}
+
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"status":      http.StatusText(http.StatusOK),
+		"status_code": http.StatusOK,
+		"message":     "",
+		"result":      bank,
+	})
+}
+
+func (o *bankConn) GetBankById(c *fiber.Ctx) error {
+	req, err := strconv.ParseInt(c.Params("id"), 10, 64)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":      http.StatusText(http.StatusBadRequest),
+			"status_code": http.StatusBadRequest,
+			"message":     "error, invalid request id param",
+			"result":      nil,
+		})
+	}
+
+	var (
+		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
+	)
+
+	defer cancel()
+
+	bank, status, err := o.BankUse.OnGetBankByBankId(ctx, req)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
