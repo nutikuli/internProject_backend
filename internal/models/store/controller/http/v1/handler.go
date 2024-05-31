@@ -49,7 +49,7 @@ func (s *storeConn) RegisterStoreAccount(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"status":      fiber.StatusCreated,
 		"status_code": fiber.StatusCreated,
-		"message":     "",
+		"message":     nil,
 		"result": dtos.StoreTokenFileRes{
 			Store: storeRes,
 			Token: userToken,
@@ -91,7 +91,7 @@ func (s *storeConn) GetStoreById(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status":      fiber.StatusOK,
 		"status_code": fiber.StatusOK,
-		"message":     "",
+		"message":     nil,
 		"result":      storeRes,
 	})
 }
