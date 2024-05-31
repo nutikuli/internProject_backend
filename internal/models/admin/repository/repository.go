@@ -6,9 +6,9 @@ import (
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/jmoiron/sqlx"
+	_accountEntities "github.com/nutikuli/internProject_backend/internal/models/account/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/admin"
 	"github.com/nutikuli/internProject_backend/internal/models/admin/entities"
-	_accountEntities "github.com/nutikuli/internProject_backend/internal/models/account/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/admin/repository/repository_query"
 	"github.com/nutikuli/internProject_backend/pkg/utils"
 )
@@ -35,10 +35,10 @@ func (a *AdminRepo) GetAccountAdmins(ctx context.Context) (*entities.Admin, erro
 	return &admin, nil
 }
 
-func (a *AdminRepo) GetAccountAdminById(ctx context.Context, id *int64) (*entities.Admin, error) {
+func (a *AdminRepo) GetAccountAdminById(ctx context.Context, id int64) (*entities.Admin, error) {
 	var admin entities.Admin
 
-	err := a.db.GetContext(ctx, &admin, repository_query.SQL_get_account_admin_by_id, "ADMIN", *id)
+	err := a.db.GetContext(ctx, &admin, repository_query.SQL_get_account_admin_by_id, "ADMIN", id)
 	if err != nil {
 		log.Info(err)
 		return nil, err
@@ -64,10 +64,9 @@ func (a *AdminRepo) CreateAdmin(ctx context.Context, admindata *entities.AdminRe
 	}
 
 	return &createdId, nil
-} 
+}
 
-
-func (a * AdminRepo) UpdateAdminById(ctx context.Context, Id int64, admindata *entities.AdminUpdateReq) error {
+func (a *AdminRepo) UpdateAdminById(ctx context.Context, Id int64, admindata *entities.AdminUpdateReq) error {
 	args := utils.Array{
 		admindata.Name,
 		admindata.Password,
@@ -91,8 +90,7 @@ func (a * AdminRepo) UpdateAdminById(ctx context.Context, Id int64, admindata *e
 	}
 
 	return nil
-} 
-
+}
 
 func (a *AdminRepo) DeleteAdminById(ctx context.Context, Id int64) error {
 	res, err := a.db.ExecContext(ctx, repository_query.SQL_delete_account_admin, Id)
@@ -105,18 +103,13 @@ func (a *AdminRepo) DeleteAdminById(ctx context.Context, Id int64) error {
 	}
 
 	return nil
-} 
+}
 
-
-
-
-func (a * AdminRepo) UpdateAdminPasswordById(ctx context.Context,  admindata *_accountEntities.UpdatePass) error {
+func (a *AdminRepo) UpdateAdminPasswordById(ctx context.Context, admindata *_accountEntities.UpdatePass) error {
 	args := utils.Array{
 		admindata.Id,
 		admindata.Password,
 		admindata.Role,
-		
-		
 	}
 
 	log.Info(args)
@@ -131,8 +124,4 @@ func (a * AdminRepo) UpdateAdminPasswordById(ctx context.Context,  admindata *_a
 	}
 
 	return nil
-} 
-
-
-
-
+}
