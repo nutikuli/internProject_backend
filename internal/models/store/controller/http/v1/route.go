@@ -11,7 +11,7 @@ import (
 	_fileRepo "github.com/nutikuli/internProject_backend/internal/services/file/repository"
 )
 
-func UseStoreRoute(db *sqlx.DB, app *fiber.App) {
+func UseStoreRoute(db *sqlx.DB, app fiber.Router) {
 	authR := app.Group("/store", func(c *fiber.Ctx) error {
 		log.Infof("all : %v", c.Request().URI().String())
 		return c.Next()
