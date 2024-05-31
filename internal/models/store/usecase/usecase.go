@@ -20,7 +20,7 @@ type storeUsecase struct {
 	accUsecase account.AccountUsecase
 }
 
-func NewUsecase(storeRepo store.StoreRepository, fileRepo file.FileRepository, accUsecase account.AccountUsecase) store.StoreUsecase {
+func NewStoreUsecase(storeRepo store.StoreRepository, fileRepo file.FileRepository, accUsecase account.AccountUsecase) store.StoreUsecase {
 	return &storeUsecase{
 		storeRepo:  storeRepo,
 		fileRepo:   fileRepo,
