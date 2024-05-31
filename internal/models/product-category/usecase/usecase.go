@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/nutikuli/internProject_backend/internal/models/product-category"
+	product_category "github.com/nutikuli/internProject_backend/internal/models/product-category"
 	"github.com/nutikuli/internProject_backend/internal/models/product-category/entities"
 )
 
@@ -20,7 +20,7 @@ func NewProductCategoryUsecase(prodCate product_category.ProductCategoryReposito
 
 // OnCreateProductCategory implements product_category.ProductCategoryUsecase.
 
-func (p *productCateUsecase) OnCreateProductCategory(ctx context.Context, req entities.ProductCategoryCreatedReq) (*int64, int, error) {
+func (p *productCateUsecase) OnCreateProductCategory(ctx context.Context, req *entities.ProductCategoryCreatedReq) (*int64, int, error) {
 	created, err := p.productCateRepo.CreateProductCategory(ctx, req)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
@@ -30,7 +30,7 @@ func (p *productCateUsecase) OnCreateProductCategory(ctx context.Context, req en
 }
 
 // OnDeleteProductCategoryById implements product_category.ProductCategoryUsecase.
-func (p *productCateUsecase) OnDeleteProductCategoryById(ctx context.Context, categoryId *int64) (int, error) {
+func (p *productCateUsecase) OnDeleteProductCategoryById(ctx context.Context, categoryId int64) (int, error) {
 	err := p.productCateRepo.DeleteProductCategoryById(ctx, categoryId)
 	if err != nil {
 		return http.StatusInternalServerError, err
@@ -40,7 +40,7 @@ func (p *productCateUsecase) OnDeleteProductCategoryById(ctx context.Context, ca
 }
 
 // OnGetProductCategoriesByStoreId implements product_category.ProductCategoryUsecase.
-func (p *productCateUsecase) OnGetProductCategoriesByStoreId(ctx context.Context, storeId *int64) ([]*entities.ProductCategory, int, error) {
+func (p *productCateUsecase) OnGetProductCategoriesByStoreId(ctx context.Context, storeId int64) ([]*entities.ProductCategory, int, error) {
 	categories, err := p.productCateRepo.GetProductCategoriesByStoreId(ctx, storeId)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
@@ -50,7 +50,7 @@ func (p *productCateUsecase) OnGetProductCategoriesByStoreId(ctx context.Context
 }
 
 // OnGetProductCategoryById implements product_category.ProductCategoryUsecase.
-func (p *productCateUsecase) OnGetProductCategoryById(ctx context.Context, categoryId *int64) (*entities.ProductCategory, int, error) {
+func (p *productCateUsecase) OnGetProductCategoryById(ctx context.Context, categoryId int64) (*entities.ProductCategory, int, error) {
 	category, err := p.productCateRepo.GetProductCategoryById(ctx, categoryId)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
