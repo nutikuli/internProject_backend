@@ -134,3 +134,31 @@ func (p *productUsecase) OnDeleteProductById(ctx context.Context, productId int6
 
 	return http.StatusOK, nil
 }
+
+// OnGetProductsByOrderId implements product.ProductUsecase.
+func (p *productUsecase) OnGetProductsByOrderId(ctx context.Context, orderId int64) ([]*dtos.ProductFileRes, int, error) {
+	products, err := p.productRepo.GetProductsByOrderId(ctx, &orderId)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	var productsFileRes []*dtos.ProductFileRes
+	for _, product := range products {
+		fEntity := &_fileEntities.FileEntityReq{
+			EntityType: "PRODUCT",
+			EntityId:   product.Id,
+		}
+
+		files, err := p.fileRepo.GetFilesByIdAndEntity(ctx, fEntity)
+		if err != nil {
+			return nil, http.StatusInternalServerError, err
+		}
+
+		productsFileRes = append(productsFileRes, &dtos.ProductFileRes{
+			Product: product,
+			Files:   files,
+		})
+	}
+
+	return productsFileRes, http.StatusInternalServerError, nil
+}
