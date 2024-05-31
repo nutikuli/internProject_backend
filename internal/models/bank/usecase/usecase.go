@@ -61,7 +61,7 @@ func (a *bankUseCase) OnCreateBank(c *fiber.Ctx, ctx context.Context, bankDatReq
 		return nil, http.StatusInternalServerError, errOnGetFiles
 	}
 
-	bankRes, errOnGetStore := a.bankRepo.GetBankById(ctx, newBankId)
+	bankRes, errOnGetStore := a.bankRepo.GetBankById(ctx, *newBankId)
 	if errOnGetStore != nil {
 		return nil, http.StatusInternalServerError, errOnGetStore
 	}
@@ -73,7 +73,7 @@ func (a *bankUseCase) OnCreateBank(c *fiber.Ctx, ctx context.Context, bankDatReq
 
 }
 
-func (a *bankUseCase) OnGetBanksByStoreId(ctx context.Context, storeId *int64) ([]*_bankDtos.BankFileRes, int, error) {
+func (a *bankUseCase) OnGetBanksByStoreId(ctx context.Context, storeId int64) ([]*_bankDtos.BankFileRes, int, error) {
 
 	bankRes, errOnGetStore := a.bankRepo.GetBanksByStoreId(ctx, storeId)
 	if errOnGetStore != nil {
@@ -102,4 +102,28 @@ func (a *bankUseCase) OnGetBanksByStoreId(ctx context.Context, storeId *int64) (
 	}
 
 	return bankWithFileRes, http.StatusOK, nil
+}
+
+// OnGetBankByBankId implements bank.BankUseCase.
+func (a *bankUseCase) OnGetBankByBankId(ctx context.Context, bankId int64) (*_bankDtos.BankFileRes, int, error) {
+
+	bankRes, errOnGetStore := a.bankRepo.GetBankById(ctx, bankId)
+	if errOnGetStore != nil {
+		return nil, http.StatusInternalServerError, errOnGetStore
+	}
+
+	fileEntity := &_fileEntities.FileEntityReq{
+		EntityType: "BANK",
+		EntityId:   bankId,
+	}
+
+	filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
+	if errOnGetFiles != nil {
+		return nil, http.StatusInternalServerError, errOnGetFiles
+	}
+
+	return &_bankDtos.BankFileRes{
+		BankData:  bankRes,
+		FilesData: filesRes,
+	}, http.StatusOK, nil
 }
