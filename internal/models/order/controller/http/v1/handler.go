@@ -143,7 +143,7 @@ func (o *orderConn) GetOrderById(c *fiber.Ctx) error {
 }
 
 func (o *orderConn) CreateOrder(c *fiber.Ctx) error {
-	req := new(dtos.OrderFileReq)
+	req := new(dtos.OrderFileBankIdOrderProductsReq)
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),
@@ -170,7 +170,7 @@ func (o *orderConn) CreateOrder(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	files, status, err := o.OrderUse.OnCreateOrder(c, ctx, req.OrderData, req.FilesData)
+	files, status, err := o.OrderUse.OnCreateOrder(c, ctx, req.BankId, req.OrderData, req.FilesData, req.OrderProductsData)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
