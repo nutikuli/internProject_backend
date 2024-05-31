@@ -35,10 +35,10 @@ func (c *CustomerRepo) GetAccountCustomers(ctx context.Context) (*entities.Custo
 	return &customer, nil
 }
 
-func (c *CustomerRepo) GetCustomerById(ctx context.Context, id *int64) (*entities.Customer, error) {
+func (c *CustomerRepo) GetCustomerById(ctx context.Context, id int64) (*entities.Customer, error) {
 	var accountbyid entities.Customer
 
-	err := c.db.GetContext(ctx, &accountbyid, repository_query.SQL_get_account_customer_by_id, "customer", *id)
+	err := c.db.GetContext(ctx, &accountbyid, repository_query.SQL_get_account_customer_by_id, "customer", id)
 	if err != nil {
 		log.Info(err)
 		return nil, err
