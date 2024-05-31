@@ -21,7 +21,7 @@ func NewProductCategoryRepository(db *sqlx.DB) product_category.ProductCategoryR
 	}
 }
 
-func (s *productCategoryRepo) CreateProductCategory(ctx context.Context, req entities.ProductCategoryCreatedReq) (*int64, error) {
+func (s *productCategoryRepo) CreateProductCategory(ctx context.Context, req *entities.ProductCategoryCreatedReq) (*int64, error) {
 	args := utils.Array{
 		req.Name,
 		req.Code,
@@ -42,7 +42,7 @@ func (s *productCategoryRepo) CreateProductCategory(ctx context.Context, req ent
 	return &newCategoryId, nil
 }
 
-func (s *productCategoryRepo) GetProductCategoryById(ctx context.Context, categoryId *int64) (*entities.ProductCategory, error) {
+func (s *productCategoryRepo) GetProductCategoryById(ctx context.Context, categoryId int64) (*entities.ProductCategory, error) {
 	var category *entities.ProductCategory
 	err := s.db.GetContext(ctx, category, repository_query.GetProductCategoryById, categoryId)
 	if err != nil {
@@ -52,7 +52,7 @@ func (s *productCategoryRepo) GetProductCategoryById(ctx context.Context, catego
 	return category, nil
 }
 
-func (s *productCategoryRepo) GetProductCategoriesByStoreId(ctx context.Context, storeId *int64) ([]*entities.ProductCategory, error) {
+func (s *productCategoryRepo) GetProductCategoriesByStoreId(ctx context.Context, storeId int64) ([]*entities.ProductCategory, error) {
 	var categories []*entities.ProductCategory
 	err := s.db.SelectContext(ctx, categories, repository_query.GetProductCategoriesByStoreId, storeId)
 	if err != nil {
@@ -63,7 +63,7 @@ func (s *productCategoryRepo) GetProductCategoriesByStoreId(ctx context.Context,
 }
 
 // DeleteProductCategoryById implements product_category.ProductCategoryRepository.
-func (s *productCategoryRepo) DeleteProductCategoryById(ctx context.Context, categoryId *int64) error {
+func (s *productCategoryRepo) DeleteProductCategoryById(ctx context.Context, categoryId int64) error {
 	res, err := s.db.ExecContext(ctx, repository_query.DeleteProductCategoryById, categoryId)
 	if err != nil {
 		return err

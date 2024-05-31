@@ -7,8 +7,8 @@ import (
 )
 
 type ProductCategoryRepository interface {
-	CreateProductCategory(ctx context.Context, req entities.ProductCategoryCreatedReq) (*int64, error)
-	GetProductCategoryById(ctx context.Context, categoryId *int64) (*entities.ProductCategory, error)
-	GetProductCategoriesByStoreId(ctx context.Context, storeId *int64) ([]*entities.ProductCategory, error)
-	DeleteProductCategoryById(ctx context.Context, categoryId *int64) error
+	CreateProductCategory(ctx context.Context, req *entities.ProductCategoryCreatedReq) (*int64, error)
+	GetProductCategoryById(ctx context.Context, categoryId int64) (*entities.ProductCategory, error)
+	GetProductCategoriesByStoreId(ctx context.Context, storeId int64) ([]*entities.ProductCategory, error)
+	DeleteProductCategoryById(ctx context.Context, categoryId int64) error
 }
