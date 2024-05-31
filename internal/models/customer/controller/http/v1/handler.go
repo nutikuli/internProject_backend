@@ -10,7 +10,6 @@ import (
 	"github.com/nutikuli/internProject_backend/internal/models/customer"
 	"github.com/nutikuli/internProject_backend/internal/models/customer/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/customer/entities"
-
 	"github.com/nutikuli/internProject_backend/pkg/utils"
 )
 
@@ -41,7 +40,7 @@ func (o *customerConn) GetOrdersByStoreId(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	customer, status, err := o.CustomerUse.OnGetCustomerById(ctx, &req)
+	customer, status, err := o.CustomerUse.OnGetCustomerById(ctx, req)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
@@ -150,7 +149,7 @@ func (con customerConn) UpdateCustomerById(c *fiber.Ctx) error {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
 			"status_code": status,
-			"message":     err.Error(),
+			"message":     "",
 			"result":      nil,
 		})
 	}
@@ -163,8 +162,8 @@ func (con customerConn) UpdateCustomerById(c *fiber.Ctx) error {
 	})
 }
 
-func (o *customerConn) DeletedCustomer(c *fiber.Ctx) error {
-	req, err := strconv.ParseInt(c.Params("id"), 10, 64)
+func (o *customerConn) GetDeletedCustomerByID(c *fiber.Ctx) error {
+	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),
@@ -174,18 +173,16 @@ func (o *customerConn) DeletedCustomer(c *fiber.Ctx) error {
 		})
 	}
 
-	var (
-		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
-	)
-
+	ctx, cancel := context.WithTimeout(c.Context(), 30*time.Second)
 	defer cancel()
 
-	customer, status, err := o.CustomerUse.OnDeletedCustomer(ctx, &req)
+	customer, err := o.CustomerUse.OnDeletedCustomer(ctx, id)
 	if err != nil {
-		return c.Status(status).JSON(fiber.Map{
-			"status":      http.StatusText(status),
-			"status_code": status,
-			"message":     err.Error(),
+		// Assuming OnGetDeletedCustomerByID returns an error if customer not found
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{
+			"status":      http.StatusText(http.StatusNotFound),
+			"status_code": http.StatusNotFound,
+			"message":     "Customer not found",
 			"result":      nil,
 		})
 	}
