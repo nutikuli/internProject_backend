@@ -41,3 +41,13 @@ func (c *OrderProductRepo) CreateOrder(ctx context.Context, orderProduct *entiti
 
 	return &userId, nil
 }
+
+func (s *OrderProductRepo) GetOrderProductByOrderId(ctx context.Context, orderId *int64) ([]*entities.OrderProduct, error) {
+	var order_products []*entities.OrderProduct
+	err := s.db.SelectContext(ctx, order_products, repository_query.SQL_get_order_products_by_order_id, orderId)
+	if err != nil {
+		return nil, err
+	}
+
+	return order_products, nil
+}

@@ -23,10 +23,10 @@ func NewOrderRepository(db *sqlx.DB) order.OrderRepository {
 	}
 }
 
-func (c *OrderRepo) GetOrderByCustomerId(ctx context.Context, id *int64) (*entities.Order, error) {
-	var order = &entities.Order{}
+func (c *OrderRepo) GetOrdersByCustomerId(ctx context.Context, Id *int64) ([]*entities.Order, error) {
+	var order = make([]*entities.Order, 0)
 
-	err := c.db.GetContext(ctx, order, repository_query.SQL_get_order_by_customerId, id)
+	err := c.db.SelectContext(ctx, order, repository_query.SQL_get_order_by_customerId, *Id)
 	if err != nil {
 		log.Info(err)
 		return nil, err
