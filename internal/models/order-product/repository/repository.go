@@ -21,10 +21,10 @@ func NewOrderRepository(db *sqlx.DB) order_product.OrderProductRepository {
 	}
 }
 
-func (c *OrderProductRepo) CreateOrder(ctx context.Context, orderProduct *entities.OrderProductCreateReq) (*int64, error) {
+func (c *OrderProductRepo) CreateOrderProduct(ctx context.Context, orderId int64, orderProduct *entities.OrderProductCreateReq) (*int64, error) {
 
 	args := utils.Array{
-		orderProduct.OrderId,
+		orderId,
 		orderProduct.ProductId,
 		orderProduct.Quantity,
 	}
@@ -42,7 +42,7 @@ func (c *OrderProductRepo) CreateOrder(ctx context.Context, orderProduct *entiti
 	return &userId, nil
 }
 
-func (s *OrderProductRepo) GetOrderProductByOrderId(ctx context.Context, orderId *int64) ([]*entities.OrderProduct, error) {
+func (s *OrderProductRepo) GetOrderProductByOrderId(ctx context.Context, orderId int64) ([]*entities.OrderProduct, error) {
 	var order_products []*entities.OrderProduct
 	err := s.db.SelectContext(ctx, order_products, repository_query.SQL_get_order_products_by_order_id, orderId)
 	if err != nil {

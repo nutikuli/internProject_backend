@@ -7,6 +7,7 @@ import (
 )
 
 type OrderProductRepository interface {
-	CreateOrder(ctx context.Context, order *entities.OrderProductCreateReq) (*int64, error)
-	GetOrderProductByOrderId(ctx context.Context, orderId *int64) ([]*entities.OrderProduct, error)
+	CreateOrderProduct(ctx context.Context, orderId int64, order *entities.OrderProductCreateReq) (*int64, error)
+	GetOrderProductByOrderId(ctx context.Context, orderId int64) ([]*entities.OrderProduct, error)
+	
 }
