@@ -19,7 +19,7 @@ type customerUsecase struct {
 	accUsecase   account.AccountUsecase
 }
 
-func NewStoreUsecase(customerRepo customer.CustomerRepository, accUsecase account.AccountUsecase) customer.CustomerUsecase {
+func NewCustomerUsecase(customerRepo customer.CustomerRepository, accUsecase account.AccountUsecase) customer.CustomerUsecase {
 	return &customerUsecase{
 		customerRepo: customerRepo,
 		accUsecase:   accUsecase,
