@@ -15,6 +15,8 @@ type OrderRepo struct {
 	db *sqlx.DB
 }
 
+// UpdateOrderTransportDetail implements order.OrderRepository.
+
 func NewOrderRepository(db *sqlx.DB) order.OrderRepository {
 	return &OrderRepo{
 		db: db,
@@ -83,4 +85,42 @@ func (c *OrderRepo) CreateOrder(ctx context.Context, order *entities.OrderCreate
 	userId, _ := res.RowsAffected()
 
 	return &userId, nil
+}
+
+func (c *OrderRepo) UpdateOrderTransportDetail(ctx context.Context, order *entities.OrderTransportDetailReq) error {
+
+	args := utils.Array{
+		order.OrderID,
+		order.DeliveryType,
+		order.ParcelNumber,
+		order.SentDate,
+	}
+
+	log.Info(args)
+
+	_, err := c.db.ExecContext(ctx, repository_query.SQL_update_order_transport_detail, args...)
+	if err != nil {
+		log.Info(err)
+		return err
+	}
+
+	return nil
+}
+
+// UpdateOrderStatus implements order.OrderRepository.
+func (c *OrderRepo) UpdateOrderStatus(ctx context.Context, order *entities.OrderStateReq) error {
+	args := utils.Array{
+		order.OrderID,
+		order.State,
+	}
+
+	log.Info(args)
+
+	_, err := c.db.ExecContext(ctx, repository_query.SQL_update_order_state, args...)
+	if err != nil {
+		log.Info(err)
+		return err
+	}
+
+	return nil
 }
