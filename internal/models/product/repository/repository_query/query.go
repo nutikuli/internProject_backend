@@ -5,4 +5,5 @@ var (
 	GetProductById       = `SELECT * FROM Product WHERE id = ?`
 	GetProductsByStoreId = `SELECT * FROM Product WHERE storeId = ?`
 	DeleteProductById    = `DELETE FROM Product WHERE id = ?`
+	GetProductsByOrderId = `SELECT * FROM Product WHERE id IN (SELECT productId FROM OrderDetail WHERE orderId = ?)`
 )

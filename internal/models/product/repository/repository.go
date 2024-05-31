@@ -84,3 +84,14 @@ func (s *productRepo) DeleteProductById(ctx context.Context, productId *int64) e
 
 	return nil
 }
+
+// GetProductsByOrderId implements product.ProductRepository.
+func (s *productRepo) GetProductsByOrderId(ctx context.Context, orderId *int64) ([]*entities.Product, error) {
+	var products []*entities.Product
+	err := s.db.SelectContext(ctx, products, repository_query.GetProductsByOrderId, orderId)
+	if err != nil {
+		return nil, err
+	}
+
+	return products, nil
+}
