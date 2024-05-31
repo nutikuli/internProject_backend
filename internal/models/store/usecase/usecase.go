@@ -71,7 +71,7 @@ func (s *storeUsecase) OnCreateStoreAccount(c *fiber.Ctx, ctx context.Context, s
 		return nil, nil, http.StatusInternalServerError, errOnGetFiles
 	}
 
-	storeRes, errOnGetStore := s.storeRepo.GetStoreById(ctx, newStoreId)
+	storeRes, errOnGetStore := s.storeRepo.GetStoreById(ctx, *newStoreId)
 	if errOnGetStore != nil {
 		return nil, nil, http.StatusInternalServerError, errOnGetStore
 	}
@@ -83,10 +83,10 @@ func (s *storeUsecase) OnCreateStoreAccount(c *fiber.Ctx, ctx context.Context, s
 
 }
 
-func (s *storeUsecase) OnGetStoreById(ctx context.Context, storeId *int64) (*_storeDtos.StoreWithFileRes, int, error) {
+func (s *storeUsecase) OnGetStoreById(ctx context.Context, storeId int64) (*_storeDtos.StoreWithFileRes, int, error) {
 	fileEntity := &_fileEntities.FileEntityReq{
 		EntityType: "STORE",
-		EntityId:   *storeId,
+		EntityId:   storeId,
 	}
 
 	filesRes, errOnGetFiles := s.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
