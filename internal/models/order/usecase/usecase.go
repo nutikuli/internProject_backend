@@ -138,3 +138,39 @@ func (s *orderUsecase) OnGetOrdersByStoreId(ctx context.Context, storeId *int64)
 
 	return orderWithFileRes, http.StatusOK, nil
 }
+
+func (s *orderUsecase) OnGetOrdersByCustomerId(ctx context.Context, customerId *int64) ([]*_orderDtos.OrderBanksFilesRes, int, error) {
+	orderRes, errOnGetOrders := s.orderRepo.GetOrdersByCustomerId(ctx, customerId)
+	if errOnGetOrders != nil {
+		return nil, http.StatusInternalServerError, errOnGetOrders
+	}
+
+	var orderWithFileRes = make([]*_orderDtos.OrderBanksFilesRes, 0)
+
+	for _, o := range orderRes {
+		fileEntity := &_fileEntities.FileEntityReq{
+			EntityType: "ORDER",
+			EntityId:   o.Id,
+		}
+
+		filesRes, errOnGetFiles := s.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
+		if errOnGetFiles != nil {
+			return nil, http.StatusInternalServerError, errOnGetFiles
+		}
+
+		banksRes, status, errOnGetBanks := s.bankUse.OnGetBanksByStoreId(ctx, &o.StoreId)
+		if errOnGetBanks != nil {
+			return nil, status, errOnGetBanks
+		}
+
+		res := &_orderDtos.OrderBanksFilesRes{
+			OrderData: o,
+			FilesData: filesRes,
+			BanksData: banksRes,
+		}
+
+		orderWithFileRes = append(orderWithFileRes, res)
+	}
+
+	return orderWithFileRes, http.StatusOK, nil
+}
