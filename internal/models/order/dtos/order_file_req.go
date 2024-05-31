@@ -6,6 +6,6 @@ import (
 )
 
 type OrderFileReq struct {
-	OrderData *_orderEntities.Order            `db:"order_data" form:"order_data"`
+	OrderData *_orderEntities.OrderCreate      `db:"order_data" form:"order_data" binding:"required"`
 	FilesData []*_fileEntities.FileUploaderReq `json:"files_data" form:"files_data" binding:"required"`
 }
