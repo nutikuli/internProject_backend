@@ -13,7 +13,7 @@ import (
 
 func UseStoreRoute(db *sqlx.DB, app fiber.Router) {
 	authR := app.Group("/store", func(c *fiber.Ctx) error {
-		log.Infof("all : %v", c.Request().URI().String())
+		log.Infof("store : %v", c.Request().URI().String())
 		return c.Next()
 	})
 
