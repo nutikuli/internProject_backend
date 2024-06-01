@@ -32,7 +32,6 @@ func (o *orderConn) GetOrdersByStoreId(c *fiber.Ctx) error {
 			"message":     "error, invalid request store_id param",
 			"result":      nil,
 		})
-
 	}
 
 	var (
