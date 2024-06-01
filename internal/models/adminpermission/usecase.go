@@ -11,4 +11,5 @@ import (
 
 type AdminpermissionUseCase interface {
 	OnCreateAdminpermissionAccount(c *fiber.Ctx, ctx context.Context, adminpermissionDatReq *_adminpermissionEntities.AdminPermissionCreatedReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_adminpermissionDtos.AdminPermissionFileRes, int, error)
+	OnGetAdminpermissionById(c *fiber.Ctx, ctx context.Context, adminpermissionId *int64) (*_adminpermissionDtos.AdminPermissionFileRes, int, error)
 }
