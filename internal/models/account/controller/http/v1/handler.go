@@ -20,7 +20,6 @@ func NewOrderHandler(accountUse account.AccountUsecase) *accountConn {
 	}
 }
 
-
 func (a *accountConn) Login(c *fiber.Ctx) error {
 	req := new(_accEntities.UsersCredential)
 	if err := c.BodyParser(req); err != nil {
@@ -33,14 +32,13 @@ func (a *accountConn) Login(c *fiber.Ctx) error {
 		})
 	}
 
-
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
 	)
 
 	defer cancel()
 
-	res,nil, status, err := a.AccountUse.Login(ctx, req)
+	res, nil, status, err := a.AccountUse.Login(ctx, req)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
@@ -58,8 +56,6 @@ func (a *accountConn) Login(c *fiber.Ctx) error {
 	})
 }
 
-
-
 func (a *accountConn) OTP(c *fiber.Ctx) error {
 	req := new(_accEntities.UsersCredential)
 	if err := c.BodyParser(req); err != nil {
@@ -72,14 +68,13 @@ func (a *accountConn) OTP(c *fiber.Ctx) error {
 		})
 	}
 
-
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
 	)
 
 	defer cancel()
 
-	res, status, err := a.AccountUse.CheckOTP(c,ctx,req)
+	res, status, err := a.AccountUse.CheckOTP(c, ctx, req)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
@@ -109,14 +104,13 @@ func (a *accountConn) UpdatePass(c *fiber.Ctx) error {
 		})
 	}
 
-
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
 	)
 
 	defer cancel()
 
-	res,nil, status, err := a.AccountUse.ResetPassword(ctx,req)
+	res, nil, status, err := a.AccountUse.ResetPassword(ctx, req)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
@@ -133,7 +127,6 @@ func (a *accountConn) UpdatePass(c *fiber.Ctx) error {
 		"result":      res,
 	})
 }
-
 
 func (a *accountConn) GetAllDataCustomer(c *fiber.Ctx) error {
 
