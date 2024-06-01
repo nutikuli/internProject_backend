@@ -22,7 +22,7 @@ type accountConn struct {
 	AdminUse    admin.AdminUseCase
 }
 
-func NewOrderHandler(accountUse account.AccountUsecase) *accountConn {
+func NewAccountHandler(accountUse account.AccountUsecase) *accountConn {
 	return &accountConn{
 		AccountUse: accountUse,
 	}
@@ -46,11 +46,7 @@ func (a *accountConn) Login(c *fiber.Ctx) error {
 
 	defer cancel()
 
-<<<<<<< HEAD
-	res, nil, status, err := a.AccountUse.Login(ctx, req)
-=======
 	usrPassport, userToken, status, err := a.AccountUse.Login(ctx, req)
->>>>>>> 60f08ff965448bd9d3c09277d1574601c7bcaf7c
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
@@ -135,11 +131,7 @@ func (a *accountConn) OTP(c *fiber.Ctx) error {
 
 	defer cancel()
 
-<<<<<<< HEAD
-	res, status, err := a.AccountUse.CheckOTP(c, ctx, req)
-=======
 	userToken, status, err := a.AccountUse.CheckOTP(c, ctx, req)
->>>>>>> 60f08ff965448bd9d3c09277d1574601c7bcaf7c
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
@@ -174,12 +166,8 @@ func (a *accountConn) UpdatePass(c *fiber.Ctx) error {
 	)
 
 	defer cancel()
-
-<<<<<<< HEAD
-	res, nil, status, err := a.AccountUse.ResetPassword(ctx, req)
-=======
 	userPass, status, err := a.AccountUse.ResetPassword(ctx, req)
->>>>>>> 60f08ff965448bd9d3c09277d1574601c7bcaf7c
+
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
