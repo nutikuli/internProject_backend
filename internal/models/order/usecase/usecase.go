@@ -72,7 +72,7 @@ func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, bankId i
 		}
 	}
 
-	_, status, err := s.ordersProductUse.OnCreateOrderProduct(ctx, *newOrderId, orderProductsReq)
+	_, status, err := s.ordersProductUse.OnCreateOrderProducts(ctx, *newOrderId, orderProductsReq)
 	if err != nil {
 		return nil, status, err
 	}
