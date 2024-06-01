@@ -15,7 +15,7 @@ type OrderProductRepo struct {
 	db *sqlx.DB
 }
 
-func NewOrderRepository(db *sqlx.DB) order_product.OrderProductRepository {
+func NewOrderProductRepository(db *sqlx.DB) order_product.OrderProductRepository {
 	return &OrderProductRepo{
 		db: db,
 	}
