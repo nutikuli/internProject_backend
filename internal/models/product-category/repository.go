@@ -11,4 +11,5 @@ type ProductCategoryRepository interface {
 	GetProductCategoryById(ctx context.Context, categoryId int64) (*entities.ProductCategory, error)
 	GetProductCategoriesByStoreId(ctx context.Context, storeId int64) ([]*entities.ProductCategory, error)
 	DeleteProductCategoryById(ctx context.Context, categoryId int64) error
+	UpdateProductCategoryById(ctx context.Context, categoryId int64, req *entities.ProductCategoryCreatedReq) error
 }
