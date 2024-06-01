@@ -49,7 +49,7 @@ func (s *productRepo) CreateProduct(ctx context.Context, req entities.ProductCre
 
 func (s *productRepo) GetProductById(ctx context.Context, productId *int64) (*entities.Product, error) {
 	var product *entities.Product
-	err := s.db.GetContext(ctx, product, repository_query.GetProductById, productId)
+	err := s.db.GetContext(ctx, product, repository_query.GetProductById, *productId)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (s *productRepo) GetProductById(ctx context.Context, productId *int64) (*en
 
 func (s *productRepo) GetProductsByStoreId(ctx context.Context, storeId *int64) ([]*entities.Product, error) {
 	var products []*entities.Product
-	err := s.db.SelectContext(ctx, products, repository_query.GetProductsByStoreId, storeId)
+	err := s.db.SelectContext(ctx, products, repository_query.GetProductsByStoreId, *storeId)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (s *productRepo) GetProductsByStoreId(ctx context.Context, storeId *int64) 
 
 // DeleteProductById implements product.ProductRepository.
 func (s *productRepo) DeleteProductById(ctx context.Context, productId *int64) error {
-	res, err := s.db.ExecContext(ctx, repository_query.DeleteProductById, productId)
+	res, err := s.db.ExecContext(ctx, repository_query.DeleteProductById, *productId)
 	if err != nil {
 		return err
 	}
@@ -88,10 +88,40 @@ func (s *productRepo) DeleteProductById(ctx context.Context, productId *int64) e
 // GetProductsByOrderId implements product.ProductRepository.
 func (s *productRepo) GetProductsByOrderId(ctx context.Context, orderId *int64) ([]*entities.Product, error) {
 	var products []*entities.Product
-	err := s.db.SelectContext(ctx, products, repository_query.GetProductsByOrderId, orderId)
+	err := s.db.SelectContext(ctx, products, repository_query.GetProductsByOrderId, *orderId)
 	if err != nil {
 		return nil, err
 	}
 
 	return products, nil
+}
+
+// UpdateProductById implements product.ProductRepository.
+func (s *productRepo) UpdateProductById(ctx context.Context, productId int64, req *entities.ProductUpdateReq) error {
+	args := utils.Array{
+		req.Name,
+		req.Detail,
+		req.Price,
+		req.Status,
+		req.ProductAvatar,
+		req.Stock,
+		req.CategoryId,
+		req.StoreId,
+		productId,
+	}
+
+	res, err := s.db.ExecContext(ctx, repository_query.UpdateProductById, args...)
+	if err != nil {
+		return err
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		return errors.New("Can't Update, Product not found")
+	}
+
+	return nil
 }
