@@ -94,7 +94,7 @@ func (p *productUsecase) OnGetProductById(ctx context.Context, productId int64) 
 	return &dtos.ProductFileRes{
 		Product: product,
 		Files:   files,
-	}, http.StatusInternalServerError, nil
+	}, http.StatusOK, nil
 }
 
 // OnGetProductsByStoreId implements product.ProductUsecase.
@@ -161,4 +161,53 @@ func (p *productUsecase) OnGetProductsByOrderId(ctx context.Context, orderId int
 	}
 
 	return productsFileRes, http.StatusInternalServerError, nil
+}
+
+func (p *productUsecase) OnUpdateProductById(c *fiber.Ctx, ctx context.Context, productId int64, productDatReq *_prodEntities.ProductUpdateReq, fileDatReq []*_fileEntities.FileUploaderReq) (*dtos.ProductFileRes, int, error) {
+	err := p.productRepo.UpdateProductById(ctx, productId, productDatReq)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	fEntity := &_fileEntities.FileEntityReq{
+		EntityType: "PRODUCT",
+		EntityId:   productId,
+	}
+
+	for _, fDatReq := range fileDatReq {
+		file := &_fileEntities.File{
+			Type:       fDatReq.FileType,
+			PathUrl:    fDatReq.FileData,
+			Name:       fDatReq.FileName,
+			EntityType: "PRODUCT",
+			EntityId:   productId,
+		}
+
+		_, fUrl, status, errOnCreatedFile := file.UpdateFile(c, true)
+		if errOnCreatedFile != nil {
+			return nil, status, errOnCreatedFile
+		}
+
+		fDatReq.FileData = *fUrl
+		errOnInsertFile := p.fileRepo.UpdateFileByIdAndEntity(ctx, fEntity, fDatReq)
+		if errOnInsertFile != nil {
+			return nil, http.StatusInternalServerError, errOnInsertFile
+		}
+
+	}
+
+	filesRes, errOnGetFiles := p.fileRepo.GetFilesByIdAndEntity(ctx, fEntity)
+	if errOnGetFiles != nil {
+		return nil, http.StatusInternalServerError, errOnGetFiles
+	}
+
+	newProduct, err := p.productRepo.GetProductById(ctx, &productId)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	return &dtos.ProductFileRes{
+		Product: newProduct,
+		Files:   filesRes,
+	}, http.StatusOK, nil
 }
