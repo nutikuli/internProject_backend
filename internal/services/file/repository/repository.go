@@ -83,3 +83,21 @@ func (f *fileRepo) DeleteFileByIdAndEntity(ctx context.Context, req *entities.Fi
 
 	return nil
 }
+
+// UpdateFileByIdAndEntity implements file.FileRepository.
+func (f *fileRepo) UpdateFileByIdAndEntity(ctx context.Context, req *entities.FileEntityReq, file *entities.FileUploaderReq) error {
+	args := utils.Array{
+		file.FileName,
+		file.FileData,
+		file.FileType,
+		req.EntityType,
+		req.EntityId,
+	}
+
+	_, err := f.db.ExecContext(ctx, repository_query.ExecFileUpdateByIdAndEntity, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
