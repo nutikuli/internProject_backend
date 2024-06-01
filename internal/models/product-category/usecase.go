@@ -11,4 +11,5 @@ type ProductCategoryUsecase interface {
 	OnGetProductCategoryById(ctx context.Context, categoryId int64) (*entities.ProductCategory, int, error)
 	OnGetProductCategoriesByStoreId(ctx context.Context, storeId int64) ([]*entities.ProductCategory, int, error)
 	OnDeleteProductCategoryById(ctx context.Context, categoryId int64) (int, error)
+	OnUpdateProductCategoryById(ctx context.Context, categoryId int64, req *entities.ProductCategoryCreatedReq) (int, error)
 }
