@@ -58,3 +58,12 @@ func (p *productCateUsecase) OnGetProductCategoryById(ctx context.Context, categ
 
 	return category, http.StatusOK, nil
 }
+
+func (p *productCateUsecase) OnUpdateProductCategoryById(ctx context.Context, categoryId int64, req *entities.ProductCategoryCreatedReq) (int, error) {
+	err := p.productCateRepo.UpdateProductCategoryById(ctx, categoryId, req)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}

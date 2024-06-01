@@ -2,16 +2,24 @@ package v1
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/nutikuli/internProject_backend/internal/models/account"
+	"github.com/nutikuli/internProject_backend/internal/models/account/dtos"
 	_accEntities "github.com/nutikuli/internProject_backend/internal/models/account/entities"
+	"github.com/nutikuli/internProject_backend/internal/models/admin"
+	"github.com/nutikuli/internProject_backend/internal/models/customer"
+	"github.com/nutikuli/internProject_backend/internal/models/store"
 )
 
 type accountConn struct {
-	AccountUse account.AccountUsecase
+	AccountUse  account.AccountUsecase
+	StoreUse    store.StoreUsecase
+	CustomerUse customer.CustomerUsecase
+	AdminUse    admin.AdminUseCase
 }
 
 func NewOrderHandler(accountUse account.AccountUsecase) *accountConn {
@@ -38,7 +46,11 @@ func (a *accountConn) Login(c *fiber.Ctx) error {
 
 	defer cancel()
 
+<<<<<<< HEAD
 	res, nil, status, err := a.AccountUse.Login(ctx, req)
+=======
+	usrPassport, userToken, status, err := a.AccountUse.Login(ctx, req)
+>>>>>>> 60f08ff965448bd9d3c09277d1574601c7bcaf7c
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
@@ -48,11 +60,60 @@ func (a *accountConn) Login(c *fiber.Ctx) error {
 		})
 	}
 
+	var accRes interface{}
+
+	switch userToken.Role {
+	case "CUSTOMER":
+		acc, status, err := a.CustomerUse.OnGetCustomerById(ctx, usrPassport.Id)
+		if err != nil {
+			return c.Status(status).JSON(fiber.Map{
+				"status":      status,
+				"status_code": status,
+				"message":     err.Error(),
+				"result":      nil,
+			})
+		}
+		accRes = acc
+	case "STORE":
+		acc, status, err := a.StoreUse.OnGetStoreById(ctx, usrPassport.Id)
+		if err != nil {
+			return c.Status(status).JSON(fiber.Map{
+				"status":      status,
+				"status_code": status,
+				"message":     err.Error(),
+				"result":      nil,
+			})
+		}
+		accRes = acc
+	case "ADMIN":
+		acc, status, err := a.AdminUse.OnGetAdminById(ctx, usrPassport.Id)
+		if err != nil {
+			return c.Status(status).JSON(fiber.Map{
+				"status":      status,
+				"status_code": status,
+				"message":     err.Error(),
+				"result":      nil,
+			})
+		}
+		accRes = acc
+	default:
+		return c.Status(status).JSON(fiber.Map{
+			"status":      status,
+			"status_code": status,
+			"message":     errors.New("Can't query the Account Table, Invalid role"),
+			"result":      nil,
+		})
+
+	}
+
 	return c.Status(status).JSON(fiber.Map{
 		"status":      http.StatusText(status),
 		"status_code": status,
 		"message":     "",
-		"result":      res,
+		"result": dtos.AccountLoginRes{
+			AccountData: accRes,
+			UserToken:   *userToken,
+		},
 	})
 }
 
@@ -74,7 +135,11 @@ func (a *accountConn) OTP(c *fiber.Ctx) error {
 
 	defer cancel()
 
+<<<<<<< HEAD
 	res, status, err := a.AccountUse.CheckOTP(c, ctx, req)
+=======
+	userToken, status, err := a.AccountUse.CheckOTP(c, ctx, req)
+>>>>>>> 60f08ff965448bd9d3c09277d1574601c7bcaf7c
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
@@ -88,7 +153,7 @@ func (a *accountConn) OTP(c *fiber.Ctx) error {
 		"status":      http.StatusText(status),
 		"status_code": status,
 		"message":     "",
-		"result":      res,
+		"result":      userToken,
 	})
 }
 
@@ -110,7 +175,11 @@ func (a *accountConn) UpdatePass(c *fiber.Ctx) error {
 
 	defer cancel()
 
+<<<<<<< HEAD
 	res, nil, status, err := a.AccountUse.ResetPassword(ctx, req)
+=======
+	userPass, status, err := a.AccountUse.ResetPassword(ctx, req)
+>>>>>>> 60f08ff965448bd9d3c09277d1574601c7bcaf7c
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
@@ -124,7 +193,7 @@ func (a *accountConn) UpdatePass(c *fiber.Ctx) error {
 		"status":      http.StatusText(status),
 		"status_code": status,
 		"message":     "",
-		"result":      res,
+		"result":      userPass,
 	})
 }
 

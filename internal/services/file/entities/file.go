@@ -255,3 +255,21 @@ func (f *File) DeleteFile(c *fiber.Ctx) error {
 	return nil
 
 }
+
+func (f *File) UpdateFile(c *fiber.Ctx, domainIncludeOnFile bool) (*string, *string, int, error) {
+	if len(f.PathUrl) == 0 || f.Type != "PDF" || f.Type != "MARKDOWN_FILE" || f.Type != "PNG" || f.Type != "JPG" {
+		return nil, nil, http.StatusUnsupportedMediaType, errors.New("Invalid file data or file type, expected file data but got nil or file type is not supported ")
+	}
+
+	err := f.DeleteFile(c)
+	if err != nil {
+		return nil, nil, http.StatusInternalServerError, err
+	}
+
+	base64url, fPathDat, status, err := f.EncodeBase64toFile(c, domainIncludeOnFile)
+	if err != nil {
+		return nil, nil, status, err
+	}
+
+	return base64url, fPathDat, status, nil
+}

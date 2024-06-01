@@ -11,4 +11,5 @@ type FileRepository interface {
 	GetFiles(ctx context.Context) ([]*entities.File, error)
 	GetFilesByIdAndEntity(ctx context.Context, req *entities.FileEntityReq) ([]*entities.File, error)
 	DeleteFileByIdAndEntity(ctx context.Context, req *entities.FileEntityReq) error
+	UpdateFileByIdAndEntity(ctx context.Context, req *entities.FileEntityReq, file *entities.FileUploaderReq) error
 }

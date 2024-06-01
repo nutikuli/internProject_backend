@@ -78,7 +78,7 @@ func (s *storeConn) GetStoreById(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	storeRes, status, err := s.storeUse.OnGetStoreById(ctx, &req64)
+	storeRes, status, err := s.storeUse.OnGetStoreById(ctx, req64)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,

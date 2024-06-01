@@ -162,7 +162,7 @@ func (con customerConn) UpdateCustomerById(c *fiber.Ctx) error {
 	})
 }
 
-func (o *customerConn) GetDeletedCustomerByID(c *fiber.Ctx) error {
+func (o *customerConn) DeletedCustomerByID(c *fiber.Ctx) error {
 	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{

@@ -14,7 +14,7 @@ type BankRepo struct {
 	db *sqlx.DB
 }
 
-func NewFileRepository(db *sqlx.DB) bank.BankRepository {
+func NewBankRepository(db *sqlx.DB) bank.BankRepository {
 	return &BankRepo{
 		db: db,
 	}
@@ -71,4 +71,48 @@ func (a *BankRepo) CreateBank(ctx context.Context, bankdata *entities.BankCreate
 	}
 
 	return &createdId, nil
+}
+
+// DeleteBankById implements bank.BankRepository.
+func (a *BankRepo) DeleteBankById(ctx context.Context, bankId int64) error {
+	res, err := a.db.ExecContext(ctx, repository_query.SQL_delete_bank_by_id, bankId)
+	if err != nil {
+		log.Info(err)
+		return err
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		log.Info(err)
+		return err
+	}
+
+	if affected == 0 {
+		log.Info("No bank was deleted")
+		return nil
+	}
+
+	return nil
+}
+
+// UpdateBankById implements bank.BankRepository.
+func (a *BankRepo) UpdateBankById(ctx context.Context, bankId int64, bankdata *entities.BankCreatedReq) error {
+	res, err := a.db.ExecContext(ctx, repository_query.SQL_update_bank_by_id, bankdata.Name, bankdata.AccNumber, bankdata.AccName, bankdata.AvartarUrl, bankId)
+	if err != nil {
+		log.Info(err)
+		return err
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		log.Info(err)
+		return err
+	}
+
+	if affected == 0 {
+		log.Info("No bank was updated")
+		return nil
+	}
+
+	return nil
 }

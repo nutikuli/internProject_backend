@@ -5,4 +5,5 @@ var (
 	QueryFileSelectAll           = `SELECT * FROM File`
 	QueryFileSelectByIdAndEntity = `SELECT * FROM File WHERE entityType = ? AND entityId = ?`
 	ExecFileDeleteByIdAndEntity  = `DELETE FROM File WHERE entityType = ? AND entityId = ?`
+	ExecFileUpdateByIdAndEntity  = `UPDATE File SET name = ?, pathUrl = ?, type = ? WHERE entityType = ? AND entityId = ?`
 )

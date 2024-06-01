@@ -44,9 +44,8 @@ func NewAccountUsecase(
 	storeUseRepo store.StoreRepository,
 ) account.AccountUsecase {
 	return &AccountUsecase{
-		accountRepo: accountRepo,
-		fileRepo:    filesRepo,
-
+		accountRepo:     accountRepo,
+		fileRepo:        filesRepo,
 		adminUseRepo:    adminUseRepo,
 		customerUseRepo: customerUseRepo,
 		storeUseRepo:    storeUseRepo,
@@ -142,7 +141,7 @@ func (a *AccountUsecase) AccountAdminfile(ctx context.Context) ([]*_adminDtos.Ad
 
 }
 
-func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersCredential) (*_accDtos.UserToken, interface{}, int, error) {
+func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersCredential) (*entities.UsersPassport, *_accDtos.UserToken, int, error) {
 
 	user, err := a.accountRepo.FindUserAsPassport(ctx, req.Email)
 
@@ -162,31 +161,7 @@ func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersCredentia
 		return nil, nil, http.StatusInternalServerError, err
 	}
 
-	var roleAccount interface{}
-	switch user.Role {
-	case "CUSTOMER":
-		acc, status, err := a.customerUse.OnGetCustomerById(ctx, user.Id)
-		if err != nil {
-			return nil, nil, status, err
-		}
-		roleAccount = acc
-	case "STORE":
-		acc, status, err := a.storeUse.OnGetStoreById(ctx, &user.Id)
-		if err != nil {
-			return nil, nil, status, err
-		}
-		roleAccount = acc
-	case "ADMIN":
-		acc, status, err := a.adminUse.OnGetAdminById(ctx, &user.Id)
-		if err != nil {
-			return nil, nil, status, err
-		}
-		roleAccount = acc
-	default:
-		return nil, nil, http.StatusInternalServerError, errors.New("Can't query the Account Table, Invalid role")
-	}
-
-	return userToken, roleAccount, http.StatusOK, nil
+	return user, userToken, http.StatusOK, nil
 }
 
 func (a *AccountUsecase) Register(ctx context.Context, req entities.AccountCredentialGetter) (*_accDtos.UserToken, *entities.UsersCredential, int, error) {
@@ -247,6 +222,11 @@ func (a *AccountUsecase) CheckOTP(c *fiber.Ctx, ctx context.Context, req *entiti
 		otp[i] = charset[otp[i]%byte(len(charset))]
 	}
 
+	var otpStore = struct {
+		sync.RWMutex
+		store map[string]entities.OTPDetails
+	}{store: make(map[string]entities.OTPDetails)}
+
 	// เก็บ OTP ในหน่วยความจำพร้อมกำหนดเวลาหมดอายุ
 	otpStore.Lock()
 	otpStore.store[req.Email] = entities.OTPDetails{OTP: string(otp), CreatedAt: time.Now()}
@@ -278,15 +258,10 @@ func (a *AccountUsecase) CheckOTP(c *fiber.Ctx, ctx context.Context, req *entiti
 	return OTPres, http.StatusOK, err
 }
 
-var otpStore = struct {
-	sync.RWMutex
-	store map[string]entities.OTPDetails
-}{store: make(map[string]entities.OTPDetails)}
-
-func (a *AccountUsecase) ResetPassword(ctx context.Context, req *entities.UsersCredential) (*entities.UpdatePass, interface{}, int, error) {
+func (a *AccountUsecase) ResetPassword(ctx context.Context, req *entities.UsersCredential) (*entities.UpdatePass, int, error) {
 	user, err := a.accountRepo.FindUserAsPassport(ctx, req.Email)
 	if err != nil {
-		return nil, nil, http.StatusInternalServerError, err
+		return nil, http.StatusInternalServerError, err
 	}
 	log.Debug(user.Email)
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
@@ -297,26 +272,25 @@ func (a *AccountUsecase) ResetPassword(ctx context.Context, req *entities.UsersC
 		Role:     user.Role,
 	}
 
-	var roleAccount interface{}
 	switch user.Role {
 	case "CUSTOMER":
 		err := a.customerUseRepo.UpdateCustomerPasswordById(ctx, repassRes)
 		if err != nil {
-			return nil, nil, http.StatusInternalServerError, err
+			return nil, http.StatusInternalServerError, err
 		}
 	case "STORE":
 		err := a.storeUseRepo.UpdateStoreAccountPassword(ctx, *repassRes)
 		if err != nil {
-			return nil, nil, http.StatusInternalServerError, err
+			return nil, http.StatusInternalServerError, err
 		}
 	case "ADMIN":
 		err := a.adminUseRepo.UpdateAdminPasswordById(ctx, repassRes)
 		if err != nil {
-			return nil, nil, http.StatusInternalServerError, err
+			return nil, http.StatusInternalServerError, err
 		}
 	default:
-		return nil, nil, http.StatusInternalServerError, errors.New("Can't query the Account Table, Invalid role")
+		return nil, http.StatusInternalServerError, errors.New("Can't reset password to the Account Table, Invalid role")
 	}
 
-	return repassRes, roleAccount, http.StatusOK, err
+	return repassRes, http.StatusOK, err
 }

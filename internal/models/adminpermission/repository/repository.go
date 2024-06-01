@@ -9,25 +9,24 @@ import (
 
 	"github.com/nutikuli/internProject_backend/internal/models/adminpermission"
 	"github.com/nutikuli/internProject_backend/internal/models/adminpermission/entities"
-	"github.com/nutikuli/internProject_backend/internal/models/adminpermission/repository/repository_query"
+	repositoryquery "github.com/nutikuli/internProject_backend/internal/models/adminpermission/repository/repository_query"
 	"github.com/nutikuli/internProject_backend/pkg/utils"
-) 
+)
 
 type AdminPermissionRepo struct {
 	db *sqlx.DB
 }
 
-func NewFileRepository(db *sqlx.DB) adminpermission.AdminPermissionRepository {
+func NewAdminPermissionRepository(db *sqlx.DB) adminpermission.AdminPermissionRepository {
 	return &AdminPermissionRepo{
 		db: db,
 	}
 }
 
-
-func (a *AdminPermissionRepo) GetAdminpermissiomById(ctx context.Context, id *int64) (*entities.Adminpermission, error) {
+func (a *AdminPermissionRepo) GetAdminpermissiomById(ctx context.Context, id int64) (*entities.Adminpermission, error) {
 	var adminpermission entities.Adminpermission
 
-	err := a.db.GetContext(ctx, &adminpermission, repositoryquery.SQL_get_adminpermission_by_id, "ADMIN", *id)
+	err := a.db.GetContext(ctx, &adminpermission, repositoryquery.SQL_get_adminpermission_by_id, "ADMIN", id)
 	if err != nil {
 		log.Info(err)
 		return nil, err
@@ -35,13 +34,6 @@ func (a *AdminPermissionRepo) GetAdminpermissiomById(ctx context.Context, id *in
 
 	return &adminpermission, nil
 }
-
-
-
-
-
-
-
 
 func (a *AdminPermissionRepo) CreateAdminPermission(ctx context.Context, adminpermissiondata *entities.AdminPermissionCreatedReq) (*int64, error) {
 
@@ -58,8 +50,7 @@ func (a *AdminPermissionRepo) CreateAdminPermission(ctx context.Context, adminpe
 	}
 
 	return &createdId, nil
-} 
-
+}
 
 func (a *AdminPermissionRepo) GetAdminPermissions(ctx context.Context) (*entities.AdminPermissionCreatedReq, error) {
 	var adminpermission entities.AdminPermissionCreatedReq
@@ -71,12 +62,9 @@ func (a *AdminPermissionRepo) GetAdminPermissions(ctx context.Context) (*entitie
 	}
 
 	return &adminpermission, nil
-} 
+}
 
-
-
-
-func (a * AdminPermissionRepo) UpdateAdminPermissionById(ctx context.Context, Id int64, adminpermissiondata *entities.AdminPermissionUpdatedReq) error {
+func (a *AdminPermissionRepo) UpdateAdminPermissionById(ctx context.Context, Id int64, adminpermissiondata *entities.AdminPermissionUpdatedReq) error {
 	args := utils.Array{
 		adminpermissiondata.MenuPermission,
 		Id,
@@ -84,7 +72,7 @@ func (a * AdminPermissionRepo) UpdateAdminPermissionById(ctx context.Context, Id
 
 	log.Info(args)
 
-	res, err := a.db.ExecContext(ctx,repositoryquery.SQL_get_adminpermission_by_id, args...)
+	res, err := a.db.ExecContext(ctx, repositoryquery.SQL_get_adminpermission_by_id, args...)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -94,9 +82,7 @@ func (a * AdminPermissionRepo) UpdateAdminPermissionById(ctx context.Context, Id
 	}
 
 	return nil
-}   
-
-
+}
 
 func (a *AdminPermissionRepo) DeleteAdminPermissionById(ctx context.Context, Id int64) error {
 	res, err := a.db.ExecContext(ctx, repositoryquery.SQL_delete_adminpermission_by_id, Id)
@@ -109,7 +95,4 @@ func (a *AdminPermissionRepo) DeleteAdminPermissionById(ctx context.Context, Id 
 	}
 
 	return nil
-} 
-
-
-
+}

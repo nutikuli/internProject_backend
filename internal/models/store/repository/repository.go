@@ -43,7 +43,7 @@ func (s *storeRepo) CreateStoreAccount(ctx context.Context, req entities.StoreRe
 	return storeId, nil
 }
 
-func (s *storeRepo) GetStoreById(ctx context.Context, storeId *int64) (*entities.Store, error) {
+func (s *storeRepo) GetStoreById(ctx context.Context, storeId int64) (*entities.Store, error) {
 	var store *entities.Store
 	err := s.db.GetContext(ctx, store, repository_query.GetStoreAccountById, storeId)
 	if err != nil {

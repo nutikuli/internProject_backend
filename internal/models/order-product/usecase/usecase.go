@@ -18,7 +18,7 @@ func NewOrderProductUsecase(order_productRepo order_product.OrderProductReposito
 	}
 }
 
-func (s *order_productUsecase) OnCreateOrderProduct(ctx context.Context, orderId int64, orders []*entities.OrderProductCreateReq) ([]*int64, int, error) {
+func (s *order_productUsecase) OnCreateOrderProducts(ctx context.Context, orderId int64, orders []*entities.OrderProductCreateReq) ([]*int64, int, error) {
 	var createdOrderIDs = make([]*int64, 0)
 
 	for _, order := range orders {

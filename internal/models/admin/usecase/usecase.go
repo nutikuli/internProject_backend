@@ -18,24 +18,22 @@ import (
 )
 
 type adminUseCase struct {
-	adminRepo admin.AdminRepository
-	fileRepo file.FileRepository
-	accUsecase account.AccountUsecase
+	adminRepo           admin.AdminRepository
+	fileRepo            file.FileRepository
+	accUsecase          account.AccountUsecase
 	adminpermissionRepo adminpermission.AdminPermissionRepository
 }
 
-
-func NewAdminUsecase(adminRepo admin.AdminRepository, fileRepo file.FileRepository,accUsecase account.AccountUsecase , adminpermissionRepo adminpermission.AdminPermissionRepository) admin.AdminUseCase {
+func NewAdminUsecase(adminRepo admin.AdminRepository, fileRepo file.FileRepository, accUsecase account.AccountUsecase, adminpermissionRepo adminpermission.AdminPermissionRepository) admin.AdminUseCase {
 	return &adminUseCase{
-		adminRepo: adminRepo,
-		fileRepo:  fileRepo,
+		adminRepo:           adminRepo,
+		fileRepo:            fileRepo,
 		adminpermissionRepo: adminpermissionRepo,
-		accUsecase: accUsecase,
+		accUsecase:          accUsecase,
 	}
 }
 
-
-func (a *adminUseCase) OnCreateAdminAccount(c *fiber.Ctx, ctx context.Context, adminDatReq *_adminEntities.AdminRegisterReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_adminDtos.AdminFileRes,*_accDtos.UserToken, int, error) {
+func (a *adminUseCase) OnCreateAdminAccount(c *fiber.Ctx, ctx context.Context, adminDatReq *_adminEntities.AdminRegisterReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_adminDtos.AdminFileRes, *_accDtos.UserToken, int, error) {
 
 	accRegister, usrCred, status, errOnRegister := a.accUsecase.Register(ctx, adminDatReq)
 	if errOnRegister != nil {
@@ -44,13 +42,9 @@ func (a *adminUseCase) OnCreateAdminAccount(c *fiber.Ctx, ctx context.Context, a
 
 	adminDatReq.Password = usrCred.Password
 
-
-
-
-
 	newAdminId, err := a.adminRepo.CreateAdmin(ctx, adminDatReq)
 	if err != nil {
-		return nil,nil, http.StatusInternalServerError, err
+		return nil, nil, http.StatusInternalServerError, err
 	}
 	fileEntity := &_fileEntities.FileEntityReq{
 		EntityType: "ADMIN",
@@ -68,38 +62,36 @@ func (a *adminUseCase) OnCreateAdminAccount(c *fiber.Ctx, ctx context.Context, a
 
 		_, fUrl, errOnCreatedFile := file.Base64toFile(c, true)
 		if errOnCreatedFile != nil {
-			return nil,nil, http.StatusConflict, errOnCreatedFile
+			return nil, nil, http.StatusConflict, errOnCreatedFile
 		}
 
 		fDatReq.FileData = *fUrl
 		_, errOnInsertFile := a.fileRepo.CreateFileByEntityAndId(ctx, fDatReq, fileEntity)
 		if errOnInsertFile != nil {
-			return nil,nil, http.StatusInternalServerError, errOnInsertFile
+			return nil, nil, http.StatusInternalServerError, errOnInsertFile
 		}
 	}
 	filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
 	if errOnGetFiles != nil {
-		return nil,nil, http.StatusInternalServerError, errOnGetFiles
+		return nil, nil, http.StatusInternalServerError, errOnGetFiles
 	}
 
-	adminRes, errOnGetAdmin := a.adminRepo.GetAccountAdminById(ctx, newAdminId)
+	adminRes, errOnGetAdmin := a.adminRepo.GetAccountAdminById(ctx, *newAdminId)
 	if errOnGetAdmin != nil {
-		return nil,nil, http.StatusInternalServerError, errOnGetAdmin
+		return nil, nil, http.StatusInternalServerError, errOnGetAdmin
 	}
 
 	return &_adminDtos.AdminFileRes{
 		AdminData: adminRes,
 		FilesData: filesRes,
-	}, accRegister,http.StatusOK, nil 
+	}, accRegister, http.StatusOK, nil
 
 }
 
-
-
-func (a *adminUseCase) OnGetAdminById( ctx context.Context, adminId *int64) (*_adminDtos.AdminFileRes, int, error) {
+func (a *adminUseCase) OnGetAdminById(ctx context.Context, adminId int64) (*_adminDtos.AdminFileRes, int, error) {
 	fileEntity := &_fileEntities.FileEntityReq{
 		EntityType: "ADMIN",
-		EntityId:   *adminId,
+		EntityId:   adminId,
 	}
 
 	filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
@@ -107,24 +99,22 @@ func (a *adminUseCase) OnGetAdminById( ctx context.Context, adminId *int64) (*_a
 		return nil, http.StatusInternalServerError, errOnGetFiles
 	}
 
-	adminRes, errOnGetAdmin := a.adminRepo.GetAccountAdminById(ctx , adminId)
+	adminRes, errOnGetAdmin := a.adminRepo.GetAccountAdminById(ctx, adminId)
 	if errOnGetAdmin != nil {
 		return nil, http.StatusInternalServerError, errOnGetAdmin
-	} 
+	}
 
-	adminPermissionRes, errOnGetAdminPermission := a.adminpermissionRepo.GetAdminpermissiomById(ctx ,adminId)
+	adminPermissionRes, errOnGetAdminPermission := a.adminpermissionRepo.GetAdminpermissiomById(ctx, adminId)
 	if errOnGetAdmin != nil {
 		return nil, http.StatusInternalServerError, errOnGetAdminPermission
-	} 
-
+	}
 
 	return &_adminDtos.AdminFileRes{
-		AdminData: adminRes,
-		AdminpermissionData : adminPermissionRes,
-		FilesData: filesRes,
+		AdminData:           adminRes,
+		AdminpermissionData: adminPermissionRes,
+		FilesData:           filesRes,
 	}, http.StatusOK, nil
 }
-
 
 func (a *adminUseCase) OnUpdateUserById(ctx context.Context, Id int64, req *entities.AdminUpdateReq) (int, error) {
 
@@ -135,10 +125,9 @@ func (a *adminUseCase) OnUpdateUserById(ctx context.Context, Id int64, req *enti
 	}
 
 	return http.StatusOK, nil
-} 
+}
 
-
-func (a *adminUseCase) AdminDeleted(ctx context.Context, Id int64) (int,error) {
+func (a *adminUseCase) AdminDeleted(ctx context.Context, Id int64) (int, error) {
 
 	err := a.adminRepo.DeleteAdminById(ctx, Id)
 
