@@ -5,14 +5,13 @@ import (
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/jmoiron/sqlx"
 	_accRepo "github.com/nutikuli/internProject_backend/internal/models/account/repository"
-	_storeRepo "github.com/nutikuli/internProject_backend/internal/models/store/repository"
-	_adminRepo "github.com/nutikuli/internProject_backend/internal/models/admin/repository"
 	_accUse "github.com/nutikuli/internProject_backend/internal/models/account/usecase"
+	_adminRepo "github.com/nutikuli/internProject_backend/internal/models/admin/repository"
 	"github.com/nutikuli/internProject_backend/internal/models/customer/repository"
+	_storeRepo "github.com/nutikuli/internProject_backend/internal/models/store/repository"
 
-	_cutomerUse "github.com/nutikuli/internProject_backend/internal/models/customer/usecase"
 	_cutomerHand "github.com/nutikuli/internProject_backend/internal/models/customer/controller/http/v1"
-	
+	_cutomerUse "github.com/nutikuli/internProject_backend/internal/models/customer/usecase"
 )
 
 func UseStoreRoute(db *sqlx.DB, app fiber.Router) {
@@ -21,22 +20,22 @@ func UseStoreRoute(db *sqlx.DB, app fiber.Router) {
 		return c.Next()
 	})
 
-//register
+	//register
 	adminRepo := _adminRepo.NewFileRepository(db)
-	storeRep :=_storeRepo.NewStoreRepository(db)
+	storeRep := _storeRepo.NewStoreRepository(db)
 	customerRepo := repository.NewCustomerRepository(db)
 	accRepo := _accRepo.NewAccountRepository(db)
 	accUse := _accUse.NewAccountUsecase(accRepo, nil, adminRepo, customerRepo, storeRep)
-	customerUse := _cutomerUse.NewCustomerUsecase(customerRepo,accUse)
+	customerUse := _cutomerUse.NewCustomerUsecase(customerRepo, accUse)
 	customerConn := _cutomerHand.NewCustomerHandler(customerUse)
 	authR.Post("/register", customerConn.CreateCustomerAccount)
 
-//login
+	//login
 	accConn := NewAccountHandler(accUse)
-authR.Post("/login", accConn.Login)
+	authR.Post("/login", accConn.Login)
 
-//OTP
-authR.Post("/otp", accConn.OTP)
-//resetPassword
-authR.Post("/resetpass", accConn.UpdatePass)
+	//OTP
+	authR.Post("/otp", accConn.OTP)
+	//resetPassword
+	authR.Post("/resetpass", accConn.UpdatePass)
 }
