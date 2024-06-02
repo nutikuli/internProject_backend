@@ -11,7 +11,7 @@ import (
 )
 
 func UseCustomerRoute(db *sqlx.DB, app *fiber.App) {
-	authR := app.Group("/customer", func(c *fiber.Ctx) error {
+	authR := app.Group("/order-product", func(c *fiber.Ctx) error {
 		log.Infof("all : %v", c.Request().URI().String())
 		return c.Next()
 	})
@@ -23,10 +23,7 @@ func UseCustomerRoute(db *sqlx.DB, app *fiber.App) {
 
 	customerUse := _customerUse.NewCustomerUsecase(customerRepo, accUse)
 
-	customerConn := NewCustomerHandler(customerUse)
+	order_productConn := NewCustomerHandler(customerUse)
 
-	authR.Get("/:customer_id", customerConn.GetCustomerById)
-	authR.Post("/account-register", customerConn.CreateCustomerAccount)
-	authR.Put("/:update_id", customerConn.UpdateCustomerById)
-	authR.Delete("/:delete_id", customerConn.DeletedCustomerByID)
+	authR.Post("/createorderproducts", order_productConn.CreateCustomerAccount)
 }
