@@ -36,14 +36,13 @@ func (c *CustomerRepo) GetAccountCustomers(ctx context.Context) (*entities.Custo
 }
 
 func (c *CustomerRepo) GetCustomerById(ctx context.Context, customerId int64) (*entities.Customer, error) {
-	var customer entities.Customer
-	err := c.db.GetContext(ctx, &customer, repository_query.SQL_get_account_customer_by_id, customerId)
+	var customer *entities.Customer
+	err := c.db.GetContext(ctx, customer, repository_query.SQL_get_account_customer_by_id, customerId)
 	if err != nil {
-		log.Info(err)
 		return nil, err
 	}
 
-	return &customer, nil
+	return customer, nil
 }
 
 func (c *CustomerRepo) CreateCustomerAccount(ctx context.Context, user *entities.CustomerRegisterReq) (*int64, error) {

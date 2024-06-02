@@ -52,7 +52,6 @@ func (s *customerUsecase) OnCreateCustomerAccount(c *fiber.Ctx, ctx context.Cont
 }
 
 func (s *customerUsecase) OnGetCustomerById(ctx context.Context, customerId int64) (*_customerDtos.CustomerAccountFileRes, int, error) {
-
 	customerRes, errOnGetCustomer := s.customerRepo.GetCustomerById(ctx, customerId)
 	if errOnGetCustomer != nil {
 		return nil, http.StatusInternalServerError, errOnGetCustomer

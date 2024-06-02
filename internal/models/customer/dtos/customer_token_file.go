@@ -9,7 +9,7 @@ type CustomerAccountFileRes struct {
 	CustomerData *_customerEntities.Customer `json:"customer_data"`
 }
 
-type StoreTokenRes struct {
+type CustomerTokenRes struct {
 	Customer *CustomerAccountFileRes `json:"customer"`
 	Token    *dtos.UserToken         `json:"token"`
 }
