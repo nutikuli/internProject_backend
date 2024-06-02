@@ -14,7 +14,7 @@ import (
 	_cutomerUse "github.com/nutikuli/internProject_backend/internal/models/customer/usecase"
 )
 
-func UseStoreRoute(db *sqlx.DB, app fiber.Router) {
+func UseAccountRoute(db *sqlx.DB, app fiber.Router) {
 	authR := app.Group("/account", func(c *fiber.Ctx) error {
 		log.Infof("store : %v", c.Request().URI().String())
 		return c.Next()
