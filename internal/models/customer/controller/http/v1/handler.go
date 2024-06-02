@@ -23,16 +23,19 @@ func NewCustomerHandler(CustomerUse customer.CustomerUsecase) *customerConn {
 	}
 }
 
-func (o *customerConn) GetCustomerById(c *fiber.Ctx) error {
-	req, err := strconv.ParseInt(c.Params("id"), 10, 64)
+func (cus *customerConn) GetCustomerById(c *fiber.Ctx) error {
+	req, err := c.ParamsInt("customer_id")
+
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":      http.StatusText(http.StatusBadRequest),
+			"status":      fiber.StatusBadRequest,
 			"status_code": http.StatusBadRequest,
-			"message":     "error, invalid request id param",
+			"message":     "error, invalid request customer_id param",
 			"result":      nil,
 		})
 	}
+
+	req64 := int64(req)
 
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
@@ -40,10 +43,10 @@ func (o *customerConn) GetCustomerById(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	customer, status, err := o.CustomerUse.OnGetCustomerById(ctx, req)
+	customer, status, err := cus.CustomerUse.OnGetCustomerById(ctx, req64)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
-			"status":      http.StatusText(status),
+			"status":      status,
 			"status_code": status,
 			"message":     err.Error(),
 			"result":      nil,
@@ -53,12 +56,12 @@ func (o *customerConn) GetCustomerById(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(fiber.Map{
 		"status":      http.StatusText(http.StatusOK),
 		"status_code": http.StatusOK,
-		"message":     "",
+		"message":     nil,
 		"result":      customer,
 	})
 }
 
-func (o *customerConn) CreateCustomerAccount(c *fiber.Ctx) error {
+func (con *customerConn) CreateCustomerAccount(c *fiber.Ctx) error {
 	req := new(dtos.CustomerFileReq)
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -86,7 +89,7 @@ func (o *customerConn) CreateCustomerAccount(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	customer, _, status, err := o.CustomerUse.OnCreateCustomerAccount(c, ctx, req.CustomerRegisterData)
+	customer, _, status, err := con.CustomerUse.OnCreateCustomerAccount(c, ctx, req.CustomerRegisterData)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
@@ -104,7 +107,7 @@ func (o *customerConn) CreateCustomerAccount(c *fiber.Ctx) error {
 	})
 }
 
-func (con customerConn) UpdateCustomerById(c *fiber.Ctx) error {
+func (con *customerConn) UpdateCustomerById(c *fiber.Ctx) error {
 
 	var req = new(entities.CustomerUpdateReq)
 	if cE := c.BodyParser(req); cE != nil {
@@ -162,8 +165,8 @@ func (con customerConn) UpdateCustomerById(c *fiber.Ctx) error {
 	})
 }
 
-func (o *customerConn) DeletedCustomerByID(c *fiber.Ctx) error {
-	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
+func (con *customerConn) DeletedCustomerByID(c *fiber.Ctx) error {
+	req, err := c.ParamsInt("store_id")
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),
@@ -173,10 +176,15 @@ func (o *customerConn) DeletedCustomerByID(c *fiber.Ctx) error {
 		})
 	}
 
-	ctx, cancel := context.WithTimeout(c.Context(), 30*time.Second)
+	req64 := int64(req)
+
+	var (
+		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
+	)
+
 	defer cancel()
 
-	customer, err := o.CustomerUse.OnDeletedCustomer(ctx, id)
+	customer, err := con.CustomerUse.OnDeletedCustomer(ctx, req64)
 	if err != nil {
 		// Assuming OnGetDeletedCustomerByID returns an error if customer not found
 		return c.Status(http.StatusNotFound).JSON(fiber.Map{
@@ -188,9 +196,9 @@ func (o *customerConn) DeletedCustomerByID(c *fiber.Ctx) error {
 	}
 
 	return c.Status(http.StatusOK).JSON(fiber.Map{
-		"status":      http.StatusText(http.StatusOK),
+		"status":      http.StatusOK,
 		"status_code": http.StatusOK,
-		"message":     "",
+		"message":     nil,
 		"result":      customer,
 	})
 }

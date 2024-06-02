@@ -46,19 +46,19 @@ func (s *customerUsecase) OnCreateCustomerAccount(c *fiber.Ctx, ctx context.Cont
 	}
 
 	return &_customerDtos.CustomerAccountFileRes{
-		Customer: *customerRes,
+		CustomerData: customerRes,
 	}, accRegister, http.StatusOK, nil
 
 }
 
-func (s *customerUsecase) OnGetCustomerById(ctx context.Context, Id int64) (*_customerDtos.CustomerAccountFileRes, int, error) {
+func (s *customerUsecase) OnGetCustomerById(ctx context.Context, customerId int64) (*_customerDtos.CustomerAccountFileRes, int, error) {
 
-	customerRes, errOnGetCustomer := s.customerRepo.GetCustomerById(ctx, Id)
+	customerRes, errOnGetCustomer := s.customerRepo.GetCustomerById(ctx, customerId)
 	if errOnGetCustomer != nil {
 		return nil, http.StatusInternalServerError, errOnGetCustomer
 	}
 	return &_customerDtos.CustomerAccountFileRes{
-		Customer: *customerRes,
+		CustomerData: customerRes,
 	}, http.StatusOK, nil
 }
 
