@@ -17,7 +17,7 @@ type adminPermissionConn struct {
 } 
 
 
-func NewAdminHandler(AdminpermissionUse adminpermission.AdminpermissionUseCase) *adminPermissionConn {
+func NewAdminPermissionHandler(AdminpermissionUse adminpermission.AdminpermissionUseCase) *adminPermissionConn {
 	return &adminPermissionConn{
 		AdminpermissionUse: AdminpermissionUse,
 	}

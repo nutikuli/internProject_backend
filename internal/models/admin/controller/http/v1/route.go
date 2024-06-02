@@ -14,7 +14,7 @@ import (
 
 func UseAdminRoute(db *sqlx.DB, app fiber.Router) {
 	authR := app.Group("/admin", func(c *fiber.Ctx) error {
-		log.Infof("store : %v", c.Request().URI().String())
+		log.Infof("admin : %v", c.Request().URI().String())
 		return c.Next()
 	})
 
