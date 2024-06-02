@@ -1,4 +1,4 @@
-package controller
+package v1
 
 import (
 	"context"
@@ -48,7 +48,7 @@ func (a *adminConn) GetAdmineById(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	adminRes, status, err := a.AdminUse.OnGetAdminById(ctx, &req64)
+	adminRes, status, err := a.AdminUse.OnGetAdminById(ctx, req64)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
