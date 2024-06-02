@@ -66,7 +66,7 @@ func (a *AccountUsecase) AccountCustomerfile(ctx context.Context) ([]*dtos.Custo
 	for _, customer := range customers {
 
 		c := &dtos.CustomerAccountFileRes{
-			Customer: *customer,
+			CustomerData: customer,
 		}
 
 		res = append(res, c)
