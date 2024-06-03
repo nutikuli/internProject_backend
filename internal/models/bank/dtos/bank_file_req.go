@@ -6,6 +6,6 @@ import (
 )
 
 type BankFileReq struct {
-	BankData  *_bankEntities.BankCreatedReq    `db:"bank_data" form:"bank_data" binding:"required"`
+	BankData  *_bankEntities.BankCreatedReq    `json:"bank_data" form:"bank_data" binding:"required"`
 	FilesData []*_fileEntities.FileUploaderReq `json:"files_data" form:"files_data" binding:"required"`
 }
