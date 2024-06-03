@@ -25,7 +25,6 @@ func main() {
 	}
 
 	// routes definition
-	api := app.Group("/api/v1")
 	db := datasource.DbConnection()
 	defer func() {
 		if err := db.Close(); err != nil {
@@ -33,7 +32,7 @@ func main() {
 		}
 	}()
 
-	datasource.InitRoute(db, &api)
+	datasource.InitRoute(db, app)
 	app.Static("/public/image", "./public/image")
 
 	log.Info("Listening on port", port)
