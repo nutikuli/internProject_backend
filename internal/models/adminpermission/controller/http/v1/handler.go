@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"github.com/gofiber/fiber/v2/log"
 
 	"time"
 
@@ -9,6 +10,7 @@ import (
 
 	"github.com/nutikuli/internProject_backend/internal/models/adminpermission"
 	_dtos "github.com/nutikuli/internProject_backend/internal/models/adminpermission/dtos"
+	"github.com/nutikuli/internProject_backend/internal/models/adminpermission/entities"
 ) 
 
 
@@ -64,7 +66,7 @@ func (a *adminPermissionConn) GetAdminePermissionById(c *fiber.Ctx) error {
 }
 
 func (a *adminPermissionConn) CreateAdminPermissionAccount(c *fiber.Ctx) error {
-	req := new(_dtos.AdminPermissionFileReq)
+	req := new(entities.AdminPermissionCreatedReq)
 	if err := c.BodyParser(req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":      fiber.StatusBadRequest,
@@ -72,7 +74,9 @@ func (a *adminPermissionConn) CreateAdminPermissionAccount(c *fiber.Ctx) error {
 			"message":     err.Error(),
 			"result":      nil,
 		})
-	}
+	} 
+
+	log.Debug("req=====>" ,req)
 
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
@@ -80,7 +84,7 @@ func (a *adminPermissionConn) CreateAdminPermissionAccount(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	adminpermissionRes, status, err := a.AdminpermissionUse.OnCreateAdminpermissionAccount(c, ctx, req.AdminpermissionData, req.FilesData)
+	adminpermissionRes, status, err := a.AdminpermissionUse.OnCreateAdminpermissionAccount(c, ctx, req)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
@@ -88,7 +92,9 @@ func (a *adminPermissionConn) CreateAdminPermissionAccount(c *fiber.Ctx) error {
 			"message":     err.Error(),
 			"result":      nil,
 		})
-	}
+	} 
+
+	log.Debug("adres=====>",adminpermissionRes)
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"status":      fiber.StatusCreated,
