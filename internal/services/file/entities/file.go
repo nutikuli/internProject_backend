@@ -24,10 +24,10 @@ type File struct {
 	PathUrl    string `json:"file_data" db:"pathUrl"`
 	Type       string `json:"file_type" db:"type"`
 	EntityType string `json:"entity_type" db:"entityType"`
-	AccountId  int64  `json:"account_id" db:"accountId"`
-	ProductId  int64  `json:"product_id" db:"productId"`
-	OrderId    int64  `json:"order_id" db:"orderId"`
-	BankId     int64  `json:"bank_id" db:"bankId"`
+	AccountId  *int64 `json:"account_id" db:"accountId"`
+	ProductId  *int64 `json:"product_id" db:"productId"`
+	OrderId    *int64 `json:"order_id" db:"orderId"`
+	BankId     *int64 `json:"bank_id" db:"bankId"`
 	CreatedAt  string `json:"created_at" db:"createdAt"`
 	UpdatedAt  string `json:"updated_at" db:"updatedAt"`
 }
