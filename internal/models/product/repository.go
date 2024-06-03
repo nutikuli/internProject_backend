@@ -13,4 +13,5 @@ type ProductRepository interface {
 	GetProductsByStoreId(ctx context.Context, storeId *int64) ([]*entities.Product, error)
 	DeleteProductById(ctx context.Context, productId *int64) error
 	UpdateProductById(ctx context.Context, productId int64, req *entities.ProductUpdateReq) error
+	GetAllProducts(ctx context.Context) ([]*entities.Product, error)
 }

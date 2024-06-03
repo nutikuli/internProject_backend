@@ -47,6 +47,16 @@ func (s *productRepo) CreateProduct(ctx context.Context, req entities.ProductCre
 
 }
 
+func (s *productRepo) GetAllProducts(ctx context.Context) ([]*entities.Product, error) {
+	var products []*entities.Product
+	err := s.db.SelectContext(ctx, &products, repository_query.GetAllProducts)
+	if err != nil {
+		return nil, err
+	}
+
+	return products, nil
+}
+
 func (s *productRepo) GetProductById(ctx context.Context, productId *int64) (*entities.Product, error) {
 	var product *entities.Product
 	err := s.db.GetContext(ctx, product, repository_query.GetProductById, *productId)

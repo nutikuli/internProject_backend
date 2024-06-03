@@ -10,9 +10,9 @@ import (
 	_customerUse "github.com/nutikuli/internProject_backend/internal/models/customer/usecase"
 )
 
-func UseCustomerRoute(db *sqlx.DB, app *fiber.App) {
+func UseCustomerRoute(db *sqlx.DB, app fiber.Router) {
 	authR := app.Group("/customer", func(c *fiber.Ctx) error {
-		log.Infof("all : %v", c.Request().URI().String())
+		log.Infof("customer : %v", c.Request().URI().String())
 		return c.Next()
 	})
 
@@ -25,8 +25,8 @@ func UseCustomerRoute(db *sqlx.DB, app *fiber.App) {
 
 	customerConn := NewCustomerHandler(customerUse)
 
-	authR.Get("/:customer_id", customerConn.GetCustomerById)
 	authR.Post("/account-register", customerConn.CreateCustomerAccount)
-	authR.Put("/update_id", customerConn.UpdateCustomerById)
-	authR.Delete("/delete_id", customerConn.DeletedCustomerByID)
+	authR.Get("/:customer_id", customerConn.GetCustomerById)
+	authR.Put("/:update_id", customerConn.UpdateCustomerById)
+	authR.Delete("/:delete_id", customerConn.DeletedCustomerByID)
 }

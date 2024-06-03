@@ -33,6 +33,7 @@ func main() {
 	}()
 
 	datasource.InitRoute(db, app)
+	datasource.InitRoute(db, app)
 	app.Static("/public/image", "./public/image")
 
 	log.Info("Listening on port", port)

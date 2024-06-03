@@ -74,6 +74,34 @@ func (p *productUsecase) OnCreateProduct(c *fiber.Ctx, ctx context.Context, prod
 	}, http.StatusCreated, nil
 }
 
+func (p *productUsecase) OnGetAllProducts(ctx context.Context) ([]*dtos.ProductFileRes, int, error) {
+	products, err := p.productRepo.GetAllProducts(ctx)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	var productFileRes []*dtos.ProductFileRes
+
+	for _, product := range products {
+		fEntity := &_fileEntities.FileEntityReq{
+			EntityType: "PRODUCT",
+			EntityId:   product.Id, // Assuming product has an ID field
+		}
+
+		files, err := p.fileRepo.GetFilesByIdAndEntity(ctx, fEntity)
+		if err != nil {
+			return nil, http.StatusInternalServerError, err
+		}
+
+		productFileRes = append(productFileRes, &dtos.ProductFileRes{
+			Product: product,
+			Files:   files,
+		})
+	}
+
+	return productFileRes, http.StatusOK, nil
+}
+
 // OnGetProductById implements product.ProductUsecase.
 func (p *productUsecase) OnGetProductById(ctx context.Context, productId int64) (*dtos.ProductFileRes, int, error) {
 	product, err := p.productRepo.GetProductById(ctx, &productId)

@@ -114,7 +114,7 @@ func (a *AdminRepo) UpdateAdminPasswordById(ctx context.Context, admindata *_acc
 
 	log.Info(args)
 
-	res, err := a.db.ExecContext(ctx, repository_query.SQL_update_password_account_admin, args...)
+	res, err := a.db.ExecContext(ctx, repository_query.SQL_update_password_account_admin, admindata.Password , admindata.Id , admindata.Role)
 	if err != nil {
 		log.Error(err)
 		return err

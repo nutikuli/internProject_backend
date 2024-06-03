@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/nutikuli/internProject_backend/internal/models/account"
 	"github.com/nutikuli/internProject_backend/internal/models/account/dtos"
 	_accEntities "github.com/nutikuli/internProject_backend/internal/models/account/entities"
@@ -22,7 +23,7 @@ type accountConn struct {
 	AdminUse    admin.AdminUseCase
 }
 
-func NewOrderHandler(accountUse account.AccountUsecase) *accountConn {
+func NewAccountHandler(accountUse account.AccountUsecase) *accountConn {
 	return &accountConn{
 		AccountUse: accountUse,
 	}
@@ -39,7 +40,7 @@ func (a *accountConn) Login(c *fiber.Ctx) error {
 			"result":      nil,
 		})
 	}
-
+	log.Debug("loging")
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
 	)
@@ -166,8 +167,8 @@ func (a *accountConn) UpdatePass(c *fiber.Ctx) error {
 	)
 
 	defer cancel()
-
 	userPass, status, err := a.AccountUse.ResetPassword(ctx, req)
+
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
