@@ -99,7 +99,7 @@ func (s *productCategoryRepo) UpdateProductCategoryById(ctx context.Context, cat
 		return err
 	}
 	if affected == 0 {
-		return errors.New("Can't Update, Product not found")
+		return errors.New("Can't Update, Product category not found")
 	}
 
 	return nil
