@@ -16,7 +16,7 @@ import (
 
 func UseAccountRoute(db *sqlx.DB, app fiber.Router) {
 	authR := app.Group("/account", func(c *fiber.Ctx) error {
-		log.Infof("store : %v", c.Request().URI().String())
+		log.Infof("Account : %v", c.Request().URI().String())
 		return c.Next()
 	})
 
