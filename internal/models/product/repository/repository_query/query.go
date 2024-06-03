@@ -7,4 +7,5 @@ var (
 	DeleteProductById    = `DELETE FROM Product WHERE id = ?`
 	GetProductsByOrderId = `SELECT * FROM Product WHERE id IN (SELECT productId FROM OrderDetail WHERE orderId = ?)`
 	UpdateProductById    = `UPDATE Product SET name = ?, detail = ?, price = ?, status = ?, productAvatar = ?, stock = ?, categoryId = ?, storeId = ? WHERE id = ?`
+	GetAllProducts       = `SELECT * FROM Product`
 )
