@@ -1,13 +1,13 @@
-//
 package account
 
 import (
 	"context"
-	"github.com/nutikuli/internProject_backend/internal/models/account/entities"
+
 	"github.com/nutikuli/internProject_backend/internal/models/account/dtos"
-	storestruct "github.com/nutikuli/internProject_backend/internal/models/store/entities"
+	"github.com/nutikuli/internProject_backend/internal/models/account/entities"
 	adminstruct "github.com/nutikuli/internProject_backend/internal/models/admin/entities"
 	customerstruct "github.com/nutikuli/internProject_backend/internal/models/customer/entities"
+	storestruct "github.com/nutikuli/internProject_backend/internal/models/store/entities"
 )
 
 type AccountRepository interface {

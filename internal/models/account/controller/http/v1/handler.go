@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/nutikuli/internProject_backend/internal/models/account"
 	"github.com/nutikuli/internProject_backend/internal/models/account/dtos"
 	_accEntities "github.com/nutikuli/internProject_backend/internal/models/account/entities"
@@ -39,7 +40,7 @@ func (a *accountConn) Login(c *fiber.Ctx) error {
 			"result":      nil,
 		})
 	}
-
+	log.Debug("loging")
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
 	)

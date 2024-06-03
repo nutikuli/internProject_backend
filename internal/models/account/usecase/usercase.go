@@ -148,11 +148,13 @@ func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersCredentia
 	if err != nil {
 		return nil, nil, http.StatusInternalServerError, err
 	}
+	log.Debug(req.Password)
+	log.Debug(user.Password)
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		fmt.Println(err.Error())
 		return nil, nil, http.StatusInternalServerError, err
 	}
-
+	
 	userToken, err := a.accountRepo.SignUsersAccessToken(&entities.UserSignToken{
 		Role:  user.Role,
 		Email: req.Email,
@@ -160,7 +162,8 @@ func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersCredentia
 	if err != nil {
 		return nil, nil, http.StatusInternalServerError, err
 	}
-
+	log.Debug(userToken)
+	log.Debug(user)
 	return user, userToken, http.StatusOK, nil
 }
 
@@ -243,13 +246,12 @@ func (a *AccountUsecase) CheckOTP(c *fiber.Ctx, ctx context.Context, req *entiti
 	to := req.Email // <-------------- (3) แก้ไขอีเมลของผู้รับ หากใส่หลายเมล จะไปอยู่ที่ cc
 
 	//Message.
-	message := []byte("OTP : " + string(otp))
 
 	// Authentication.
 	auth := smtp.PlainAuth("", os.Getenv("emailFrom"), os.Getenv("passwordMail"), os.Getenv("smtpHost"))
 	log.Debug("+++++++++++++++**********-----------------", auth)
 	// Sending email.
-	err = smtp.SendMail(os.Getenv("smtpHost")+":"+os.Getenv("smtpPort"), auth, os.Getenv("emailFrom"), []string{to}, message)
+	err = smtp.SendMail(os.Getenv("smtpHost")+":"+os.Getenv("smtpPort"), auth, os.Getenv("emailFrom"), []string{to}, otp)
 	OTPres := &_accDtos.OTPres{
 		OTP:       string(otp),
 		Email:     req.Email,
@@ -263,7 +265,7 @@ func (a *AccountUsecase) ResetPassword(ctx context.Context, req *entities.UsersC
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
-	log.Debug(user.Email)
+	log.Debug("User Email : ",user)
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 
 	repassRes := &entities.UpdatePass{
@@ -285,6 +287,7 @@ func (a *AccountUsecase) ResetPassword(ctx context.Context, req *entities.UsersC
 		}
 	case "ADMIN":
 		err := a.adminUseRepo.UpdateAdminPasswordById(ctx, repassRes)
+		log.Debug("Change")
 		if err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
