@@ -36,15 +36,15 @@ func (a *AdminRepo) GetAccountAdmins(ctx context.Context) (*entities.Admin, erro
 }
 
 func (a *AdminRepo) GetAccountAdminById(ctx context.Context, id int64) (*entities.Admin, error) {
-	var admin entities.Admin
+	 admin := &entities.Admin{}
 
-	err := a.db.GetContext(ctx, &admin, repository_query.SQL_get_account_admin_by_id, "ADMIN", id)
+	err := a.db.GetContext(ctx, &admin, repository_query.SQL_get_account_admin_by_id, "ADMIN",id)
 	if err != nil {
 		log.Info(err)
 		return nil, err
 	}
 
-	return &admin, nil
+	return admin, nil
 }
 
 func (a *AdminRepo) CreateAdmin(ctx context.Context, admindata *entities.AdminRegisterReq) (*int64, error) {
