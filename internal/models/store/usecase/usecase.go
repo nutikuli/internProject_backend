@@ -42,7 +42,7 @@ func (s *storeUsecase) OnCreateStoreAccount(c *fiber.Ctx, ctx context.Context, s
 		return nil, nil, http.StatusInternalServerError, err
 	}
 	fileEntity := &_fileEntities.FileEntityReq{
-		EntityType: "STORE",
+		EntityType: "ACCOUNT",
 		EntityId:   *newStoreId,
 	}
 
@@ -51,8 +51,8 @@ func (s *storeUsecase) OnCreateStoreAccount(c *fiber.Ctx, ctx context.Context, s
 			Type:       fDatReq.FileType,
 			PathUrl:    fDatReq.FileData,
 			Name:       fDatReq.FileName,
-			EntityType: "STORE",
-			EntityId:   *newStoreId,
+			EntityType: "ACCOUNT",
+			AccountId:  *newStoreId,
 		}
 
 		_, fUrl, status, errOnCreatedFile := file.EncodeBase64toFile(c, true)
@@ -85,7 +85,7 @@ func (s *storeUsecase) OnCreateStoreAccount(c *fiber.Ctx, ctx context.Context, s
 
 func (s *storeUsecase) OnGetStoreById(ctx context.Context, storeId int64) (*_storeDtos.StoreWithFileRes, int, error) {
 	fileEntity := &_fileEntities.FileEntityReq{
-		EntityType: "STORE",
+		EntityType: "ACCOUNT",
 		EntityId:   storeId,
 	}
 

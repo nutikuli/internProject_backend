@@ -22,7 +22,6 @@ func NewStoreRepository(db *sqlx.DB) store.StoreRepository {
 }
 
 func (s *storeRepo) CreateStoreAccount(ctx context.Context, req entities.StoreRegisterReq) (*int64, error) {
-	var storeId *int64
 	args := utils.Array{
 		req.Email,
 		req.Password,
@@ -35,16 +34,21 @@ func (s *storeRepo) CreateStoreAccount(ctx context.Context, req entities.StoreRe
 		req.StoreLocation,
 	}
 
-	err := s.db.GetContext(ctx, storeId, repository_query.InsertStoreAccount, args...)
+	res, err := s.db.ExecContext(ctx, repository_query.InsertStoreAccount, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	return storeId, nil
+	storeId, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	return &storeId, nil
 }
 
 func (s *storeRepo) GetStoreById(ctx context.Context, storeId int64) (*entities.Store, error) {
-	var store *entities.Store
+	store := &entities.Store{}
 	err := s.db.GetContext(ctx, store, repository_query.GetStoreAccountById, storeId)
 	if err != nil {
 		return nil, err
@@ -57,6 +61,7 @@ func (s *storeRepo) UpdateStoreAccountPassword(ctx context.Context, req _accEnti
 	args := utils.Array{
 		req.Password,
 		req.Id,
+		req.Role,
 	}
 
 	_, err := s.db.ExecContext(ctx, repository_query.UpdateStoreAccountPassword, args...)
