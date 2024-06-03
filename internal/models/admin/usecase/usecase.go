@@ -47,7 +47,7 @@ func (a *adminUseCase) OnCreateAdminAccount(c *fiber.Ctx, ctx context.Context, a
 		return nil, nil, http.StatusInternalServerError, err
 	}
 	fileEntity := &_fileEntities.FileEntityReq{
-		EntityType: "ADMIN",
+		EntityType: "ACCOUNT",
 		EntityId:   *newAdminId,
 	}
 
@@ -56,7 +56,7 @@ func (a *adminUseCase) OnCreateAdminAccount(c *fiber.Ctx, ctx context.Context, a
 			Type:       fDatReq.FileType,
 			PathUrl:    fDatReq.FileData,
 			Name:       fDatReq.FileName,
-			EntityType: "ADMIN",
+			EntityType: "ACCOUNT",
 			EntityId:   *newAdminId,
 		}
 

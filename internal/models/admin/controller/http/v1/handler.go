@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 
 	"github.com/nutikuli/internProject_backend/internal/models/admin"
 	"github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
@@ -75,7 +76,8 @@ func (a *adminConn) RegisterAdminAccount(c *fiber.Ctx) error {
 			"message":     err.Error(),
 			"result":      nil,
 		})
-	}
+	} 
+	log.Debug(req)
 
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
@@ -83,7 +85,7 @@ func (a *adminConn) RegisterAdminAccount(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	adminRes, userToken, status, err := a.AdminUse.OnCreateAdminAccount(c, ctx, req.AdminData, req.FilesData)
+	adminRes, userToken, status, err := a.AdminUse.OnCreateAdminAccount(c, ctx , req.AdminData , req.FilesData)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
