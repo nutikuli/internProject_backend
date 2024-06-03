@@ -54,7 +54,7 @@ func (s *productCategoryRepo) GetProductCategoryById(ctx context.Context, catego
 
 func (s *productCategoryRepo) GetProductCategoriesByStoreId(ctx context.Context, storeId int64) ([]*entities.ProductCategory, error) {
 	categories := []*entities.ProductCategory{}
-	err := s.db.SelectContext(ctx, categories, repository_query.GetProductCategoriesByStoreId, storeId)
+	err := s.db.SelectContext(ctx, &categories, repository_query.GetProductCategoriesByStoreId, storeId)
 	if err != nil {
 		return nil, err
 	}
