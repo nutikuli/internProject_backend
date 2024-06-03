@@ -10,6 +10,8 @@ import (
 	productCateRoute "github.com/nutikuli/internProject_backend/internal/models/product-category/controller/http/v1"
 	productRoute "github.com/nutikuli/internProject_backend/internal/models/product/controller/http/v1"
 	storeRoute "github.com/nutikuli/internProject_backend/internal/models/store/controller/http/v1"
+	adminRoute "github.com/nutikuli/internProject_backend/internal/models/admin/controller/http/v1"
+	adminPermissionRoute "github.com/nutikuli/internProject_backend/internal/models/adminpermission/controller/http/v1"
 )
 
 type RouteRepository interface {
@@ -21,7 +23,8 @@ func InitRoute(db *sqlx.DB, app *fiber.App) {
 	apiEntry := app.Group("/api/v1", func(c *fiber.Ctx) error {
 		return c.Next()
 	})
-
+	adminRoute.UseAdminRoute(db,apiEntry)
+	adminPermissionRoute.UseAdminPermissionRoute(db , apiEntry)
 	storeRoute.UseStoreRoute(db, apiEntry)
 	orderRoute.UseOrderRoute(db, apiEntry)
 	productCateRoute.UseProductCategoryRoute(db, apiEntry)
