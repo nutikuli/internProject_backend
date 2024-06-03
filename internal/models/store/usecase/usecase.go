@@ -52,7 +52,7 @@ func (s *storeUsecase) OnCreateStoreAccount(c *fiber.Ctx, ctx context.Context, s
 			PathUrl:    fDatReq.FileData,
 			Name:       fDatReq.FileName,
 			EntityType: "ACCOUNT",
-			AccountId:  *newStoreId,
+			AccountId:  newStoreId,
 		}
 
 		_, fUrl, status, errOnCreatedFile := file.EncodeBase64toFile(c, true)

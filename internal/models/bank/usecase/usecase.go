@@ -41,7 +41,7 @@ func (a *bankUseCase) OnCreateBank(c *fiber.Ctx, ctx context.Context, bankDatReq
 			PathUrl:    fDatReq.FileData,
 			Name:       fDatReq.FileName,
 			EntityType: "BANK",
-			BankId:     *newBankId,
+			BankId:     newBankId,
 		}
 
 		_, fUrl, status, errOnCreatedFile := file.EncodeBase64toFile(c, true)
@@ -157,7 +157,7 @@ func (a *bankUseCase) OnUpdateBankById(c *fiber.Ctx, ctx context.Context, bankId
 			PathUrl:    fDatReq.FileData,
 			Name:       fDatReq.FileName,
 			EntityType: "BANK",
-			BankId:     bankId,
+			BankId:     &bankId,
 		}
 
 		_, fUrl, status, errOnCreatedFile := file.EncodeBase64toFile(c, true)
