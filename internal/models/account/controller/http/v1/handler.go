@@ -161,7 +161,7 @@ func (a *accountConn) UpdatePass(c *fiber.Ctx) error {
 			"result":      nil,
 		})
 	}
-
+	log.Debug(req)
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
 	)

@@ -148,13 +148,14 @@ func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersCredentia
 	if err != nil {
 		return nil, nil, http.StatusInternalServerError, err
 	}
+	log.Debug(user)
 	log.Debug(req.Password)
 	log.Debug(user.Password)
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		fmt.Println(err.Error())
 		return nil, nil, http.StatusInternalServerError, err
 	}
-	
+
 	userToken, err := a.accountRepo.SignUsersAccessToken(&entities.UserSignToken{
 		Role:  user.Role,
 		Email: req.Email,
@@ -174,6 +175,7 @@ func (a *AccountUsecase) Register(ctx context.Context, req entities.AccountCrede
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*req.GetPassword()), bcrypt.DefaultCost)
+	
 	if err != nil {
 		return nil, nil, http.StatusInternalServerError, err
 	}
@@ -265,8 +267,8 @@ func (a *AccountUsecase) ResetPassword(ctx context.Context, req *entities.UsersC
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
-	log.Debug("User Email : ",user)
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	log.Debug("User Email : ", user)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
 
 	repassRes := &entities.UpdatePass{
 		Id:       user.Id,
@@ -287,7 +289,7 @@ func (a *AccountUsecase) ResetPassword(ctx context.Context, req *entities.UsersC
 		}
 	case "ADMIN":
 		err := a.adminUseRepo.UpdateAdminPasswordById(ctx, repassRes)
-		log.Debug("Change")
+		log.Debug(err, repassRes)
 		if err != nil {
 			return nil, http.StatusInternalServerError, err
 		}
