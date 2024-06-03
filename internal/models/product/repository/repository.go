@@ -48,7 +48,7 @@ func (s *productRepo) CreateProduct(ctx context.Context, req entities.ProductCre
 }
 
 func (s *productRepo) GetAllProducts(ctx context.Context) ([]*entities.Product, error) {
-	var products []*entities.Product
+	var products = make([]*entities.Product, 0)
 	err := s.db.SelectContext(ctx, &products, repository_query.GetAllProducts)
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (s *productRepo) GetAllProducts(ctx context.Context) ([]*entities.Product, 
 }
 
 func (s *productRepo) GetProductById(ctx context.Context, productId *int64) (*entities.Product, error) {
-	var product *entities.Product
+	var product = &entities.Product{}
 	err := s.db.GetContext(ctx, product, repository_query.GetProductById, *productId)
 	if err != nil {
 		return nil, err
@@ -68,8 +68,8 @@ func (s *productRepo) GetProductById(ctx context.Context, productId *int64) (*en
 }
 
 func (s *productRepo) GetProductsByStoreId(ctx context.Context, storeId *int64) ([]*entities.Product, error) {
-	var products []*entities.Product
-	err := s.db.SelectContext(ctx, products, repository_query.GetProductsByStoreId, *storeId)
+	var products = make([]*entities.Product, 0)
+	err := s.db.SelectContext(ctx, &products, repository_query.GetProductsByStoreId, *storeId)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (s *productRepo) DeleteProductById(ctx context.Context, productId *int64) e
 		return err
 	}
 	if affected == 0 {
-		return errors.New("Can't Delete, Product not found")
+		return errors.New("Can't Delete, Product not found ")
 	}
 
 	return nil
@@ -98,7 +98,7 @@ func (s *productRepo) DeleteProductById(ctx context.Context, productId *int64) e
 // GetProductsByOrderId implements product.ProductRepository.
 func (s *productRepo) GetProductsByOrderId(ctx context.Context, orderId *int64) ([]*entities.Product, error) {
 	var products = make([]*entities.Product, 0)
-	err := s.db.SelectContext(ctx, products, repository_query.GetProductsByOrderId, *orderId)
+	err := s.db.SelectContext(ctx, &products, repository_query.GetProductsByOrderId, *orderId)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (s *productRepo) UpdateProductById(ctx context.Context, productId int64, re
 		return err
 	}
 	if affected == 0 {
-		return errors.New("Can't Update, Product not found")
+		return errors.New("Can't Update, Product not found or had been updated already")
 	}
 
 	return nil

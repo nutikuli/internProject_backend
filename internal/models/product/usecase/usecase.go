@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/nutikuli/internProject_backend/internal/models/product"
 	"github.com/nutikuli/internProject_backend/internal/models/product/dtos"
 	_prodEntities "github.com/nutikuli/internProject_backend/internal/models/product/entities"
@@ -228,6 +229,7 @@ func (p *productUsecase) OnUpdateProductById(c *fiber.Ctx, ctx context.Context, 
 	if errOnGetFiles != nil {
 		return nil, http.StatusInternalServerError, errOnGetFiles
 	}
+	log.Debug(filesRes)
 
 	newProduct, err := p.productRepo.GetProductById(ctx, &productId)
 	if err != nil {

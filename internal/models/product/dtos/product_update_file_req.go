@@ -7,5 +7,5 @@ import (
 
 type ProductFileUpdateReq struct {
 	ProductData *entities.ProductUpdateReq       `json:"product_data"`
-	FileData    []*_fileEntities.FileUploaderReq `json:"file_data"`
+	FilesData   []*_fileEntities.FileUploaderReq `json:"files_data"`
 }
