@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/nutikuli/internProject_backend/internal/models/customer"
 	"github.com/nutikuli/internProject_backend/internal/models/customer/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/customer/entities"
@@ -22,7 +23,7 @@ func NewCustomerHandler(CustomerUse customer.CustomerUsecase) *customerConn {
 }
 
 func (cus *customerConn) GetCustomerById(c *fiber.Ctx) error {
-	req, err := c.ParamsInt("customer_id")
+	req, err := strconv.ParseInt(c.Params("customer_id"), 10, 64)
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -33,7 +34,7 @@ func (cus *customerConn) GetCustomerById(c *fiber.Ctx) error {
 		})
 	}
 
-	req64 := int64(req)
+	log.Debug(req)
 
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
@@ -41,7 +42,7 @@ func (cus *customerConn) GetCustomerById(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	customer, status, err := cus.CustomerUse.OnGetCustomerById(ctx, req64)
+	customer, status, err := cus.CustomerUse.OnGetCustomerById(ctx, req)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
@@ -60,7 +61,7 @@ func (cus *customerConn) GetCustomerById(c *fiber.Ctx) error {
 }
 
 func (con *customerConn) CreateCustomerAccount(c *fiber.Ctx) error {
-	req := new(dtos.CustomerFileReq)
+	req := new(entities.CustomerRegisterReq)
 	if err := c.BodyParser(req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":      fiber.StatusBadRequest,
@@ -69,6 +70,7 @@ func (con *customerConn) CreateCustomerAccount(c *fiber.Ctx) error {
 			"result":      nil,
 		})
 	}
+	log.Debug(req)
 
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
@@ -76,7 +78,7 @@ func (con *customerConn) CreateCustomerAccount(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	customerRes, userToken, status, err := con.CustomerUse.OnCreateCustomerAccount(c, ctx, req.CustomerRegisterData)
+	customerRes, userToken, status, err := con.CustomerUse.OnCreateCustomerAccount(c, ctx, req)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
@@ -112,7 +114,7 @@ func (con *customerConn) UpdateCustomerById(c *fiber.Ctx) error {
 
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
-		reqP        = c.Params("admin_id")
+		reqP        = c.Params("customer_id")
 	)
 	defer cancel()
 

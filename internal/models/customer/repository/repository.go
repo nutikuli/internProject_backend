@@ -36,7 +36,7 @@ func (c *CustomerRepo) GetAccountCustomers(ctx context.Context) (*entities.Custo
 }
 
 func (c *CustomerRepo) GetCustomerById(ctx context.Context, customerId int64) (*entities.Customer, error) {
-	var customer *entities.Customer
+	customer := &entities.Customer{}
 	err := c.db.GetContext(ctx, customer, repository_query.SQL_get_account_customer_by_id, customerId)
 	if err != nil {
 		return nil, err
