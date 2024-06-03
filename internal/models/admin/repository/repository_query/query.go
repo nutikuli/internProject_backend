@@ -16,7 +16,7 @@ var SQL_update_account_admin = `UPDATE  Account SET name= ?, password = ? ,phone
 
 //update password account admin
 
-var SQL_update_password_account_admin = `UPDATE Account SET password = ?  WHERE id = ? ;`
+var SQL_update_password_account_admin = `UPDATE Account SET password = ?  WHERE id = ? and role = ? ;`
 
 //delete admin account 
 
