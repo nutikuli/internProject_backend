@@ -29,7 +29,7 @@ model Account {
     orders            Order[]           @relation("CustomerOrder")
     Order             Order[]
     createdAt         DateTime          @default(now())
-    updatedAt         DateTime          @updatedAt
+    updatedAt         DateTime          @default(now()) @updatedAt
 
     @@index([email])
 }
@@ -49,7 +49,7 @@ model Product {
     files         File[]          @relation("ProductFile")
     orderProducts OrderProduct[]
     createdAt     DateTime        @default(now())
-    updatedAt     DateTime        @updatedAt
+    updatedAt     DateTime        @default(now()) @updatedAt
 }
 
 model ProductCategory {
@@ -61,7 +61,7 @@ model ProductCategory {
     products      Product[]
     storeAccounts Account[] @relation("StoreProductCategory")
     createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt
+    updatedAt     DateTime  @default(now()) @updatedAt
 }
 
 model Order {
@@ -83,7 +83,7 @@ model Order {
     orderProducts OrderProduct[]
     File          File[]
     createdAt     DateTime       @default(now())
-    updatedAt     DateTime       @updatedAt
+    updatedAt     DateTime       @default(now()) @updatedAt
 }
 
 model OrderProduct {
@@ -93,7 +93,7 @@ model OrderProduct {
     order     Order    @relation(fields: [orderId], references: [id])
     product   Product  @relation(fields: [productId], references: [id])
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    updatedAt DateTime @default(now()) @updatedAt
 
     @@id([orderId, productId])
 }
@@ -110,7 +110,7 @@ model Bank {
     orders    Order[]
     files     File[]   @relation("BankFile")
     createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    updatedAt DateTime @default(now()) @updatedAt
 }
 
 model AdminPermission {
@@ -134,7 +134,7 @@ model File {
     Order      Order?     @relation(fields: [orderId], references: [id])
     orderId    Int?
     createdAt  DateTime   @default(now())
-    updatedAt  DateTime   @updatedAt
+    updatedAt  DateTime   @default(now()) @updatedAt
 }
 
 model Log {
@@ -143,7 +143,7 @@ model Log {
     menuRequest   String
     actionRequest String
     createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+    updatedAt     DateTime @default(now()) @updatedAt
     accountId     Int
     account       Account  @relation(fields: [accountId], references: [id])
 }
