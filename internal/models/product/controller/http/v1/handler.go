@@ -19,6 +19,30 @@ func NewProductHandler(prodUse product.ProductUsecase) *prodConn {
 	}
 }
 
+func (p *prodConn) GetAllProducts(c *fiber.Ctx) error {
+	var (
+		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
+	)
+	defer cancel()
+
+	products, status, err := p.prodUse.OnGetAllProducts(ctx)
+	if err != nil {
+		return c.Status(status).JSON(fiber.Map{
+			"status":      status,
+			"status_code": status,
+			"message":     err.Error(),
+			"result":      nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":      fiber.StatusOK,
+		"status_code": fiber.StatusOK,
+		"message":     nil,
+		"result":      products,
+	})
+}
+
 func (p *prodConn) GetProductsByStoreId(c *fiber.Ctx) error {
 	req, err := c.ParamsInt("store_id")
 

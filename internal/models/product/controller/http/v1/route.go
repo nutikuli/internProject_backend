@@ -28,5 +28,5 @@ func UseProductRoute(db *sqlx.DB, app fiber.Router) {
 	prodR.Get("/get-products-by-order-id/:order_id", prodConn.GetProductsByOrderId)
 	prodR.Delete("/delete-product-id/:product_id", prodConn.DeleteProductById)
 	prodR.Patch("/update-product-id/:product_id", prodConn.UpdateProductById)
-
+	prodR.Get("/get-products", prodConn.GetAllProducts)
 }
