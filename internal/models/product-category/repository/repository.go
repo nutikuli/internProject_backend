@@ -80,3 +80,27 @@ func (s *productCategoryRepo) DeleteProductCategoryById(ctx context.Context, cat
 
 	return nil
 }
+
+func (s *productCategoryRepo) UpdateProductCategoryById(ctx context.Context, categoryId int64, req *entities.ProductCategoryCreatedReq) error {
+	args := utils.Array{
+		req.Name,
+		req.Status,
+		req.Code,
+		req.Detail,
+	}
+
+	res, err := s.db.ExecContext(ctx, repository_query.UpdateProductCategoryById, args...)
+	if err != nil {
+		return err
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affected == 0 {
+		return errors.New("Can't Update, Product not found")
+	}
+
+	return nil
+}
