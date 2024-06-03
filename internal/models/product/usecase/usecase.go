@@ -42,7 +42,7 @@ func (p *productUsecase) OnCreateProduct(c *fiber.Ctx, ctx context.Context, prod
 			PathUrl:    fDatReq.FileData,
 			Name:       fDatReq.FileName,
 			EntityType: "PRODUCT",
-			EntityId:   *productId,
+			ProductId:  productId,
 		}
 
 		_, fUrl, status, errOnCreatedFile := file.EncodeBase64toFile(c, true)
@@ -208,7 +208,7 @@ func (p *productUsecase) OnUpdateProductById(c *fiber.Ctx, ctx context.Context, 
 			PathUrl:    fDatReq.FileData,
 			Name:       fDatReq.FileName,
 			EntityType: "PRODUCT",
-			EntityId:   productId,
+			ProductId:  &productId,
 		}
 
 		_, fUrl, status, errOnCreatedFile := file.UpdateFile(c, true)

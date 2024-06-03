@@ -81,7 +81,6 @@ model Order {
     bank          Bank           @relation(fields: [bankId], references: [id])
     files         File[]         @relation("OrderFile")
     orderProducts OrderProduct[]
-    File          File[]
     createdAt     DateTime       @default(now())
     updatedAt     DateTime       @default(now()) @updatedAt
 }
@@ -125,14 +124,14 @@ model File {
     pathUrl    String
     type       String
     entityType EntityType
-    entityId   Int
-    account    Account?   @relation(name: "AccountFile", fields: [entityId], references: [id], map: "AccountFileRelation")
-    order      Order?     @relation(name: "OrderFile", fields: [entityId], references: [id], map: "OrderFileRelation")
-    product    Product?   @relation(name: "ProductFile", fields: [entityId], references: [id], map: "ProductFileRelation")
-    bank       Bank?      @relation(name: "BankFile", fields: [entityId], references: [id], map: "BankFileRelation")
     accountId  Int?
-    Order      Order?     @relation(fields: [orderId], references: [id])
     orderId    Int?
+    productId  Int?
+    bankId     Int?
+    account    Account?   @relation(name: "AccountFile", fields: [accountId], references: [id])
+    order      Order?     @relation(name: "OrderFile", fields: [orderId], references: [id])
+    product    Product?   @relation(name: "ProductFile", fields: [productId], references: [id])
+    bank       Bank?      @relation(name: "BankFile", fields: [bankId], references: [id])
     createdAt  DateTime   @default(now())
     updatedAt  DateTime   @default(now()) @updatedAt
 }

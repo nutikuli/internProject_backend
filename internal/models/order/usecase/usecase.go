@@ -57,7 +57,7 @@ func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, bankId i
 			PathUrl:    fDatReq.FileData,
 			Name:       fDatReq.FileName,
 			EntityType: "ORDER",
-			EntityId:   *newOrderId,
+			OrderId:    newOrderId,
 		}
 
 		_, fUrl, status, errOnCreatedFile := file.EncodeBase64toFile(c, true)
