@@ -48,7 +48,6 @@ func (c *CustomerRepo) GetCustomerById(ctx context.Context, customerId int64) (*
 func (c *CustomerRepo) CreateCustomerAccount(ctx context.Context, user *entities.CustomerRegisterReq) (*int64, error) {
 
 	args := utils.Array{
-		user.Id,
 		user.Name,
 		user.Password,
 		user.Phone,

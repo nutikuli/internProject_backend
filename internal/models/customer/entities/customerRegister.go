@@ -1,7 +1,6 @@
 package entities
 
 type CustomerRegisterReq struct {
-	Id       int64  `json:"id" form:"id" binding:"required"`
 	Name     string `json:"acc_name" form:"acc_name" binding:"required"`
 	Password string ` json:"acc_password" form:"acc_password" binding:"required"`
 	Phone    string ` json:"acc_phone" form:"acc_phone" binding:"required"`
