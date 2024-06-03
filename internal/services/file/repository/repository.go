@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/jmoiron/sqlx"
 	"github.com/nutikuli/internProject_backend/internal/services/file"
 	"github.com/nutikuli/internProject_backend/internal/services/file/entities"
@@ -21,16 +22,44 @@ func NewFileRepository(db *sqlx.DB) file.FileRepository {
 }
 
 func (f *fileRepo) CreateFileByEntityAndId(ctx context.Context, file *entities.FileUploaderReq, fileEntity *entities.FileEntityReq) (*int64, error) {
-	args := utils.Array{
-		file.FileName,
-		file.FileData,
-		file.FileType,
-		fileEntity.EntityType,
-		fileEntity.EntityId,
-	}
+	var args utils.Array
 
-	result, err := f.db.ExecContext(ctx, repository_query.FileInsertByEntityAndId, args...)
+	var SQL_FileInsertByEntityAndId string
+	switch fileEntity.EntityType {
+	case "ACCOUNT":
+		SQL_FileInsertByEntityAndId = "INSERT INTO File (name, pathUrl, type,  entityType, accountId) VALUES (?, ?, ?, ?, ?)"
+		args = utils.Array{
+			file.FileName,
+			file.FileData,
+			file.FileType,
+			fileEntity.EntityType,
+			struct {
+				AccountId int64 `db:"accountId"`
+			}{AccountId: fileEntity.EntityId},
+		}
+	case "PRODUCT":
+		SQL_FileInsertByEntityAndId = "INSERT INTO File (name, pathUrl, type,  entityType, productId) VALUES (?, ?, ?, ?, ?)"
+		args = utils.Array{file.FileName, file.FileData, file.FileType, fileEntity.EntityType, struct {
+			ProductId int64 `db:"productId"`
+		}{ProductId: fileEntity.EntityId}}
+	case "ORDER":
+		SQL_FileInsertByEntityAndId = "INSERT INTO File (name, pathUrl, type,  entityType, orderId) VALUES (?, ?, ?, ?, ?)"
+		args = utils.Array{file.FileName, file.FileData, file.FileType, fileEntity.EntityType, struct {
+			OrderId int64 `db:"orderId"`
+		}{OrderId: fileEntity.EntityId}}
+	case "BANK":
+		SQL_FileInsertByEntityAndId = "INSERT INTO File (name, pathUrl, type,  entityType, bankId) VALUES (?, ?, ?, ?, ?)"
+		args = utils.Array{file.FileName, file.FileData, file.FileType, fileEntity.EntityType, struct {
+			BankId int64 `db:"bankId"`
+		}{BankId: fileEntity.EntityId}}
+	default:
+		panic("invalid entity type")
+	}
+	log.Debug("args: ", args)
+
+	result, err := f.db.ExecContext(ctx, SQL_FileInsertByEntityAndId, args...)
 	if err != nil {
+		log.Debug("err on CreateFileByEntityAndId: ", err)
 		return nil, err
 	}
 
@@ -44,7 +73,7 @@ func (f *fileRepo) CreateFileByEntityAndId(ctx context.Context, file *entities.F
 }
 
 func (f *fileRepo) GetFiles(ctx context.Context) ([]*entities.File, error) {
-	var files []*entities.File
+	var files = make([]*entities.File, 0)
 
 	err := f.db.SelectContext(ctx, &files, repository_query.QueryFileSelectAll)
 	if err != nil {
@@ -55,15 +84,51 @@ func (f *fileRepo) GetFiles(ctx context.Context) ([]*entities.File, error) {
 }
 
 func (f *fileRepo) GetFilesByIdAndEntity(ctx context.Context, req *entities.FileEntityReq) ([]*entities.File, error) {
-	var files []*entities.File
+	var files = make([]*entities.File, 0)
 
-	args := utils.Array{
-		req.EntityType,
-		req.EntityId,
+	var args utils.Array
+
+	var SQL_QueryFileSelectByIdAndEntity string
+	switch req.EntityType {
+	case "ACCOUNT":
+		SQL_QueryFileSelectByIdAndEntity = "SELECT * FROM File WHERE entityType = ? AND accountId = ?"
+		args = utils.Array{
+			req.EntityType,
+			struct {
+				AccountId int64 `db:"accountId"`
+			}{AccountId: req.EntityId},
+		}
+	case "PRODUCT":
+		SQL_QueryFileSelectByIdAndEntity = "SELECT * FROM File WHERE entityType = ? AND productId = ?"
+		args = utils.Array{
+			req.EntityType,
+			struct {
+				ProductId int64 `db:"productId"`
+			}{ProductId: req.EntityId},
+		}
+	case "ORDER":
+		SQL_QueryFileSelectByIdAndEntity = "SELECT * FROM File WHERE entityType = ? AND orderId = ?"
+		args = utils.Array{
+			req.EntityType,
+			struct {
+				OrderId int64 `db:"orderId"`
+			}{OrderId: req.EntityId},
+		}
+	case "BANK":
+		SQL_QueryFileSelectByIdAndEntity = "SELECT * FROM File WHERE entityType = ? AND bankId = ?"
+		args = utils.Array{
+			req.EntityType,
+			struct {
+				BankId int64 `db:"bankId"`
+			}{BankId: req.EntityId},
+		}
+	default:
+		panic("invalid entity type")
 	}
 
-	err := f.db.SelectContext(ctx, &files, repository_query.QueryFileSelectByIdAndEntity, args...)
+	err := f.db.SelectContext(ctx, &files, SQL_QueryFileSelectByIdAndEntity, args...)
 	if err != nil {
+		log.Debug("err on GetFilesByIdAndEntity: ", err)
 		return nil, err
 	}
 
@@ -71,12 +136,48 @@ func (f *fileRepo) GetFilesByIdAndEntity(ctx context.Context, req *entities.File
 }
 
 func (f *fileRepo) DeleteFileByIdAndEntity(ctx context.Context, req *entities.FileEntityReq) error {
-	args := utils.Array{
-		req.EntityType,
-		req.EntityId,
+
+	var args utils.Array
+
+	var SQL_ExecFileDeleteByIdAndEntity string
+	switch req.EntityType {
+	case "ACCOUNT":
+		SQL_ExecFileDeleteByIdAndEntity = "DELETE FROM File WHERE entityType = ? AND accountId = ?"
+		args = utils.Array{
+			req.EntityType,
+			struct {
+				AccountId int64 `db:"accountId"`
+			}{AccountId: req.EntityId},
+		}
+	case "PRODUCT":
+		SQL_ExecFileDeleteByIdAndEntity = "DELETE FROM File WHERE entityType = ? AND productId = ?"
+		args = utils.Array{
+			req.EntityType,
+			struct {
+				ProductId int64 `db:"productId"`
+			}{ProductId: req.EntityId},
+		}
+	case "ORDER":
+		SQL_ExecFileDeleteByIdAndEntity = "DELETE FROM File WHERE entityType = ? AND orderId = ?"
+		args = utils.Array{
+			req.EntityType,
+			struct {
+				OrderId int64 `db:"orderId"`
+			}{OrderId: req.EntityId},
+		}
+	case "BANK":
+		SQL_ExecFileDeleteByIdAndEntity = "DELETE FROM File WHERE entityType = ? AND bankId = ?"
+		args = utils.Array{
+			req.EntityType,
+			struct {
+				BankId int64 `db:"bankId"`
+			}{BankId: req.EntityId},
+		}
+	default:
+		panic("invalid entity type")
 	}
 
-	_, err := f.db.ExecContext(ctx, repository_query.ExecFileDeleteByIdAndEntity, args...)
+	_, err := f.db.ExecContext(ctx, SQL_ExecFileDeleteByIdAndEntity, args...)
 	if err != nil {
 		return err
 	}
@@ -86,15 +187,60 @@ func (f *fileRepo) DeleteFileByIdAndEntity(ctx context.Context, req *entities.Fi
 
 // UpdateFileByIdAndEntity implements file.FileRepository.
 func (f *fileRepo) UpdateFileByIdAndEntity(ctx context.Context, req *entities.FileEntityReq, file *entities.FileUploaderReq) error {
-	args := utils.Array{
-		file.FileName,
-		file.FileData,
-		file.FileType,
-		req.EntityType,
-		req.EntityId,
+	var args utils.Array
+
+	var SQL_ExecFileUpdateByIdAndEntity string
+	switch req.EntityType {
+	case "ACCOUNT":
+		SQL_ExecFileUpdateByIdAndEntity = "UPDATE File SET name = ?, pathUrl = ?, type = ? WHERE entityType = ? AND accountId = ?"
+		args = utils.Array{
+			file.FileName,
+			file.FileData,
+			file.FileType,
+			req.EntityType,
+			struct {
+				AccountId int64 `db:"accountId"`
+			}{AccountId: req.EntityId},
+		}
+	case "PRODUCT":
+		SQL_ExecFileUpdateByIdAndEntity = "UPDATE File SET name = ?, pathUrl = ?, type = ? WHERE entityType = ? AND productId = ?"
+		args = utils.Array{
+			file.FileName,
+			file.FileData,
+			file.FileType,
+			req.EntityType,
+			struct {
+				ProductId int64 `db:"productId"`
+			}{ProductId: req.EntityId},
+		}
+	case "ORDER":
+		SQL_ExecFileUpdateByIdAndEntity = "UPDATE File SET name = ?, pathUrl = ?, type = ? WHERE entityType = ? AND orderId = ?"
+		args = utils.Array{
+			file.FileName,
+			file.FileData,
+			file.FileType,
+			req.EntityType,
+
+			struct {
+				OrderId int64 `db:"orderId"`
+			}{OrderId: req.EntityId},
+		}
+	case "BANK":
+		SQL_ExecFileUpdateByIdAndEntity = "UPDATE File SET name = ?, pathUrl = ?, type = ? WHERE entityType = ? AND bankId = ?"
+		args = utils.Array{
+			file.FileName,
+			file.FileData,
+			file.FileType,
+			req.EntityType,
+			struct {
+				BankId int64 `db:"bankId"`
+			}{BankId: req.EntityId},
+		}
+	default:
+		panic("invalid entity type")
 	}
 
-	_, err := f.db.ExecContext(ctx, repository_query.ExecFileUpdateByIdAndEntity, args...)
+	_, err := f.db.ExecContext(ctx, SQL_ExecFileUpdateByIdAndEntity, args...)
 	if err != nil {
 		return err
 	}

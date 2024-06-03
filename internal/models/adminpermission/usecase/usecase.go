@@ -41,7 +41,7 @@ func (a *adminpermissionUseCase) OnCreateAdminpermissionAccount(c *fiber.Ctx, ct
 			PathUrl:    fDatReq.FileData,
 			Name:       fDatReq.FileName,
 			EntityType: "ADMIN",
-			EntityId:   *newAdminpermissionId,
+			AccountId:  *newAdminpermissionId,
 		}
 
 		_, fUrl, errOnCreatedFile := file.Base64toFile(c, true)
