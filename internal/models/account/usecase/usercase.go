@@ -164,7 +164,7 @@ func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersCredentia
 		return nil, nil, http.StatusInternalServerError, err
 	}
 	log.Debug(userToken)
-	log.Debug(user)
+	log.Debug("user : ",user)
 	return user, userToken, http.StatusOK, nil
 }
 
