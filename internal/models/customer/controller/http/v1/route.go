@@ -26,7 +26,9 @@ func UseCustomerRoute(db *sqlx.DB, app fiber.Router) {
 	customerConn := NewCustomerHandler(customerUse)
 
 	authR.Post("/account-register", customerConn.CreateCustomerAccount)
+	authR.Get("/getallcustomer", customerConn.GetAllCustomer)
 	authR.Get("/:customer_id", customerConn.GetCustomerById)
 	authR.Patch("/:customer_id", customerConn.UpdateCustomerById)
 	authR.Delete("/:customer_id", customerConn.DeletedCustomerByID)
+
 }

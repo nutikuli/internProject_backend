@@ -82,3 +82,20 @@ func (u *customerUsecase) OnDeletedCustomer(ctx context.Context, Id int64) (int,
 
 	return http.StatusOK, nil
 }
+
+func (u *customerUsecase) OnGetAllUserCustomer(ctx context.Context) ([]*_customerDtos.CustomerRes, int, error) {
+	customer, err := u.customerRepo.GetAccountCustomers(ctx)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	var customerRes []*_customerDtos.CustomerRes
+
+	for _, customers := range customer {
+		customerRes = append(customerRes, &_customerDtos.CustomerRes{
+			CustomerData: customers,
+		})
+	}
+
+	return customerRes, http.StatusOK, nil
+}
