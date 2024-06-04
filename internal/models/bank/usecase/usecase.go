@@ -205,7 +205,7 @@ func (a *bankUseCase) OnGetBankByOrderId(ctx context.Context, orderId int64) (*_
 	}
 
 	return &_bankDtos.BankFileRes{
-		BankData:  bankRes,
+		Bank:      bankRes,
 		FilesData: filesRes,
 	}, http.StatusOK, nil
 }
