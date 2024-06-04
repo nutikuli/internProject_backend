@@ -53,15 +53,16 @@ model Product {
 }
 
 model ProductCategory {
-    id            Int       @id @default(autoincrement())
-    name          String
-    status        Boolean
-    code          String?
-    detail        String?
-    products      Product[]
-    storeAccounts Account[] @relation("StoreProductCategory")
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @default(now()) @updatedAt
+    id           Int       @id @default(autoincrement())
+    name         String
+    status       Boolean
+    code         String?
+    detail       String?
+    products     Product[]
+    storeAccount Account   @relation(name: "StoreProductCategory", fields: [storeId], references: [id], onDelete: Cascade)
+    storeId      Int
+    createdAt    DateTime  @default(now())
+    updatedAt    DateTime  @default(now()) @updatedAt
 }
 
 model Order {
