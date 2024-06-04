@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+
 	"github.com/joho/godotenv"
 	"github.com/nutikuli/internProject_backend/pkg/datasource"
 )
@@ -16,6 +17,13 @@ func main() {
 	}
 
 	app := fiber.New()
+
+	app.Use(func(c *fiber.Ctx) error {
+		c.Set("Access-Control-Allow-Origin", "*")
+		c.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH")
+		c.Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		return c.Next()
+	})
 
 	port := os.Getenv("SERVER_PORT")
 
