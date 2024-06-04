@@ -42,7 +42,7 @@ func UseOrderRoute(db *sqlx.DB, app fiber.Router) {
 	orderConn := NewOrderHandler(orderUse)
 
 	orderR.Post("/create-order", orderConn.CreateOrder)
-	orderR.Get("/get-order-id/:order_id", orderConn.GetOrderById)
+	orderR.Get("/get-store-order-by-id/:store_id/:order_id", orderConn.GetOrderById)
 	orderR.Get("/get-orders-by-store-id/:store_id", orderConn.GetOrdersByStoreId)
 	orderR.Get("/get-orders-by-customer-id/:customer_id", orderConn.GetOrdersByCustomerId)
 	orderR.Patch("/update-order-state/:order_id", orderConn.UpdateOrderTransportDetailAndState)
