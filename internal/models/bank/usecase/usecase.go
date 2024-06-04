@@ -187,3 +187,26 @@ func (a *bankUseCase) OnUpdateBankById(c *fiber.Ctx, ctx context.Context, bankId
 		FilesData: filesRes,
 	}, http.StatusOK, nil
 }
+
+// OnGetBankByOrderId implements bank.BankUseCase.
+func (a *bankUseCase) OnGetBankByOrderId(ctx context.Context, orderId int64) (*_bankDtos.BankFileRes, int, error) {
+	bankRes, errOnGetStore := a.bankRepo.GetBankByOrderId(ctx, orderId)
+	if errOnGetStore != nil {
+		return nil, http.StatusInternalServerError, errOnGetStore
+	}
+
+	fileEntity := &_fileEntities.FileEntityReq{
+		EntityType: "ORDER",
+		EntityId:   orderId,
+	}
+
+	filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
+	if errOnGetFiles != nil {
+		return nil, http.StatusInternalServerError, errOnGetFiles
+	}
+
+	return &_bankDtos.BankFileRes{
+		BankData:  bankRes,
+		FilesData: filesRes,
+	}, http.StatusOK, nil
+}
