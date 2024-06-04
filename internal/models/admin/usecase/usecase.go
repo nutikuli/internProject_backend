@@ -13,7 +13,7 @@ import (
 	"github.com/nutikuli/internProject_backend/internal/models/admin"
 	"github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
 	_adminDtos "github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
-	"github.com/nutikuli/internProject_backend/internal/models/admin/entities"
+	// "github.com/nutikuli/internProject_backend/internal/models/admin/entities"
 	_adminEntities "github.com/nutikuli/internProject_backend/internal/models/admin/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/adminpermission"
 	"github.com/nutikuli/internProject_backend/internal/services/file"
@@ -25,14 +25,16 @@ type adminUseCase struct {
 	fileRepo            file.FileRepository
 	accUsecase          account.AccountUsecase
 	adminpermissionRepo adminpermission.AdminPermissionRepository
+	fileUse         file.FileUsecase 
 }
 
-func NewAdminUsecase(adminRepo admin.AdminRepository, fileRepo file.FileRepository, accUsecase account.AccountUsecase, adminpermissionRepo adminpermission.AdminPermissionRepository) admin.AdminUseCase {
+func NewAdminUsecase(adminRepo admin.AdminRepository, fileRepo file.FileRepository, accUsecase account.AccountUsecase, adminpermissionRepo adminpermission.AdminPermissionRepository,fileUse file.FileUsecase	) admin.AdminUseCase {
 	return &adminUseCase{
 		adminRepo:           adminRepo,
 		fileRepo:            fileRepo,
 		adminpermissionRepo: adminpermissionRepo,
 		accUsecase:          accUsecase,
+		fileUse: fileUse,
 	}
 }
 
@@ -127,16 +129,74 @@ func (a *adminUseCase) OnGetAdminById(ctx context.Context, adminId int64) (*_adm
 	}, http.StatusOK, nil
 }
 
-func (a *adminUseCase) OnUpdateUserById(ctx context.Context, Id int64, req *entities.AdminUpdateReq) (int, error) {
-
-	err := a.adminRepo.UpdateAdminById(ctx, Id, req)
-
+func (a *adminUseCase) OnUpdateAdminById(c *fiber.Ctx, ctx context.Context, adminId int64, adminDatReq *_adminEntities.AdminUpdateReq, fileDatReq []*_fileEntities.FileUploaderReq) (*dtos.AdminFileRes, int, error) {
+	err := a.adminRepo.UpdateAdminById(ctx, adminId, adminDatReq)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("failed to update user by ID: %w", err)
+		return nil, http.StatusInternalServerError, err
+	}
+	fEntity := &_fileEntities.FileEntityReq{
+		EntityType: "ACCOUNT",
+		EntityId:   adminId,
 	}
 
-	return http.StatusOK, nil
+	oldFilesProd, err := a.fileRepo.GetFilesByIdAndEntity(ctx, fEntity)
+	if err != nil {
+		log.Debug("error get file ", err)
+		return nil, http.StatusInternalServerError, err
+	}
+
+	for _, f := range oldFilesProd {
+		status, errOnDeleteFile := a.fileUse.OnDeleteFileByIdAndEntity(c, ctx, f.Id, fEntity)
+		if errOnDeleteFile != nil {
+			return nil, status, errOnDeleteFile
+		}
+
+	}
+
+	for _, fDatReq := range fileDatReq {
+		file := &_fileEntities.File{
+			Type:       fDatReq.FileType,
+			PathUrl:    fDatReq.FileData,
+			Name:       fDatReq.FileName,
+			EntityType: "ACCOUNT",
+			ProductId:  &adminId,
+		}
+
+		_, fUrl, status, errOnCreatedFile := file.UpdateFile(c, true)
+		if errOnCreatedFile != nil {
+			return nil, status, errOnCreatedFile
+		}
+
+		fDatReq.FileData = *fUrl
+		status, errOnInsertFile := a.fileUse.OnUpdateFileByIdAndEntity(c, ctx, fEntity, fDatReq)
+		if errOnInsertFile != nil {
+			return nil, status, errOnInsertFile
+		}
+		log.Debug("url ", fUrl)
+
+	}
+
+	filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fEntity)
+	if errOnGetFiles != nil {
+		return nil, http.StatusInternalServerError, errOnGetFiles
+	}
+	log.Debug(filesRes)
+
+	newAdmin, err := a.adminRepo.GetAccountAdminById(ctx, adminId)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	return &dtos.AdminFileRes{
+		AdminData: newAdmin,
+		FilesData:   filesRes,
+	}, http.StatusOK, nil
 }
+
+
+
+
+
 
 func (a *adminUseCase) AdminDeleted(ctx context.Context, Id int64) (int, error) {
 

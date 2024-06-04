@@ -10,6 +10,7 @@ import (
 	_AdminUse "github.com/nutikuli/internProject_backend/internal/models/admin/usecase"
 	_adperRepo "github.com/nutikuli/internProject_backend/internal/models/adminpermission/repository"
 	_fileRepo "github.com/nutikuli/internProject_backend/internal/services/file/repository"
+	_fileUse "github.com/nutikuli/internProject_backend/internal/services/file/usecase"
 )
 
 func UseAdminRoute(db *sqlx.DB, app fiber.Router) {
@@ -21,11 +22,12 @@ func UseAdminRoute(db *sqlx.DB, app fiber.Router) {
 	fileRepo := _fileRepo.NewFileRepository(db)
 	adminRepo := repository.NewFileRepository(db)
 	adperRepo := _adperRepo.NewAdminPermissionRepository(db)
+	fileUse := _fileUse.NewFileUsecase(fileRepo)
 
 	accRepo := _accRepo.NewAccountRepository(db)
 	accUse := _accUse.NewAccountUsecase(accRepo, fileRepo, adminRepo, nil, nil)
 
-	AdminUseCase := _AdminUse.NewAdminUsecase(adminRepo, fileRepo, accUse, adperRepo)
+	AdminUseCase := _AdminUse.NewAdminUsecase(adminRepo, fileRepo, accUse, adperRepo, fileUse)
 
 	AdminConn := NewAdminHandler(AdminUseCase)
 

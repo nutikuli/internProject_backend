@@ -139,7 +139,7 @@ func (a *bankUseCase) OnDeleteBankById(ctx context.Context, bankId int64) (int, 
 }
 
 // OnUpdateBankById implements bank.BankUseCase.
-func (a *bankUseCase) OnUpdateBankById(c *fiber.Ctx, ctx context.Context, bankId int64, bankDatReq *_bankEntities.BankCreatedReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_bankDtos.BankFileRes, int, error) {
+func (a *bankUseCase) OnUpdateBankById(c *fiber.Ctx, ctx context.Context, bankId int64, bankDatReq *_bankEntities.BankUpdateReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_bankDtos.BankFileRes, int, error) {
 
 	err := a.bankRepo.UpdateBankById(ctx, bankId, bankDatReq)
 	if err != nil {

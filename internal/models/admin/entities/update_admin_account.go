@@ -1,5 +1,6 @@
 package entities 
 
+
 type AdminUpdateReq struct {
 	Name         string `json:"name" from:"name" binding:"required"`
 	Password     string `json:"password" from:"password" binding:"required"`
@@ -9,5 +10,8 @@ type AdminUpdateReq struct {
 	Role         string `json:"role" from:"role" binding:"required"`
 	Status       bool   `json:"status" from:"status" binding:"required"`
 	PermissionID string `json:"permissino_id" from:"permissino_id" binding:"required"`
+	
+
+	
 }
 
