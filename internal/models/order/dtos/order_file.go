@@ -10,6 +10,6 @@ import (
 type OrderBanksFilesRes struct {
 	OrderData         *_orderEntities.Order          `json:"order_data"`
 	FilesData         []*_fileEntities.File          `json:"files_data"`
-	BanksData         []*_bankDtos.BankFileRes       `json:"banks_data"`
+	BanksData         *_bankDtos.BankFileRes         `json:"bank_payment"`
 	OrdersProductData []*_productDtos.ProductFileRes `json:"product_data"`
 }
