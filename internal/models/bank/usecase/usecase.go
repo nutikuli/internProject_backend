@@ -25,8 +25,7 @@ func NewBankUsecase(bankRepo bank.BankRepository, fileRepo file.FileRepository) 
 }
 
 func (a *bankUseCase) OnCreateBank(c *fiber.Ctx, ctx context.Context, bankDatReq *_bankEntities.BankCreatedReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_bankDtos.BankFileRes, int, error) {
-
-	newBankId, err := a.bankRepo.CreateBank(ctx, bankDatReq)
+	newBankId, err := a.bankRepo.CreateBank(ctx, *bankDatReq)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
@@ -61,13 +60,13 @@ func (a *bankUseCase) OnCreateBank(c *fiber.Ctx, ctx context.Context, bankDatReq
 		return nil, http.StatusInternalServerError, errOnGetFiles
 	}
 
-	bankRes, errOnGetStore := a.bankRepo.GetBankById(ctx, *newBankId)
-	if errOnGetStore != nil {
-		return nil, http.StatusInternalServerError, errOnGetStore
+	bankRes, err := a.bankRepo.GetBankById(ctx, *newBankId)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
 	}
 
 	return &_bankDtos.BankFileRes{
-		BankData:  bankRes,
+		Bank:      bankRes,
 		FilesData: filesRes,
 	}, http.StatusOK, nil
 
@@ -94,7 +93,7 @@ func (a *bankUseCase) OnGetBanksByStoreId(ctx context.Context, storeId int64) ([
 		}
 
 		res := &_bankDtos.BankFileRes{
-			BankData:  b,
+			Bank:      b,
 			FilesData: filesRes,
 		}
 
@@ -123,7 +122,7 @@ func (a *bankUseCase) OnGetBankByBankId(ctx context.Context, bankId int64) (*_ba
 	}
 
 	return &_bankDtos.BankFileRes{
-		BankData:  bankRes,
+		Bank:      bankRes,
 		FilesData: filesRes,
 	}, http.StatusOK, nil
 }
@@ -183,7 +182,7 @@ func (a *bankUseCase) OnUpdateBankById(c *fiber.Ctx, ctx context.Context, bankId
 	}
 
 	return &_bankDtos.BankFileRes{
-		BankData:  bankRes,
+		Bank:      bankRes,
 		FilesData: filesRes,
 	}, http.StatusOK, nil
 }

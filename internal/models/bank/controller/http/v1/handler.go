@@ -59,22 +59,11 @@ func (o *bankConn) GetBanksByStoreId(c *fiber.Ctx) error {
 
 func (o *bankConn) CreateBank(c *fiber.Ctx) error {
 	req := new(dtos.BankFileReq)
-	if err := c.BodyParser(&req); err != nil {
+	if err := c.BodyParser(req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":      fiber.StatusBadRequest,
 			"status_code": fiber.StatusBadRequest,
 			"message":     "error, invalid request body",
-			"raw_message": err.Error(),
-			"result":      nil,
-		})
-	}
-
-	_, errOnValidate := utils.SchemaValidator(req)
-	if errOnValidate != nil {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"status":      http.StatusText(http.StatusBadRequest),
-			"status_code": http.StatusBadRequest,
-			"message":     errOnValidate.Error(),
 			"result":      nil,
 		})
 	}
@@ -82,9 +71,9 @@ func (o *bankConn) CreateBank(c *fiber.Ctx) error {
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
 	)
+
 	defer cancel()
 
-	// Call OnCreateBank with all four arguments
 	bank, status, err := o.BankUse.OnCreateBank(c, ctx, req.BankData, req.FilesData)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
@@ -98,7 +87,7 @@ func (o *bankConn) CreateBank(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(fiber.Map{
 		"status":      http.StatusText(http.StatusOK),
 		"status_code": http.StatusOK,
-		"message":     "",
+		"message":     nil,
 		"result":      bank,
 	})
 }

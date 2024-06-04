@@ -57,17 +57,22 @@ func (a *BankRepo) GetBankById(ctx context.Context, id int64) (*entities.Bank, e
 	return bank, nil
 }
 
-func (a *BankRepo) CreateBank(ctx context.Context, bankdata *entities.BankCreatedReq) (*int64, error) {
-
-	bankstatus := 1
-	res, err := a.db.ExecContext(ctx, repository_query.SQL_insert_bank, bankdata.Name, bankdata.AccNumber, bankdata.AccName, bankstatus, bankdata.AvatarUrl, bankdata.StoreId)
+func (a *BankRepo) CreateBank(ctx context.Context, bankdata entities.BankCreatedReq) (*int64, error) {
+	args := utils.Array{
+		bankdata.AccName,
+		bankdata.AccNumber,
+		bankdata.AvatarUrl,
+		bankdata.Status,
+		bankdata.Name,
+		bankdata.StoreId,
+	}
+	res, err := a.db.ExecContext(ctx, repository_query.SQL_insert_bank, args...)
 	if err != nil {
-		log.Info(err)
 		return nil, err
 	}
+
 	createdId, err := res.LastInsertId()
 	if err != nil {
-		log.Info(err)
 		return nil, err
 	}
 
