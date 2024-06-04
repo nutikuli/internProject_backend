@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	_accDtos "github.com/nutikuli/internProject_backend/internal/models/account/dtos"
+	"github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
 	_adminDtos "github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
 	_adminEntities "github.com/nutikuli/internProject_backend/internal/models/admin/entities"
 	_fileEntities "github.com/nutikuli/internProject_backend/internal/services/file/entities"
@@ -15,4 +16,5 @@ type AdminUseCase interface {
 	OnGetAdminById(ctx context.Context, adminId int64) (*_adminDtos.AdminFileRes, int, error)
 	OnUpdateUserById(ctx context.Context, Id int64, req *_adminEntities.AdminUpdateReq) (int, error)
 	AdminDeleted(ctx context.Context, Id int64) (int, error)
+	OnGetAllUserAdmin(ctx context.Context) ([]*dtos.AdminFileRes, int, error)
 }

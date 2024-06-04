@@ -31,6 +31,7 @@ func UseAdminRoute(db *sqlx.DB, app fiber.Router) {
 
 	authR.Post("/admin-register", AdminConn.RegisterAdminAccount)
 	authR.Get("/:admin_id", AdminConn.GetAdmineById)
-	authR.Patch("/admin_id", AdminConn.UpdateAdminById)
-	authR.Delete("/admin_id", AdminConn.DeletedAdminByID)
+	authR.Get("/getalladmin", AdminConn.GetAllAdmin)
+	authR.Patch("/:admin_id", AdminConn.UpdateAdminById)
+	authR.Delete("/:admin_id", AdminConn.DeletedAdminByID)
 }

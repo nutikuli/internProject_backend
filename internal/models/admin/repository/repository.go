@@ -23,8 +23,8 @@ func NewFileRepository(db *sqlx.DB) admin.AdminRepository {
 	}
 }
 
-func (a *AdminRepo) GetAccountAdmins(ctx context.Context) (*entities.Admin, error) {
-	var admin entities.Admin
+func (a *AdminRepo) GetAccountAdmins(ctx context.Context) ([]*entities.Admin, error) {
+	var admin []*entities.Admin
 
 	err := a.db.GetContext(ctx, &admin, repository_query.SQL_get_account_admin, "ADMIN")
 	if err != nil {
@@ -32,17 +32,19 @@ func (a *AdminRepo) GetAccountAdmins(ctx context.Context) (*entities.Admin, erro
 		return nil, err
 	}
 
-	return &admin, nil
+	return admin, nil
 }
 
 func (a *AdminRepo) GetAccountAdminById(ctx context.Context, id int64) (*entities.Admin, error) {
 	 admin := &entities.Admin{}
 
-	err := a.db.GetContext(ctx, &admin, repository_query.SQL_get_account_admin_by_id, "ADMIN",id)
+	err := a.db.GetContext(ctx, admin, repository_query.SQL_get_account_adminid, id)
+	log.Debug("err=====>",err)
 	if err != nil {
 		log.Info(err)
 		return nil, err
-	}
+	} 
+	
 
 	return admin, nil
 }
@@ -62,6 +64,8 @@ func (a *AdminRepo) CreateAdmin(ctx context.Context, admindata *entities.AdminRe
 		log.Info(err)
 		return nil, err
 	}
+	log.Debug("res=====>",res) 
+	
 
 	return &createdId, nil
 }
