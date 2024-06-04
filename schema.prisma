@@ -44,8 +44,8 @@ model Product {
     categoryId    Int
     storeId       Int
     productAvatar String          @default("https://www.nasco.co.th/wp-content/uploads/2022/06/placeholder.png")
-    category      ProductCategory @relation(fields: [categoryId], references: [id])
-    store         Account         @relation(fields: [storeId], references: [id], "StoreProduct")
+    category      ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    store         Account         @relation(fields: [storeId], references: [id], "StoreProduct", onDelete: Cascade)
     files         File[]          @relation("ProductFile")
     orderProducts OrderProduct[]
     createdAt     DateTime        @default(now())
@@ -89,8 +89,8 @@ model OrderProduct {
     orderId   Int
     productId Int
     quantity  Int
-    order     Order    @relation(fields: [orderId], references: [id])
-    product   Product  @relation(fields: [productId], references: [id])
+    order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
 
@@ -105,7 +105,7 @@ model Bank {
     status    String
     avatarUrl String   @default("https://www.nasco.co.th/wp-content/uploads/2022/06/placeholder.png")
     storeId   Int
-    store     Account  @relation(fields: [storeId], references: [id], "StoreBank")
+    store     Account  @relation(fields: [storeId], references: [id], "StoreBank", onDelete: Cascade)
     orders    Order[]
     files     File[]   @relation("BankFile")
     createdAt DateTime @default(now())
@@ -128,10 +128,10 @@ model File {
     orderId    Int?
     productId  Int?
     bankId     Int?
-    account    Account?   @relation(name: "AccountFile", fields: [accountId], references: [id])
-    order      Order?     @relation(name: "OrderFile", fields: [orderId], references: [id])
-    product    Product?   @relation(name: "ProductFile", fields: [productId], references: [id])
-    bank       Bank?      @relation(name: "BankFile", fields: [bankId], references: [id])
+    account    Account?   @relation(name: "AccountFile", fields: [accountId], references: [id], onDelete: Cascade)
+    order      Order?     @relation(name: "OrderFile", fields: [orderId], references: [id], onDelete: Cascade)
+    product    Product?   @relation(name: "ProductFile", fields: [productId], references: [id], onDelete: Cascade)
+    bank       Bank?      @relation(name: "BankFile", fields: [bankId], references: [id], onDelete: Cascade)
     createdAt  DateTime   @default(now())
     updatedAt  DateTime   @default(now()) @updatedAt
 }
@@ -144,7 +144,7 @@ model Log {
     createdAt     DateTime @default(now())
     updatedAt     DateTime @default(now()) @updatedAt
     accountId     Int
-    account       Account  @relation(fields: [accountId], references: [id])
+    account       Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
