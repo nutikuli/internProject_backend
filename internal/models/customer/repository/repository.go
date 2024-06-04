@@ -23,16 +23,15 @@ func NewCustomerRepository(db *sqlx.DB) customer.CustomerRepository {
 	}
 }
 
-func (c *CustomerRepo) GetAccountCustomers(ctx context.Context) (*entities.Customer, error) {
-	var customer entities.Customer
-
-	err := c.db.GetContext(ctx, &customer, repository_query.SQL_get_account_customer, "customer")
+func (c *CustomerRepo) GetAccountCustomers(ctx context.Context) ([]*entities.Customer, error) {
+	var customers = make([]*entities.Customer, 0)
+	err := c.db.SelectContext(ctx, &customers, repository_query.SQL_get_account_customer, "CUSTOMER")
 	if err != nil {
 		log.Info(err)
 		return nil, err
 	}
 
-	return &customer, nil
+	return customers, nil
 }
 
 func (c *CustomerRepo) GetCustomerById(ctx context.Context, customerId int64) (*entities.Customer, error) {

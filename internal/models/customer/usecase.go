@@ -14,4 +14,5 @@ type CustomerUsecase interface {
 	OnGetCustomerById(ctx context.Context, customerId int64) (*_customerDtos.CustomerAccountFileRes, int, error)
 	OnUpdateCustomerById(ctx context.Context, userId int64, req *_customerEntities.CustomerUpdateReq) (int, error)
 	OnDeletedCustomer(ctx context.Context, Id int64) (int, error)
+	OnGetAllUserCustomer(ctx context.Context) ([]*_customerDtos.CustomerRes, int, error)
 }
