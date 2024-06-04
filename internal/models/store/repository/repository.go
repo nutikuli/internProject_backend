@@ -74,3 +74,31 @@ func (s *storeRepo) UpdateStoreAccountPassword(ctx context.Context, req _accEnti
 
 	return nil
 }
+
+func (s *storeRepo) UpdateStoreById(ctx context.Context, storeId int64, req entities.StoreUpdatedReq) error {
+	args := utils.Array{
+		req.Email,
+		req.Name,
+		req.Phone,
+		req.Location,
+		req.Status,
+		req.StoreName,
+		req.StoreLocation,
+	}
+
+	_, err := s.db.ExecContext(ctx, repository_query.UpdateStoreById, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *storeRepo) DeleteStoreById(ctx context.Context, storeId int64) error {
+	_, err := s.db.ExecContext(ctx, repository_query.DeleteStoreById, storeId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
