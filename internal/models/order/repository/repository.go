@@ -26,7 +26,7 @@ func NewOrderRepository(db *sqlx.DB) order.OrderRepository {
 func (c *OrderRepo) GetOrdersByCustomerId(ctx context.Context, Id *int64) ([]*entities.Order, error) {
 	var order = make([]*entities.Order, 0)
 
-	err := c.db.SelectContext(ctx, order, repository_query.SQL_get_order_by_customerId, *Id)
+	err := c.db.SelectContext(ctx, &order, repository_query.SQL_get_order_by_customerId, *Id)
 	if err != nil {
 		log.Info(err)
 		return nil, err
@@ -38,7 +38,7 @@ func (c *OrderRepo) GetOrdersByCustomerId(ctx context.Context, Id *int64) ([]*en
 func (c *OrderRepo) GetOrderById(ctx context.Context, Id *int64) (*entities.Order, error) {
 	order := &entities.Order{}
 
-	err := c.db.SelectContext(ctx, order, repository_query.SQL_get_order_by_Id, *Id)
+	err := c.db.GetContext(ctx, order, repository_query.SQL_get_order_by_Id, *Id)
 	if err != nil {
 		log.Info(err)
 		return nil, err
@@ -50,7 +50,7 @@ func (c *OrderRepo) GetOrderById(ctx context.Context, Id *int64) (*entities.Orde
 func (c *OrderRepo) GetOrdersByStoreId(ctx context.Context, Id *int64) ([]*entities.Order, error) {
 	orders := make([]*entities.Order, 0)
 
-	err := c.db.SelectContext(ctx, orders, repository_query.SQL_get_order_by_storeId, *Id)
+	err := c.db.SelectContext(ctx, &orders, repository_query.SQL_get_order_by_storeId, *Id)
 	if err != nil {
 		log.Info(err)
 		return nil, err
@@ -82,44 +82,66 @@ func (c *OrderRepo) CreateOrder(ctx context.Context, order *entities.OrderCreate
 		return nil, err
 	}
 
-	userId, _ := res.RowsAffected()
+	userId, _ := res.LastInsertId()
 
 	return &userId, nil
 }
 
-func (c *OrderRepo) UpdateOrderTransportDetail(ctx context.Context, order *entities.OrderTransportDetailReq) error {
+func (c *OrderRepo) UpdateOrderTransportDetail(ctx context.Context, orderId int64, order *entities.OrderTransportDetailReq) error {
 
 	args := utils.Array{
-		order.OrderID,
 		order.DeliveryType,
 		order.ParcelNumber,
 		order.SentDate,
+		orderId,
 	}
 
 	log.Info(args)
 
-	_, err := c.db.ExecContext(ctx, repository_query.SQL_update_order_transport_detail, args...)
+	res, err := c.db.ExecContext(ctx, repository_query.SQL_update_order_transport_detail, args...)
 	if err != nil {
 		log.Info(err)
 		return err
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		log.Info(err)
+		return err
+	}
+
+	if affected == 0 {
+		log.Info("No order was updated ")
+		return nil
 	}
 
 	return nil
 }
 
 // UpdateOrderStatus implements order.OrderRepository.
-func (c *OrderRepo) UpdateOrderStatus(ctx context.Context, order *entities.OrderStateReq) error {
+func (c *OrderRepo) UpdateOrderStatus(ctx context.Context, orderId int64, order *entities.OrderStateReq) error {
 	args := utils.Array{
-		order.OrderID,
 		order.State,
+		orderId,
 	}
 
 	log.Info(args)
 
-	_, err := c.db.ExecContext(ctx, repository_query.SQL_update_order_state, args...)
+	res, err := c.db.ExecContext(ctx, repository_query.SQL_update_order_state, args...)
 	if err != nil {
 		log.Info(err)
 		return err
+	}
+
+	affected, err := res.RowsAffected()
+	if err != nil {
+		log.Info(err)
+		return err
+	}
+
+	if affected == 0 {
+		log.Info("No order transport detail was updated ")
+		return nil
 	}
 
 	return nil

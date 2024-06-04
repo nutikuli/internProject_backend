@@ -11,6 +11,6 @@ type OrderRepository interface {
 	GetOrdersByCustomerId(ctx context.Context, Id *int64) ([]*entities.Order, error)
 	GetOrderById(ctx context.Context, Id *int64) (*entities.Order, error)
 	GetOrdersByStoreId(ctx context.Context, Id *int64) ([]*entities.Order, error)
-	UpdateOrderTransportDetail(ctx context.Context, order *entities.OrderTransportDetailReq) error
-	UpdateOrderStatus(ctx context.Context, order *entities.OrderStateReq) error
+	UpdateOrderTransportDetail(ctx context.Context, orderId int64, order *entities.OrderTransportDetailReq) error
+	UpdateOrderStatus(ctx context.Context, orderId int64, order *entities.OrderStateReq) error
 }
