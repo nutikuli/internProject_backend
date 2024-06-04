@@ -13,4 +13,5 @@ type BankRepository interface {
 	GetBanksByStoreId(ctx context.Context, storeId int64) ([]*entities.Bank, error)
 	DeleteBankById(ctx context.Context, bankId int64) error
 	UpdateBankById(ctx context.Context, bankId int64, bankdata *entities.BankUpdateReq) error
+	GetBankByOrderId(ctx context.Context, orderId int64) (*entities.Bank, error)
 }

@@ -15,3 +15,5 @@ var SQL_insert_bank = `INSERT INTO Bank (name,accNumber,accName,status,avatarUrl
 var SQL_delete_bank_by_id = `DELETE FROM Bank WHERE id = ?;`
 
 var SQL_update_bank_by_id = `UPDATE Bank SET name = ?, accNumber = ?, accName = ?, avatarUrl = ?, status = ?, storeId = ? WHERE id = ?;`
+
+var SQL_get_bank_by_order_id = `SELECT b.* FROM Bank b JOIN Order o ON b.id = o.bankId WHERE o.id = ?;`
