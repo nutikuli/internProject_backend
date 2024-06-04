@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/jmoiron/sqlx"
@@ -37,7 +38,20 @@ func (a *AdminPermissionRepo) GetAdminpermissiomById(ctx context.Context, id int
 
 func (a *AdminPermissionRepo) CreateAdminPermission(ctx context.Context, adminpermissiondata *entities.AdminPermissionCreatedReq) (*int64, error) {
 
-	res, err := a.db.ExecContext(ctx, repositoryquery.SQL_get_permisson_admin, adminpermissiondata.MenuPermission)
+	// var adminPermissionData AdminPermissionCreatedReq
+	// err := json.Unmarshal(*adminpermissiondata, &adminPermissionData)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	jsonData, err := json.Marshal(adminpermissiondata.MenuPermission)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	res, err := a.db.NamedExec(`INSERT INTO AdminPermission (menuPermission) VALUES (:json)`, map[string]interface{}{
+		"json": string(jsonData),
+	})
 
 	if err != nil {
 		log.Info(err)

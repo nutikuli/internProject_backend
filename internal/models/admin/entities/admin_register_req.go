@@ -8,7 +8,7 @@ type AdminRegisterReq struct {
 	Email        string `json:"email" from:"email" binding:"required"`
 	Role         string `json:"role" from:"role" binding:"required"`
 	Status       bool   `json:"status" from:"status" binding:"required"`
-	PermissionID string `json:"permissino_id" from:"permissino_id" binding:"required"`
+	PermissionID string `json:"permissionid" from:"permissionid" binding:"required"`
 } 
 
 
