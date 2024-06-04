@@ -61,8 +61,8 @@ func (o *bankConn) CreateBank(c *fiber.Ctx) error {
 	req := new(dtos.BankFileReq)
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"status":      http.StatusText(http.StatusBadRequest),
-			"status_code": http.StatusBadRequest,
+			"status":      fiber.StatusBadRequest,
+			"status_code": fiber.StatusBadRequest,
 			"message":     "error, invalid request body",
 			"raw_message": err.Error(),
 			"result":      nil,
@@ -139,7 +139,7 @@ func (o *bankConn) GetBankById(c *fiber.Ctx) error {
 }
 
 func (o *bankConn) UpdateBankById(c *fiber.Ctx) error {
-	req := new(dtos.BankFileReq)
+	req := new(dtos.BankUpdateFileReq)
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),

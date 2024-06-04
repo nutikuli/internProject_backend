@@ -14,5 +14,5 @@ type BankUseCase interface {
 	OnGetBanksByStoreId(ctx context.Context, bankId int64) ([]*_bankDtos.BankFileRes, int, error)
 	OnGetBankByBankId(ctx context.Context, bankId int64) (*_bankDtos.BankFileRes, int, error)
 	OnDeleteBankById(ctx context.Context, bankId int64) (int, error)
-	OnUpdateBankById(c *fiber.Ctx, ctx context.Context, bankId int64, bankDatReq *_bankEntities.BankCreatedReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_bankDtos.BankFileRes, int, error)
+	OnUpdateBankById(c *fiber.Ctx, ctx context.Context, bankId int64, bankDatReq *_bankEntities.BankUpdateReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_bankDtos.BankFileRes, int, error)
 }

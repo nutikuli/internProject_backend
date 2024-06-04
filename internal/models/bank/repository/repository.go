@@ -8,6 +8,7 @@ import (
 	"github.com/nutikuli/internProject_backend/internal/models/bank"
 	"github.com/nutikuli/internProject_backend/internal/models/bank/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/bank/repository/repository_query"
+	"github.com/nutikuli/internProject_backend/pkg/utils"
 )
 
 type BankRepo struct {
@@ -96,8 +97,17 @@ func (a *BankRepo) DeleteBankById(ctx context.Context, bankId int64) error {
 }
 
 // UpdateBankById implements bank.BankRepository.
-func (a *BankRepo) UpdateBankById(ctx context.Context, bankId int64, bankdata *entities.BankCreatedReq) error {
-	res, err := a.db.ExecContext(ctx, repository_query.SQL_update_bank_by_id, bankdata.Name, bankdata.AccNumber, bankdata.AccName, bankdata.AvatarUrl, bankId)
+func (a *BankRepo) UpdateBankById(ctx context.Context, bankId int64, bankdata *entities.BankUpdateReq) error {
+	args := utils.Array{
+		bankId,
+		bankdata.Name,
+		bankdata.AccNumber,
+		bankdata.AccName,
+		bankdata.AvatarUrl,
+		bankdata.Status,
+		bankdata.StoreId,
+	}
+	res, err := a.db.ExecContext(ctx, repository_query.SQL_update_bank_by_id, args...)
 	if err != nil {
 		log.Info(err)
 		return err
