@@ -94,11 +94,9 @@ func (c *CustomerRepo) UpdateCustomerPasswordById(ctx context.Context, admindata
 func (r *CustomerRepo) UpdateCustomerById(ctx context.Context, userId int64, user *entities.CustomerUpdateReq) error {
 	args := utils.Array{
 		user.Name,
-		user.Password,
 		user.Phone,
 		user.Location,
 		user.Email,
-		user.Role,
 		user.Status,
 	}
 
