@@ -250,10 +250,8 @@ func (f *File) DeleteFile(c *fiber.Ctx) error {
 	} else {
 		fileName = "public/image/" + hash + fmt.Sprintf(".%s", strings.ToLower(f.Type))
 	}
-	err := os.Remove(fileName)
-	if err != nil {
-		return err
-	}
+	os.Remove(fileName)
+
 	log.Info("Deleted file name: ", fileName)
 	return nil
 
