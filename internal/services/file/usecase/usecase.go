@@ -51,10 +51,19 @@ func (f *fileUse) OnUploadFile(c *fiber.Ctx, ctx context.Context, fileReq *entit
 	return fileModel, http.StatusOK, nil
 }
 
-func (f *fileUse) OnDeleteFileByIdAndEntity(c *fiber.Ctx, ctx context.Context, req *entities.FileEntityReq) (int, error) {
-	err := f.fileRepo.DeleteFileByIdAndEntity(ctx, req)
+func (f *fileUse) OnDeleteFileByIdAndEntity(c *fiber.Ctx, ctx context.Context, fileId int64, req *entities.FileEntityReq) (int, error) {
+	err := f.fileRepo.DeleteFileByIdAndEntity(ctx, fileId, req)
 	if err != nil {
 		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}
+
+func (f *fileUse) OnUpdateFileByIdAndEntity(c *fiber.Ctx, ctx context.Context, req *entities.FileEntityReq, fileEntityReq *entities.FileUploaderReq) (int, error) {
+	_, errOnUpload := f.fileRepo.CreateFileByEntityAndId(ctx, fileEntityReq, req)
+	if errOnUpload != nil {
+		return http.StatusInternalServerError, errOnUpload
 	}
 
 	return http.StatusOK, nil
