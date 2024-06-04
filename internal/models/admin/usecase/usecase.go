@@ -25,14 +25,16 @@ type adminUseCase struct {
 	fileRepo            file.FileRepository
 	accUsecase          account.AccountUsecase
 	adminpermissionRepo adminpermission.AdminPermissionRepository
+	fileUse         file.FileUsecase 
 }
 
-func NewAdminUsecase(adminRepo admin.AdminRepository, fileRepo file.FileRepository, accUsecase account.AccountUsecase, adminpermissionRepo adminpermission.AdminPermissionRepository) admin.AdminUseCase {
+func NewAdminUsecase(adminRepo admin.AdminRepository, fileRepo file.FileRepository, accUsecase account.AccountUsecase, adminpermissionRepo adminpermission.AdminPermissionRepository,fileUse file.FileUsecase	) admin.AdminUseCase {
 	return &adminUseCase{
 		adminRepo:           adminRepo,
 		fileRepo:            fileRepo,
 		adminpermissionRepo: adminpermissionRepo,
 		accUsecase:          accUsecase,
+		fileUse: fileUse,
 	}
 }
 
@@ -132,10 +134,23 @@ func (a *adminUseCase) OnUpdateAdminById(c *fiber.Ctx, ctx context.Context, admi
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
-
 	fEntity := &_fileEntities.FileEntityReq{
 		EntityType: "ACCOUNT",
 		EntityId:   adminId,
+	}
+
+	oldFilesProd, err := a.fileRepo.GetFilesByIdAndEntity(ctx, fEntity)
+	if err != nil {
+		log.Debug("error get file ", err)
+		return nil, http.StatusInternalServerError, err
+	}
+
+	for _, f := range oldFilesProd {
+		status, errOnDeleteFile := a.fileUse.OnDeleteFileByIdAndEntity(c, ctx, f.Id, fEntity)
+		if errOnDeleteFile != nil {
+			return nil, status, errOnDeleteFile
+		}
+
 	}
 
 	for _, fDatReq := range fileDatReq {
@@ -153,10 +168,11 @@ func (a *adminUseCase) OnUpdateAdminById(c *fiber.Ctx, ctx context.Context, admi
 		}
 
 		fDatReq.FileData = *fUrl
-		errOnInsertFile := a.fileRepo.UpdateFileByIdAndEntity(ctx, fEntity, fDatReq)
+		status, errOnInsertFile := a.fileUse.OnUpdateFileByIdAndEntity(c, ctx, fEntity, fDatReq)
 		if errOnInsertFile != nil {
-			return nil, http.StatusInternalServerError, errOnInsertFile
+			return nil, status, errOnInsertFile
 		}
+		log.Debug("url ", fUrl)
 
 	}
 
