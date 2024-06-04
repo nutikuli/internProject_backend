@@ -60,9 +60,9 @@ func (a *adminUseCase) OnCreateAdminAccount(c *fiber.Ctx, ctx context.Context, a
 			AccountId:   newAdminId,
 		}
 
-		_, fUrl, errOnCreatedFile := file.Base64toFile(c, true)
+		_, fUrl, status ,errOnCreatedFile := file.EncodeBase64toFile(c, true)
 		if errOnCreatedFile != nil {
-			return nil, nil, http.StatusConflict, errOnCreatedFile
+			return nil, nil, status, errOnCreatedFile
 		}
 
 		fDatReq.FileData = *fUrl

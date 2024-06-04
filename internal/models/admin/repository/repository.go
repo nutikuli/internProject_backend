@@ -52,7 +52,7 @@ func (a *AdminRepo) CreateAdmin(ctx context.Context, admindata *entities.AdminRe
 	adminrole := "ADMIN"
 	adminstatus := 1
 	res, err := a.db.ExecContext(ctx, repository_query.SQL_insert_account_admin, admindata.Name, admindata.Password,
-		admindata.Phone, admindata.Location, admindata.Email, adminrole, adminstatus, admindata.PermissionID)
+		admindata.Phone, admindata.Location, admindata.Email, adminrole, adminstatus,admindata.PermissionID)
 	if err != nil {
 		log.Info(err)
 		return nil, err
