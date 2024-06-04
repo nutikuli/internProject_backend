@@ -20,8 +20,8 @@ func NewProductCategoryUsecase(prodCate product_category.ProductCategoryReposito
 
 // OnCreateProductCategory implements product_category.ProductCategoryUsecase.
 
-func (p *productCateUsecase) OnCreateProductCategory(ctx context.Context, req *entities.ProductCategoryCreatedReq) (*int64, int, error) {
-	created, err := p.productCateRepo.CreateProductCategory(ctx, req)
+func (p *productCateUsecase) OnCreateProductCategoryWithStoreId(ctx context.Context, storeId int64, req *entities.ProductCategoryCreatedReq) (*int64, int, error) {
+	created, err := p.productCateRepo.CreateProductCategoryWithStoreId(ctx, storeId, req)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}

@@ -21,12 +21,13 @@ func NewProductCategoryRepository(db *sqlx.DB) product_category.ProductCategoryR
 	}
 }
 
-func (s *productCategoryRepo) CreateProductCategory(ctx context.Context, req *entities.ProductCategoryCreatedReq) (*int64, error) {
+func (s *productCategoryRepo) CreateProductCategoryWithStoreId(ctx context.Context, storeId int64, req *entities.ProductCategoryCreatedReq) (*int64, error) {
 	args := utils.Array{
 		req.Name,
 		req.Code,
 		req.Detail,
 		req.Status,
+		storeId,
 	}
 
 	res, err := s.db.ExecContext(ctx, repository_query.InsertProductCategory, args...)
@@ -90,18 +91,9 @@ func (s *productCategoryRepo) UpdateProductCategoryById(ctx context.Context, cat
 		categoryId,
 	}
 
-	res, err := s.db.ExecContext(ctx, repository_query.UpdateProductCategoryById, args...)
+	_, err := s.db.ExecContext(ctx, repository_query.UpdateProductCategoryById, args...)
 	if err != nil {
 		return err
-	}
-
-	affected, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if affected == 0 {
-		return errors.New("Error on updating product category, category not found")
 	}
 
 	return nil

@@ -19,10 +19,9 @@ func UseProductCategoryRoute(db *sqlx.DB, app fiber.Router) {
 
 	prodCatConn := NewProductCategoryHandler(prodCatUse)
 
-	prodCatR.Post("/create-product-category", prodCatConn.CreateProductCategory)
+	prodCatR.Post("/create-product-category/:store_id", prodCatConn.CreateProductCategory)
 	prodCatR.Get("/get-product-category-id/:product_category_id", prodCatConn.GetProductCategoryById)
 	prodCatR.Get("/get-product-categories-by-store-id/:store_id", prodCatConn.GetProductCategoriesByStoreId)
 	prodCatR.Delete("/delete-product-category-id/:product_category_id", prodCatConn.DeleteProductCategoryById)
 	prodCatR.Patch("/update-product-category-id/:product_category_id", prodCatConn.UpdateProductCategoryById)
-
 }

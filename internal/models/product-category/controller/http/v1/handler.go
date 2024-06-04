@@ -35,6 +35,18 @@ func (p *prodCateConn) CreateProductCategory(c *fiber.Ctx) error {
 		})
 	}
 
+	storeId, err := c.ParamsInt("store_id")
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"status":      http.StatusText(http.StatusBadRequest),
+			"status_code": http.StatusBadRequest,
+			"message":     "error, invalid store_id",
+			"result":      nil,
+		})
+	}
+
+	storeId64 := int64(storeId)
+
 	_, errOnValidate := utils.SchemaValidator(req)
 	if errOnValidate != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
@@ -51,7 +63,7 @@ func (p *prodCateConn) CreateProductCategory(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	res, status, err := p.prodCateUse.OnCreateProductCategory(ctx, req)
+	res, status, err := p.prodCateUse.OnCreateProductCategoryWithStoreId(ctx, storeId64, req)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
@@ -65,7 +77,9 @@ func (p *prodCateConn) CreateProductCategory(c *fiber.Ctx) error {
 		"status":      http.StatusText(status),
 		"status_code": status,
 		"message":     nil,
-		"result":      res,
+		"result": fiber.Map{
+			"product_category_id": res,
+		},
 	})
 
 }
