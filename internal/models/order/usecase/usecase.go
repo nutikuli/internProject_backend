@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/nutikuli/internProject_backend/internal/models/bank"
-	_bankDtos "github.com/nutikuli/internProject_backend/internal/models/bank/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/order"
 	order_product "github.com/nutikuli/internProject_backend/internal/models/order-product"
 	_orderProductEntities "github.com/nutikuli/internProject_backend/internal/models/order-product/entities"
@@ -40,7 +40,7 @@ func NewOrderUsecase(
 	}
 }
 
-func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, bankId int64, orderDatReq *_orderEntities.OrderCreate, filesDatReq []*_fileEntities.FileUploaderReq, orderProductsReq []*_orderProductEntities.OrderProductCreateReq) (*_orderDtos.OrderBanksFilesRes, int, error) {
+func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, orderDatReq *_orderEntities.OrderCreate, filesDatReq []*_fileEntities.FileUploaderReq, orderProductsReq []*_orderProductEntities.OrderProductCreateReq) (*_orderDtos.OrderBanksFilesRes, int, error) {
 	newOrderId, err := s.orderRepo.CreateOrder(ctx, orderDatReq)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
@@ -65,6 +65,8 @@ func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, bankId i
 			return nil, status, errOnCreatedFile
 		}
 
+		log.Debug(*fileEntity)
+
 		fDatReq.FileData = *fUrl
 		_, errOnInsertFile := s.fileRepo.CreateFileByEntityAndId(ctx, fDatReq, fileEntity)
 		if errOnInsertFile != nil {
@@ -82,7 +84,10 @@ func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, bankId i
 		return nil, status, err
 	}
 
-	bankRes, status, err := s.bankUse.OnGetBankByBankId(ctx, bankId)
+	bankRes, status, err := s.bankUse.OnGetBankByBankId(ctx, orderDatReq.BankId)
+	if err != nil {
+		return nil, status, err
+	}
 
 	filesRes, errOnGetFiles := s.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
 	if errOnGetFiles != nil {
@@ -97,14 +102,14 @@ func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, bankId i
 	return &_orderDtos.OrderBanksFilesRes{
 		OrderData:         orderRes,
 		FilesData:         filesRes,
-		BanksData:         []*_bankDtos.BankFileRes{bankRes},
+		BanksData:         bankRes,
 		OrdersProductData: prodRes,
 	}, http.StatusOK, nil
 }
 
 func (s *orderUsecase) OnGetOrderById(ctx context.Context, req *_orderEntities.StoreAndOrderIdReq) (*_orderDtos.OrderBanksFilesRes, int, error) {
 	fileEntity := &_fileEntities.FileEntityReq{
-		EntityType: "Order",
+		EntityType: "ORDER",
 		EntityId:   req.OrderId,
 	}
 
@@ -118,7 +123,7 @@ func (s *orderUsecase) OnGetOrderById(ctx context.Context, req *_orderEntities.S
 		return nil, http.StatusInternalServerError, errOnGetOrder
 	}
 
-	banksRes, status, errOnGetBanks := s.bankUse.OnGetBanksByStoreId(ctx, req.StoreId)
+	banksRes, status, errOnGetBanks := s.bankUse.OnGetBankByBankId(ctx, orderRes.BankId)
 	if errOnGetBanks != nil {
 		return nil, status, errOnGetBanks
 	}
@@ -155,7 +160,7 @@ func (s *orderUsecase) OnGetOrdersByStoreId(ctx context.Context, storeId *int64)
 			return nil, http.StatusInternalServerError, errOnGetFiles
 		}
 
-		banksRes, status, errOnGetBanks := s.bankUse.OnGetBanksByStoreId(ctx, o.StoreId)
+		banksRes, status, errOnGetBanks := s.bankUse.OnGetBankByBankId(ctx, o.BankId)
 		if errOnGetBanks != nil {
 			return nil, status, errOnGetBanks
 		}
@@ -197,7 +202,7 @@ func (s *orderUsecase) OnGetOrdersByCustomerId(ctx context.Context, customerId *
 			return nil, http.StatusInternalServerError, errOnGetFiles
 		}
 
-		banksRes, status, errOnGetBanks := s.bankUse.OnGetBanksByStoreId(ctx, o.StoreId)
+		banksRes, status, errOnGetBanks := s.bankUse.OnGetBankByBankId(ctx, o.BankId)
 		if errOnGetBanks != nil {
 			return nil, status, errOnGetBanks
 		}
@@ -221,8 +226,8 @@ func (s *orderUsecase) OnGetOrdersByCustomerId(ctx context.Context, customerId *
 }
 
 // OnUpdateOrderStatus implements order.OrderUsecase.
-func (s *orderUsecase) OnUpdateOrderStatus(ctx context.Context, req *_orderEntities.OrderStateReq) (int, error) {
-	err := s.orderRepo.UpdateOrderStatus(ctx, req)
+func (s *orderUsecase) OnUpdateOrderStatus(ctx context.Context, orderId int64, req *_orderEntities.OrderStateReq) (int, error) {
+	err := s.orderRepo.UpdateOrderStatus(ctx, orderId, req)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -231,8 +236,8 @@ func (s *orderUsecase) OnUpdateOrderStatus(ctx context.Context, req *_orderEntit
 }
 
 // OnUpdateOrderTransportDetail implements order.OrderUsecase.
-func (s *orderUsecase) OnUpdateOrderTransportDetail(ctx context.Context, req *_orderEntities.OrderTransportDetailReq) (int, error) {
-	err := s.orderRepo.UpdateOrderTransportDetail(ctx, req)
+func (s *orderUsecase) OnUpdateOrderTransportDetail(ctx context.Context, orderId int64, req *_orderEntities.OrderTransportDetailReq) (int, error) {
+	err := s.orderRepo.UpdateOrderTransportDetail(ctx, orderId, req)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
