@@ -15,6 +15,7 @@ import (
 	_storeRepo "github.com/nutikuli/internProject_backend/internal/models/store/repository"
 	_storeUse "github.com/nutikuli/internProject_backend/internal/models/store/usecase"
 	_fileRepo "github.com/nutikuli/internProject_backend/internal/services/file/repository"
+	_fileUse "github.com/nutikuli/internProject_backend/internal/services/file/usecase"
 )
 
 func UseAccountRoute(db *sqlx.DB, app fiber.Router) {
@@ -24,7 +25,9 @@ func UseAccountRoute(db *sqlx.DB, app fiber.Router) {
 	})
 	adperRepo := _adperRepo.NewAdminPermissionRepository(db)
 	//register
+
 	fileRepo := _fileRepo.NewFileRepository(db)
+	fileUse := _fileUse.NewFileUsecase(fileRepo)
 	adminRepo := _adminRepo.NewFileRepository(db)
 	storeRep := _storeRepo.NewStoreRepository(db)
 	customerRepo := repository.NewCustomerRepository(db)
@@ -34,7 +37,7 @@ func UseAccountRoute(db *sqlx.DB, app fiber.Router) {
 	customerConn := _cutomerHand.NewCustomerHandler(customerUse)
 	authR.Post("/register", customerConn.CreateCustomerAccount)
 
-	AdminUseCase := _AdminUse.NewAdminUsecase(adminRepo, fileRepo, accUse, adperRepo)
+	AdminUseCase := _AdminUse.NewAdminUsecase(adminRepo, fileRepo, accUse, adperRepo, fileUse)
 	storeUse := _storeUse.NewStoreUsecase(storeRep, fileRepo, accUse)
 	//login
 	accConn := NewAccountHandler(accUse, storeUse, customerUse, AdminUseCase)
@@ -44,4 +47,9 @@ func UseAccountRoute(db *sqlx.DB, app fiber.Router) {
 	authR.Post("/otp", accConn.OTP)
 	//resetPassword
 	authR.Post("/resetpass", accConn.UpdatePass)
+
+	// get
+	authR.Get("/get-customer", accConn.GetAllDataCustomer)
+	authR.Get("/get-store", accConn.GetAllDataStore)
+	authR.Get("/get-admin", accConn.GetAllDataAdmin)
 }
