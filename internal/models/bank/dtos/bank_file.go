@@ -6,6 +6,6 @@ import (
 )
 
 type BankFileRes struct {
-	BankData  *_bankEntities.Bank   `json:"bank_data"`
-	FilesData []*_fileEntities.File `json:"files_data"`
+	*_bankEntities.Bank `json:"bank_data" form:"bank_data" binding:"required"`
+	FilesData           []*_fileEntities.File `json:"files_data" form:"files_data" binding:"required"`
 }
