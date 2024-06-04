@@ -7,6 +7,7 @@ import (
 	"github.com/nutikuli/internProject_backend/internal/models/product/repository"
 	"github.com/nutikuli/internProject_backend/internal/models/product/usecase"
 	_fileRepo "github.com/nutikuli/internProject_backend/internal/services/file/repository"
+	_fileUse "github.com/nutikuli/internProject_backend/internal/services/file/usecase"
 )
 
 func UseProductRoute(db *sqlx.DB, app fiber.Router) {
@@ -16,9 +17,10 @@ func UseProductRoute(db *sqlx.DB, app fiber.Router) {
 	})
 
 	fileRepo := _fileRepo.NewFileRepository(db)
+	fileUse := _fileUse.NewFileUsecase(fileRepo)
 
 	prodRepo := repository.NewproductRepository(db)
-	prodUse := usecase.NewProductUsecase(prodRepo, fileRepo)
+	prodUse := usecase.NewProductUsecase(prodRepo, fileRepo, fileUse)
 
 	prodConn := NewProductHandler(prodUse)
 

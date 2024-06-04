@@ -15,6 +15,7 @@ import (
 	_prodRepo "github.com/nutikuli/internProject_backend/internal/models/product/repository"
 
 	_fileRepo "github.com/nutikuli/internProject_backend/internal/services/file/repository"
+	_fileUse "github.com/nutikuli/internProject_backend/internal/services/file/usecase"
 )
 
 func UseOrderRoute(db *sqlx.DB, app fiber.Router) {
@@ -24,9 +25,10 @@ func UseOrderRoute(db *sqlx.DB, app fiber.Router) {
 	})
 
 	fileRepo := _fileRepo.NewFileRepository(db)
+	fileUse := _fileUse.NewFileUsecase(fileRepo)
 
 	prodRepo := _prodRepo.NewproductRepository(db)
-	prodUse := _prodUse.NewProductUsecase(prodRepo, fileRepo)
+	prodUse := _prodUse.NewProductUsecase(prodRepo, fileRepo, fileUse)
 
 	orderProdRepo := _orderProdRepo.NewOrderProductRepository(db)
 	orderProdUse := _orderProdUse.NewOrderProductUsecase(orderProdRepo)
@@ -44,5 +46,4 @@ func UseOrderRoute(db *sqlx.DB, app fiber.Router) {
 	orderR.Get("/get-orders-by-store-id/:store_id", orderConn.GetOrdersByStoreId)
 	orderR.Get("/get-orders-by-customer-id/:customer_id", orderConn.GetOrdersByCustomerId)
 	orderR.Patch("/update-order-state/:order_id", orderConn.UpdateOrderTransportDetailAndState)
-
 }

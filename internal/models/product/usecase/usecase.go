@@ -16,12 +16,16 @@ import (
 type productUsecase struct {
 	productRepo product.ProductRepository
 	fileRepo    file.FileRepository
+	fileUse     file.FileUsecase
 }
 
-func NewProductUsecase(productRepo product.ProductRepository, fileRepo file.FileRepository) product.ProductUsecase {
+func NewProductUsecase(productRepo product.ProductRepository, fileRepo file.FileRepository,
+	fileUse file.FileUsecase,
+) product.ProductUsecase {
 	return &productUsecase{
 		productRepo: productRepo,
 		fileRepo:    fileRepo,
+		fileUse:     fileUse,
 	}
 }
 
@@ -197,10 +201,23 @@ func (p *productUsecase) OnUpdateProductById(c *fiber.Ctx, ctx context.Context, 
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
-
 	fEntity := &_fileEntities.FileEntityReq{
 		EntityType: "PRODUCT",
 		EntityId:   productId,
+	}
+
+	oldFilesProd, err := p.fileRepo.GetFilesByIdAndEntity(ctx, fEntity)
+	if err != nil {
+		log.Debug("error get file ", err)
+		return nil, http.StatusInternalServerError, err
+	}
+
+	for _, f := range oldFilesProd {
+		status, errOnDeleteFile := p.fileUse.OnDeleteFileByIdAndEntity(c, ctx, f.Id, fEntity)
+		if errOnDeleteFile != nil {
+			return nil, status, errOnDeleteFile
+		}
+
 	}
 
 	for _, fDatReq := range fileDatReq {
@@ -218,10 +235,11 @@ func (p *productUsecase) OnUpdateProductById(c *fiber.Ctx, ctx context.Context, 
 		}
 
 		fDatReq.FileData = *fUrl
-		errOnInsertFile := p.fileRepo.UpdateFileByIdAndEntity(ctx, fEntity, fDatReq)
+		status, errOnInsertFile := p.fileUse.OnUpdateFileByIdAndEntity(c, ctx, fEntity, fDatReq)
 		if errOnInsertFile != nil {
-			return nil, http.StatusInternalServerError, errOnInsertFile
+			return nil, status, errOnInsertFile
 		}
+		log.Debug("url ", fUrl)
 
 	}
 
