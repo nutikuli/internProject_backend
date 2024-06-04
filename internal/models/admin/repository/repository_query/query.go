@@ -6,6 +6,8 @@ var SQL_get_account_admin = `SELECT id,name,password,phone,location,email,status
 // get admin account by id
 var SQL_get_account_admin_by_id = `SELECT id,name,password,phone,location,email,status,permissionId FROM Account WHERE role = ? and id = ?;`
 
+var SQL_get_account_adminid = `SELECT email, password, name, phone, location, status, role  FROM Account WHERE id = ?`
+
 //insert admin account
 
 var SQL_insert_account_admin = `INSERT INTO Account (name,password,phone,location,email,role,status,permissionid) VALUE(?,?,?,?,?,?,?,?) ;`

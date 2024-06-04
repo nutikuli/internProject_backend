@@ -169,7 +169,8 @@ func (ad adminConn) UpdateAdminById(c *fiber.Ctx) error {
 
 
 func (a *adminConn) DeletedAdminByID(c *fiber.Ctx) error {
-	id, err := strconv.ParseInt(c.Params("id"), 10, 64)
+	id, err := strconv.ParseInt(c.Params("admin_id"), 10, 64)
+	log.Debug("id=====>",id)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),
@@ -198,5 +199,29 @@ func (a *adminConn) DeletedAdminByID(c *fiber.Ctx) error {
 		"status_code": http.StatusOK,
 		"message":     "",
 		"result":      admin,
+	})
+} 
+
+func (a *adminConn) GetAllAdmin(c *fiber.Ctx) error {
+	var (
+		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
+	)
+	defer cancel()
+
+	admins, status, err := a.AdminUse.OnGetAllUserAdmin(ctx)
+	if err != nil {
+		return c.Status(status).JSON(fiber.Map{
+			"status":      status,
+			"status_code": status,
+			"message":     err.Error(),
+			"result":      nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":      fiber.StatusOK,
+		"status_code": fiber.StatusOK,
+		"message":     nil,
+		"result":      admins,
 	})
 }

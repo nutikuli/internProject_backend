@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gofiber/fiber/v2/log"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/nutikuli/internProject_backend/internal/models/account"
 	_accDtos "github.com/nutikuli/internProject_backend/internal/models/account/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/admin"
+	"github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
 	_adminDtos "github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/admin/entities"
 	_adminEntities "github.com/nutikuli/internProject_backend/internal/models/admin/entities"
@@ -89,25 +92,33 @@ func (a *adminUseCase) OnCreateAdminAccount(c *fiber.Ctx, ctx context.Context, a
 }
 
 func (a *adminUseCase) OnGetAdminById(ctx context.Context, adminId int64) (*_adminDtos.AdminFileRes, int, error) {
+	
+	log.Debug("adminid=====>",adminId)
+	
 	fileEntity := &_fileEntities.FileEntityReq{
-		EntityType: "ADMIN",
+		EntityType: "ACCOUNT",
 		EntityId:   adminId,
 	}
 
 	filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
 	if errOnGetFiles != nil {
 		return nil, http.StatusInternalServerError, errOnGetFiles
-	}
+	} 
+
+	log.Debug("fileres=====>",filesRes)
 
 	adminRes, errOnGetAdmin := a.adminRepo.GetAccountAdminById(ctx, adminId)
 	if errOnGetAdmin != nil {
 		return nil, http.StatusInternalServerError, errOnGetAdmin
 	}
+	log.Debug("adminres=====>",adminRes)
 
 	adminPermissionRes, errOnGetAdminPermission := a.adminpermissionRepo.GetAdminpermissiomById(ctx, adminId)
 	if errOnGetAdmin != nil {
 		return nil, http.StatusInternalServerError, errOnGetAdminPermission
-	}
+	} 
+
+	
 
 	return &_adminDtos.AdminFileRes{
 		AdminData:           adminRes,
@@ -136,4 +147,43 @@ func (a *adminUseCase) AdminDeleted(ctx context.Context, Id int64) (int, error) 
 	}
 
 	return http.StatusOK, nil
-}
+} 
+
+
+
+func (a *adminUseCase) OnGetAllUserAdmin(ctx context.Context) ([]*dtos.AdminFileRes, int, error) {
+	admins, err := a.adminRepo.GetAccountAdmins(ctx)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	var adminFileRes []*dtos.AdminFileRes
+
+	for _, admin := range admins {
+		fEntity := &_fileEntities.FileEntityReq{
+			EntityType: "ADMIN",
+			EntityId:   admin.Id, // Assuming product has an ID field
+		}
+
+		files, err := a.fileRepo.GetFilesByIdAndEntity(ctx, fEntity)
+		if err != nil {
+			return nil, http.StatusInternalServerError, err
+		}
+
+		adminFileRes = append(adminFileRes, &dtos.AdminFileRes{
+			AdminData: admin,
+			FilesData:   files,
+		})
+	}
+
+	return adminFileRes, http.StatusOK, nil
+}  
+
+
+
+
+
+
+
+
+
