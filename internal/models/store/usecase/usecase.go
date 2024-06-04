@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/nutikuli/internProject_backend/internal/models/account"
 	_accDtos "github.com/nutikuli/internProject_backend/internal/models/account/dtos"
 	"github.com/nutikuli/internProject_backend/internal/models/store"
@@ -18,6 +19,15 @@ type storeUsecase struct {
 	storeRepo  store.StoreRepository
 	fileRepo   file.FileRepository
 	accUsecase account.AccountUsecase
+}
+
+// OnDeleteStoreById implements store.StoreUsecase.
+func (s *storeUsecase) OnDeleteStoreById(ctx context.Context, storeId int64) (int, error) {
+	err := s.storeRepo.DeleteStoreById(ctx, storeId)
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
 }
 
 func NewStoreUsecase(storeRepo store.StoreRepository, fileRepo file.FileRepository, accUsecase account.AccountUsecase) store.StoreUsecase {
@@ -87,6 +97,63 @@ func (s *storeUsecase) OnGetStoreById(ctx context.Context, storeId int64) (*_sto
 	fileEntity := &_fileEntities.FileEntityReq{
 		EntityType: "ACCOUNT",
 		EntityId:   storeId,
+	}
+
+	filesRes, errOnGetFiles := s.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
+	if errOnGetFiles != nil {
+		return nil, http.StatusInternalServerError, errOnGetFiles
+	}
+
+	storeRes, errOnGetStore := s.storeRepo.GetStoreById(ctx, storeId)
+	if errOnGetStore != nil {
+		return nil, http.StatusInternalServerError, errOnGetStore
+	}
+
+	return &_storeDtos.StoreWithFileRes{
+		StoreData: storeRes,
+		FilesData: filesRes,
+	}, http.StatusOK, nil
+}
+
+func (s *storeUsecase) OnUpdateStoreById(c *fiber.Ctx, ctx context.Context, storeId int64, storeDatReq *_storeEntities.StoreUpdatedReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_storeDtos.StoreWithFileRes, int, error) {
+	fileEntity := &_fileEntities.FileEntityReq{
+		EntityType: "ACCOUNT",
+		EntityId:   storeId,
+	}
+
+	oldFilesProd, err := s.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
+	if err != nil {
+		log.Debug("error get file ", err)
+		return nil, http.StatusInternalServerError, err
+	}
+
+	for _, f := range oldFilesProd {
+		errOnDeleteFile := s.fileRepo.DeleteFileByIdAndEntity(ctx, f.Id, fileEntity)
+		if errOnDeleteFile != nil {
+			return nil, http.StatusInternalServerError, errOnDeleteFile
+		}
+
+	}
+
+	for _, fDatReq := range filesDatReq {
+		file := &_fileEntities.File{
+			Type:       fDatReq.FileType,
+			PathUrl:    fDatReq.FileData,
+			Name:       fDatReq.FileName,
+			EntityType: "ACCOUNT",
+			AccountId:  &storeId,
+		}
+
+		_, fUrl, status, errOnCreatedFile := file.EncodeBase64toFile(c, true)
+		if errOnCreatedFile != nil {
+			return nil, status, errOnCreatedFile
+		}
+
+		fDatReq.FileData = *fUrl
+		_, errOnInsertFile := s.fileRepo.CreateFileByEntityAndId(ctx, fDatReq, fileEntity)
+		if errOnInsertFile != nil {
+			return nil, http.StatusInternalServerError, errOnInsertFile
+		}
 	}
 
 	filesRes, errOnGetFiles := s.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
