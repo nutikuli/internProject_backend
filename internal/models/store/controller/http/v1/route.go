@@ -12,7 +12,7 @@ import (
 )
 
 func UseStoreRoute(db *sqlx.DB, app fiber.Router) {
-	authR := app.Group("/store", func(c *fiber.Ctx) error {
+	storeR := app.Group("/store", func(c *fiber.Ctx) error {
 		log.Infof("store : %v", c.Request().URI().String())
 		return c.Next()
 	})
@@ -28,6 +28,8 @@ func UseStoreRoute(db *sqlx.DB, app fiber.Router) {
 
 	storeConn := NewStoreHandler(storeUse)
 
-	authR.Post("/account-register", storeConn.RegisterStoreAccount)
-	authR.Get("/:store_id", storeConn.GetStoreById)
+	storeR.Post("/account-register", storeConn.RegisterStoreAccount)
+	storeR.Get("/get-store-by-id/:store_id", storeConn.GetStoreById)
+	storeR.Patch("/update-store-by-id/:store_id", storeConn.UpdateStoreById)
+	storeR.Delete("/delete-store-by-id/:store_id", storeConn.DeleteStoreById)
 }
