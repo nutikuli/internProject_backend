@@ -13,7 +13,7 @@ import (
 	"github.com/nutikuli/internProject_backend/internal/models/admin"
 	"github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
 	_adminDtos "github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
-	"github.com/nutikuli/internProject_backend/internal/models/admin/entities"
+	// "github.com/nutikuli/internProject_backend/internal/models/admin/entities"
 	_adminEntities "github.com/nutikuli/internProject_backend/internal/models/admin/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/adminpermission"
 	"github.com/nutikuli/internProject_backend/internal/services/file"
@@ -127,16 +127,60 @@ func (a *adminUseCase) OnGetAdminById(ctx context.Context, adminId int64) (*_adm
 	}, http.StatusOK, nil
 }
 
-func (a *adminUseCase) OnUpdateUserById(ctx context.Context, Id int64, req *entities.AdminUpdateReq) (int, error) {
-
-	err := a.adminRepo.UpdateAdminById(ctx, Id, req)
-
+func (a *adminUseCase) OnUpdateAdminById(c *fiber.Ctx, ctx context.Context, adminId int64, adminDatReq *_adminEntities.AdminUpdateReq, fileDatReq []*_fileEntities.FileUploaderReq) (*dtos.AdminFileRes, int, error) {
+	err := a.adminRepo.UpdateAdminById(ctx, adminId, adminDatReq)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("failed to update user by ID: %w", err)
+		return nil, http.StatusInternalServerError, err
 	}
 
-	return http.StatusOK, nil
+	fEntity := &_fileEntities.FileEntityReq{
+		EntityType: "ACCOUNT",
+		EntityId:   adminId,
+	}
+
+	for _, fDatReq := range fileDatReq {
+		file := &_fileEntities.File{
+			Type:       fDatReq.FileType,
+			PathUrl:    fDatReq.FileData,
+			Name:       fDatReq.FileName,
+			EntityType: "ACCOUNT",
+			ProductId:  &adminId,
+		}
+
+		_, fUrl, status, errOnCreatedFile := file.UpdateFile(c, true)
+		if errOnCreatedFile != nil {
+			return nil, status, errOnCreatedFile
+		}
+
+		fDatReq.FileData = *fUrl
+		errOnInsertFile := a.fileRepo.UpdateFileByIdAndEntity(ctx, fEntity, fDatReq)
+		if errOnInsertFile != nil {
+			return nil, http.StatusInternalServerError, errOnInsertFile
+		}
+
+	}
+
+	filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fEntity)
+	if errOnGetFiles != nil {
+		return nil, http.StatusInternalServerError, errOnGetFiles
+	}
+	log.Debug(filesRes)
+
+	newAdmin, err := a.adminRepo.GetAccountAdminById(ctx, adminId)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	return &dtos.AdminFileRes{
+		AdminData: newAdmin,
+		FilesData:   filesRes,
+	}, http.StatusOK, nil
 }
+
+
+
+
+
 
 func (a *adminUseCase) AdminDeleted(ctx context.Context, Id int64) (int, error) {
 

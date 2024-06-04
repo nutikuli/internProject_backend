@@ -14,7 +14,7 @@ import (
 type AdminUseCase interface {
 	OnCreateAdminAccount(c *fiber.Ctx, ctx context.Context, adminDatReq *_adminEntities.AdminRegisterReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_adminDtos.AdminFileRes, *_accDtos.UserToken, int, error)
 	OnGetAdminById(ctx context.Context, adminId int64) (*_adminDtos.AdminFileRes, int, error)
-	OnUpdateUserById(ctx context.Context, Id int64, req *_adminEntities.AdminUpdateReq) (int, error)
+	OnUpdateAdminById(c *fiber.Ctx, ctx context.Context, adminId int64, adminDatReq *_adminEntities.AdminUpdateReq, fileDatReq []*_fileEntities.FileUploaderReq) (*dtos.AdminFileRes, int, error)
 	AdminDeleted(ctx context.Context, Id int64) (int, error)
 	OnGetAllUserAdmin(ctx context.Context) ([]*dtos.AdminFileRes, int, error)
 }

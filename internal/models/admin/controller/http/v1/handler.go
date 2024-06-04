@@ -12,7 +12,7 @@ import (
 
 	"github.com/nutikuli/internProject_backend/internal/models/admin"
 	"github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
-	"github.com/nutikuli/internProject_backend/internal/models/admin/entities"
+	
 ) 
 
 
@@ -109,63 +109,52 @@ func (a *adminConn) RegisterAdminAccount(c *fiber.Ctx) error {
 
 
 
-func (ad adminConn) UpdateAdminById(c *fiber.Ctx) error {
+func (a *adminConn) UpdateAdminById(c *fiber.Ctx) error {
+	adminId, err := c.ParamsInt("admin_id")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":      fiber.StatusBadRequest,
+			"status_code": fiber.StatusBadRequest,
+			"message":     "error, invalid request admin_id param",
+			"result":      nil,
+		})
+	}
 
-	var req = new(entities.AdminUpdateReq)
-	if cE := c.BodyParser(req); cE != nil {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"status":      http.StatusText(http.StatusBadRequest),
-			"status_code": http.StatusBadRequest,
+	adId64 := int64(adminId)
+
+	req := new(dtos.AdminFileUpdateReq)
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status":      fiber.StatusBadRequest,
+			"status_code": fiber.StatusBadRequest,
 			"message":     "error, invalid request body",
-			"raw_message": cE.Error(),
 			"result":      nil,
 		})
 	}
 
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
-		reqP        = c.Params("admin_id")
 	)
+
 	defer cancel()
 
-	if reqP == "" {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"status":      http.StatusText(http.StatusBadRequest),
-			"status_code": http.StatusBadRequest,
-			"message":     "user_id params is required",
-			"raw_message": "",
-			"result":      nil,
-		})
-	}
-
-	adminId, err := strconv.ParseInt(reqP, 10, 64)
+	admin, status, err := a.AdminUse.OnUpdateAdminById(c, ctx, adId64,req.AdminData,req.FilesData)
 	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"status":      http.StatusText(http.StatusBadRequest),
-			"status_code": http.StatusBadRequest,
-			"raw_message": err.Error(),
-			"message":     "error, invalid user_id params",
-			"result":      nil,
-		})
-	}
-
-	status, cE := ad.AdminUse.OnUpdateUserById(ctx, adminId, req)
-	if cE != nil {
 		return c.Status(status).JSON(fiber.Map{
-			"status":      http.StatusText(status),
+			"status":      status,
 			"status_code": status,
-			"message":     "",
+			"message":     err.Error(),
 			"result":      nil,
 		})
 	}
 
-	return c.Status(status).JSON(fiber.Map{
-		"status":      http.StatusText(status),
-		"status_code": status,
-		"message":     "user updated successfully",
-		"result":      nil,
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":      fiber.StatusOK,
+		"status_code": fiber.StatusOK,
+		"message":     nil,
+		"result":      admin,
 	})
-} 
+}
 
 
 func (a *adminConn) DeletedAdminByID(c *fiber.Ctx) error {
