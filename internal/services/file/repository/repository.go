@@ -104,25 +104,27 @@ func (f *fileRepo) GetFilesByIdAndEntity(ctx context.Context, req *entities.File
 	return files, nil
 }
 
-func (f *fileRepo) DeleteFileByIdAndEntity(ctx context.Context, req *entities.FileEntityReq) error {
+func (f *fileRepo) DeleteFileByIdAndEntity(ctx context.Context, fileId int64, req *entities.FileEntityReq) error {
 	args := utils.Array{
 		req.EntityType,
-		req.EntityId,
+		fileId,
 	}
 
-	var SQL_ExecFileDeleteByIdAndEntity string
-	switch req.EntityType {
-	case "ACCOUNT":
-		SQL_ExecFileDeleteByIdAndEntity = "DELETE FROM File WHERE entityType = ? AND accountId = ?"
-	case "PRODUCT":
-		SQL_ExecFileDeleteByIdAndEntity = "DELETE FROM File WHERE entityType = ? AND productId = ?"
-	case "ORDER":
-		SQL_ExecFileDeleteByIdAndEntity = "DELETE FROM File WHERE entityType = ? AND orderId = ?"
-	case "BANK":
-		SQL_ExecFileDeleteByIdAndEntity = "DELETE FROM File WHERE entityType = ? AND bankId = ?"
-	default:
-		panic("invalid entity type")
-	}
+	// var SQL_ExecFileDeleteByIdAndEntity string
+	// switch req.EntityType {
+	// case "ACCOUNT":
+	// 	SQL_ExecFileDeleteByIdAndEntity = "DELETE FROM File WHERE entityType = ? AND accountId = ?"
+	// case "PRODUCT":
+	// 	SQL_ExecFileDeleteByIdAndEntity = "DELETE FROM File WHERE entityType = ? AND productId = ?"
+	// case "ORDER":
+	// 	SQL_ExecFileDeleteByIdAndEntity = "DELETE FROM File WHERE entityType = ? AND orderId = ?"
+	// case "BANK":
+	// 	SQL_ExecFileDeleteByIdAndEntity = "DELETE FROM File WHERE entityType = ? AND bankId = ?"
+	// default:
+	// 	panic("invalid entity type")
+	// }
+
+	var SQL_ExecFileDeleteByIdAndEntity = "DELETE FROM File WHERE entityType = ? AND id = ?"
 
 	_, err := f.db.ExecContext(ctx, SQL_ExecFileDeleteByIdAndEntity, args...)
 	if err != nil {
@@ -132,37 +134,37 @@ func (f *fileRepo) DeleteFileByIdAndEntity(ctx context.Context, req *entities.Fi
 	return nil
 }
 
-// UpdateFileByIdAndEntity implements file.FileRepository.
-func (f *fileRepo) UpdateFileByIdAndEntity(ctx context.Context, req *entities.FileEntityReq, file *entities.FileUploaderReq) error {
-	args := utils.Array{
-		file.FileName,
-		file.FileData,
-		file.FileType,
-		req.EntityType,
-		req.EntityId,
-	}
+//- Don't used right now
+// func (f *fileRepo) UpdateFileByIdAndEntity(ctx context.Context, req *entities.FileEntityReq, file *entities.FileUploaderReq) error {
+// 	args := utils.Array{
+// 		file.FileName,
+// 		file.FileData,
+// 		file.FileType,
+// 		req.EntityType,
+// 		req.EntityId,
+// 	}
 
-	var SQL_ExecFileUpdateByIdAndEntity string
-	switch req.EntityType {
-	case "ACCOUNT":
-		SQL_ExecFileUpdateByIdAndEntity = "UPDATE File SET name = ?, pathUrl = ?, type = ? WHERE entityType = ? AND accountId = ?"
-	case "PRODUCT":
-		SQL_ExecFileUpdateByIdAndEntity = "UPDATE File SET name = ?, pathUrl = ?, type = ? WHERE entityType = ? AND productId = ?"
-	case "ORDER":
-		SQL_ExecFileUpdateByIdAndEntity = "UPDATE File SET name = ?, pathUrl = ?, type = ? WHERE entityType = ? AND orderId = ?"
-	case "BANK":
-		SQL_ExecFileUpdateByIdAndEntity = "UPDATE File SET name = ?, pathUrl = ?, type = ? WHERE entityType = ? AND bankId = ?"
-	default:
-		panic("invalid entity type")
-	}
+// 	var SQL_ExecFileUpdateByIdAndEntity string
+// 	switch req.EntityType {
+// 	case "ACCOUNT":
+// 		SQL_ExecFileUpdateByIdAndEntity = "UPDATE File SET name = ?, pathUrl = ?, type = ? WHERE entityType = ? AND accountId = ?"
+// 	case "PRODUCT":
+// 		SQL_ExecFileUpdateByIdAndEntity = "UPDATE File SET name = ?, pathUrl = ?, type = ? WHERE entityType = ? AND productId = ?"
+// 	case "ORDER":
+// 		SQL_ExecFileUpdateByIdAndEntity = "UPDATE File SET name = ?, pathUrl = ?, type = ? WHERE entityType = ? AND orderId = ?"
+// 	case "BANK":
+// 		SQL_ExecFileUpdateByIdAndEntity = "UPDATE File SET name = ?, pathUrl = ?, type = ? WHERE entityType = ? AND bankId = ?"
+// 	default:
+// 		panic("invalid entity type")
+// 	}
 
-	_, err := f.db.ExecContext(ctx, SQL_ExecFileUpdateByIdAndEntity, args...)
-	if err != nil {
-		return err
-	}
+// 	_, err := f.db.ExecContext(ctx, SQL_ExecFileUpdateByIdAndEntity, args...)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // package repository
 
