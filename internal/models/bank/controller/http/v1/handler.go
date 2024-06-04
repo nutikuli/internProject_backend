@@ -23,7 +23,7 @@ func NewBankHandler(BankUse bank.BankUseCase) *bankConn {
 }
 
 func (o *bankConn) GetBanksByStoreId(c *fiber.Ctx) error {
-	req, err := strconv.ParseInt(c.Params("id"), 10, 64)
+	req, err := strconv.ParseInt(c.Params("store_id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),
@@ -104,7 +104,7 @@ func (o *bankConn) CreateBank(c *fiber.Ctx) error {
 }
 
 func (o *bankConn) GetBankById(c *fiber.Ctx) error {
-	req, err := strconv.ParseInt(c.Params("id"), 10, 64)
+	req, err := strconv.ParseInt(c.Params("bank_id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),
@@ -195,7 +195,7 @@ func (o *bankConn) UpdateBankById(c *fiber.Ctx) error {
 }
 
 func (o *bankConn) DeleteBankById(c *fiber.Ctx) error {
-	req, err := strconv.ParseInt(c.Params("id"), 10, 64)
+	req, err := strconv.ParseInt(c.Params("bank_id"), 10, 64)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),

@@ -7,11 +7,14 @@ import (
 	_accRepo "github.com/nutikuli/internProject_backend/internal/models/account/repository"
 	_accUse "github.com/nutikuli/internProject_backend/internal/models/account/usecase"
 	_adminRepo "github.com/nutikuli/internProject_backend/internal/models/admin/repository"
-	"github.com/nutikuli/internProject_backend/internal/models/customer/repository"
-	_storeRepo "github.com/nutikuli/internProject_backend/internal/models/store/repository"
-
+	_AdminUse "github.com/nutikuli/internProject_backend/internal/models/admin/usecase"
+	_adperRepo "github.com/nutikuli/internProject_backend/internal/models/adminpermission/repository"
 	_cutomerHand "github.com/nutikuli/internProject_backend/internal/models/customer/controller/http/v1"
+	"github.com/nutikuli/internProject_backend/internal/models/customer/repository"
 	_cutomerUse "github.com/nutikuli/internProject_backend/internal/models/customer/usecase"
+	_storeRepo "github.com/nutikuli/internProject_backend/internal/models/store/repository"
+	_storeUse "github.com/nutikuli/internProject_backend/internal/models/store/usecase"
+	_fileRepo "github.com/nutikuli/internProject_backend/internal/services/file/repository"
 )
 
 func UseAccountRoute(db *sqlx.DB, app fiber.Router) {
@@ -19,8 +22,9 @@ func UseAccountRoute(db *sqlx.DB, app fiber.Router) {
 		log.Infof("Account : %v", c.Request().URI().String())
 		return c.Next()
 	})
-
+	adperRepo := _adperRepo.NewAdminPermissionRepository(db)
 	//register
+	fileRepo := _fileRepo.NewFileRepository(db)
 	adminRepo := _adminRepo.NewFileRepository(db)
 	storeRep := _storeRepo.NewStoreRepository(db)
 	customerRepo := repository.NewCustomerRepository(db)
@@ -30,8 +34,10 @@ func UseAccountRoute(db *sqlx.DB, app fiber.Router) {
 	customerConn := _cutomerHand.NewCustomerHandler(customerUse)
 	authR.Post("/register", customerConn.CreateCustomerAccount)
 
+	AdminUseCase := _AdminUse.NewAdminUsecase(adminRepo, fileRepo, accUse, adperRepo)
+	storeUse := _storeUse.NewStoreUsecase(storeRep, fileRepo, accUse)
 	//login
-	accConn := NewAccountHandler(accUse)
+	accConn := NewAccountHandler(accUse, storeUse, customerUse, AdminUseCase)
 	authR.Post("/login", accConn.Login)
 
 	//OTP

@@ -145,7 +145,7 @@ func (f *File) Base64toJpg(c *fiber.Ctx) (*string, *string, error) {
 }
 
 func (f *File) Base64toFile(c *fiber.Ctx, includeDomain bool) (*string, *string, error) {
-	if len(f.PathUrl) == 0 || f.Type != "PDF" || f.Type != "MARKDOWN_FILE" {
+	if len(f.PathUrl) == 0 || (f.Type != "PDF" && f.Type != "MARKDOWN_FILE") {
 		return nil, nil, errors.New("Invalid file data or file type, expected PDF file type but got " + f.Type)
 	}
 
@@ -236,7 +236,7 @@ func (file *File) EncodeBase64toFile(c *fiber.Ctx, domainIncludeOnFile bool) (*s
 }
 
 func (f *File) DeleteFile(c *fiber.Ctx) error {
-	if len(f.PathUrl) == 0 || f.Type != "PDF" || f.Type != "MARKDOWN_FILE" || f.Type != "PNG" || f.Type != "JPG" {
+	if len(f.PathUrl) == 0 || f.Type != "PDF" && f.Type != "MARKDOWN_FILE" && f.Type != "PNG" && f.Type != "JPG" {
 		return errors.New("Invalid file data or file type, expected file data but got nil or file type is not supported ")
 	}
 
@@ -260,7 +260,7 @@ func (f *File) DeleteFile(c *fiber.Ctx) error {
 }
 
 func (f *File) UpdateFile(c *fiber.Ctx, domainIncludeOnFile bool) (*string, *string, int, error) {
-	if len(f.PathUrl) == 0 || f.Type != "PDF" || f.Type != "MARKDOWN_FILE" || f.Type != "PNG" || f.Type != "JPG" {
+	if len(f.PathUrl) == 0 || f.Type != "PDF" && f.Type != "MARKDOWN_FILE" && f.Type != "PNG" && f.Type != "JPG" {
 		return nil, nil, http.StatusUnsupportedMediaType, errors.New("Invalid file data or file type, expected file data but got nil or file type is not supported ")
 	}
 

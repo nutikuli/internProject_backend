@@ -23,14 +23,20 @@ type accountConn struct {
 	AdminUse    admin.AdminUseCase
 }
 
-func NewAccountHandler(accountUse account.AccountUsecase) *accountConn {
+func NewAccountHandler(accountUse account.AccountUsecase,storeUse store.StoreUsecase,customerUse customer.CustomerUsecase,adminUse admin.AdminUseCase) *accountConn {
 	return &accountConn{
 		AccountUse: accountUse,
+		StoreUse: storeUse,
+		CustomerUse: customerUse,
+		AdminUse: adminUse,
+		
+
 	}
 }
 
 func (a *accountConn) Login(c *fiber.Ctx) error {
 	req := new(_accEntities.UsersCredential)
+
 	if err := c.BodyParser(req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),
@@ -61,6 +67,7 @@ func (a *accountConn) Login(c *fiber.Ctx) error {
 
 	switch userToken.Role {
 	case "CUSTOMER":
+		log.Debug("Passport : ",usrPassport)
 		acc, status, err := a.CustomerUse.OnGetCustomerById(ctx, usrPassport.Id)
 		if err != nil {
 			return c.Status(status).JSON(fiber.Map{
@@ -72,7 +79,9 @@ func (a *accountConn) Login(c *fiber.Ctx) error {
 		}
 		accRes = acc
 	case "STORE":
+		log.Debug("Passport : ",usrPassport)
 		acc, status, err := a.StoreUse.OnGetStoreById(ctx, usrPassport.Id)
+		
 		if err != nil {
 			return c.Status(status).JSON(fiber.Map{
 				"status":      status,
@@ -81,6 +90,7 @@ func (a *accountConn) Login(c *fiber.Ctx) error {
 				"result":      nil,
 			})
 		}
+		log.Debug("Store acc",acc)
 		accRes = acc
 	case "ADMIN":
 		acc, status, err := a.AdminUse.OnGetAdminById(ctx, usrPassport.Id)

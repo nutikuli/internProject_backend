@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 
+	"github.com/gofiber/fiber/v2/log"
+
 	"github.com/jmoiron/sqlx"
 	_accEntities "github.com/nutikuli/internProject_backend/internal/models/account/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/store"
@@ -49,6 +51,7 @@ func (s *storeRepo) CreateStoreAccount(ctx context.Context, req entities.StoreRe
 
 func (s *storeRepo) GetStoreById(ctx context.Context, storeId int64) (*entities.Store, error) {
 	store := &entities.Store{}
+	log.Debug("store id", storeId)
 	err := s.db.GetContext(ctx, store, repository_query.GetStoreAccountById, storeId)
 	if err != nil {
 		return nil, err

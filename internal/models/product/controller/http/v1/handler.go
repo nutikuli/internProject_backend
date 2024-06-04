@@ -174,7 +174,7 @@ func (p *prodConn) CreateProduct(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	product, status, err := p.prodUse.OnCreateProduct(c, ctx, req.ProductData, req.FileData)
+	product, status, err := p.prodUse.OnCreateProduct(c, ctx, req.ProductData, req.FilesData)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,
@@ -259,7 +259,7 @@ func (p *prodConn) UpdateProductById(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	product, status, err := p.prodUse.OnUpdateProductById(c, ctx, prodId64, req.ProductData, req.FileData)
+	product, status, err := p.prodUse.OnUpdateProductById(c, ctx, prodId64, req.ProductData, req.FilesData)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      status,

@@ -6,6 +6,6 @@ import (
 )
 
 type ProductFileReq struct {
-	ProductData *entities.ProductCreateReq       `json:"product_data"`
-	FileData    []*_fileEntities.FileUploaderReq `json:"file_data"`
+	ProductData *entities.ProductCreateReq       `json:"product_data" form:"product_data" binding:"required"`
+	FilesData   []*_fileEntities.FileUploaderReq `json:"files_data" form:"files_data" binding:"required"`
 }
