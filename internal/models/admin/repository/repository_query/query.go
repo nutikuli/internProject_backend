@@ -14,7 +14,7 @@ var SQL_insert_account_admin = `INSERT INTO Account (name,password,phone,locatio
 
 //update admin account
 
-var SQL_update_account_admin = `UPDATE  Account SET name= ?, password = ? ,phone = ?,location = ?,email = ?,status = ?,permissionId = ? WHERE id = ? ;`
+var SQL_update_account_admin = `UPDATE  Account SET name= ?, password = ? ,phone = ?,location = ? ,email = ?,status = ? WHERE id = ? ;`
 
 //update password account admin
 

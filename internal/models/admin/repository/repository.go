@@ -73,6 +73,7 @@ func (a *AdminRepo) CreateAdmin(ctx context.Context, admindata *entities.AdminRe
 func (a *AdminRepo) UpdateAdminById(ctx context.Context, Id int64, admindata *entities.AdminUpdateReq) error {
 	args := utils.Array{
 		admindata.Name,
+		admindata.Email,
 		admindata.Password,
 		admindata.Phone,
 		admindata.Location,
@@ -83,8 +84,10 @@ func (a *AdminRepo) UpdateAdminById(ctx context.Context, Id int64, admindata *en
 	}
 
 	log.Info(args)
+	
 
-	res, err := a.db.ExecContext(ctx, repository_query.SQL_update_account_admin, args...)
+	res, err := a.db.ExecContext(ctx, repository_query.SQL_update_account_admin, admindata.Name,admindata.Password,admindata.Phone,admindata.Location,admindata.Email,admindata.Status,Id)
+	log.Debug(res)
 	if err != nil {
 		log.Error(err)
 		return err
