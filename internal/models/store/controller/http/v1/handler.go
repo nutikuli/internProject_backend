@@ -181,3 +181,28 @@ func (s *storeConn) DeleteStoreById(c *fiber.Ctx) error {
 		"result":      nil,
 	})
 }
+
+func (s *storeConn) GetStoreAccounts(c *fiber.Ctx) error {
+	var (
+		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
+	)
+
+	defer cancel()
+
+	stores, status, err := s.storeUse.OnGetStoreAccounts(ctx)
+	if err != nil {
+		return c.Status(status).JSON(fiber.Map{
+			"status":      status,
+			"status_code": status,
+			"message":     err.Error(),
+			"result":      nil,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":      fiber.StatusOK,
+		"status_code": fiber.StatusOK,
+		"message":     nil,
+		"result":      stores,
+	})
+}
