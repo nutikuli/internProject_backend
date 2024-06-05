@@ -22,7 +22,6 @@ model Account {
     permissionId      Int?              @unique
     files             File[]            @relation("AccountFile")
     adminPermission   AdminPermission?  @relation(fields: [permissionId], references: [id])
-    logs              Log[]
     products          Product[]         @relation("StoreProduct")
     productCategories ProductCategory[] @relation("StoreProductCategory")
     banks             Bank[]            @relation("StoreBank")
@@ -144,8 +143,6 @@ model Log {
     actionRequest String
     createdAt     DateTime @default(now())
     updatedAt     DateTime @default(now()) @updatedAt
-    accountId     Int
-    account       Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
