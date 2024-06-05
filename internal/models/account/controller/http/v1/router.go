@@ -12,10 +12,12 @@ import (
 	_cutomerHand "github.com/nutikuli/internProject_backend/internal/models/customer/controller/http/v1"
 	"github.com/nutikuli/internProject_backend/internal/models/customer/repository"
 	_cutomerUse "github.com/nutikuli/internProject_backend/internal/models/customer/usecase"
+	_logRepo "github.com/nutikuli/internProject_backend/internal/models/logdata/repository"
 	_storeRepo "github.com/nutikuli/internProject_backend/internal/models/store/repository"
 	_storeUse "github.com/nutikuli/internProject_backend/internal/models/store/usecase"
 	_fileRepo "github.com/nutikuli/internProject_backend/internal/services/file/repository"
 	_fileUse "github.com/nutikuli/internProject_backend/internal/services/file/usecase"
+	"github.com/nutikuli/internProject_backend/pkg/middlewares"
 )
 
 func UseAccountRoute(db *sqlx.DB, app fiber.Router) {
@@ -26,6 +28,9 @@ func UseAccountRoute(db *sqlx.DB, app fiber.Router) {
 	adperRepo := _adperRepo.NewAdminPermissionRepository(db)
 	//register
 
+	logRepo := _logRepo.NewLoggerRepository(db)
+	logger := middlewares.NewLogger(logRepo)
+
 	fileRepo := _fileRepo.NewFileRepository(db)
 	fileUse := _fileUse.NewFileUsecase(fileRepo)
 	adminRepo := _adminRepo.NewFileRepository(db)
@@ -35,18 +40,48 @@ func UseAccountRoute(db *sqlx.DB, app fiber.Router) {
 	accUse := _accUse.NewAccountUsecase(accRepo, nil, adminRepo, customerRepo, storeRep)
 	customerUse := _cutomerUse.NewCustomerUsecase(customerRepo, accUse)
 	customerConn := _cutomerHand.NewCustomerHandler(customerUse)
-	authR.Post("/register", customerConn.CreateCustomerAccount)
 
 	AdminUseCase := _AdminUse.NewAdminUsecase(adminRepo, fileRepo, accUse, adperRepo, fileUse)
 	storeUse := _storeUse.NewStoreUsecase(storeRep, fileRepo, accUse)
+
+	authR.Post("/register",
+
+		customerConn.CreateCustomerAccount)
 	//login
 	accConn := NewAccountHandler(accUse, storeUse, customerUse, AdminUseCase)
-	authR.Post("/login", accConn.Login)
+	authR.Post("/login",
+		func(c *fiber.Ctx) error {
+			logAction := &middlewares.LoggerAction{
+				Menu:   "Account",
+				Action: "เข้าสู่ระบบ",
+			}
+
+			return logger.LogRequest(c, logAction)
+		},
+		accConn.Login)
 
 	//OTP
-	authR.Post("/otp", accConn.OTP)
+	authR.Post("/otp",
+		func(c *fiber.Ctx) error {
+			logAction := &middlewares.LoggerAction{
+				Menu:   "Account",
+				Action: "ส่ง OTP",
+			}
+
+			return logger.LogRequest(c, logAction)
+		},
+		accConn.OTP)
 	//resetPassword
-	authR.Post("/resetpass", accConn.UpdatePass)
+	authR.Post("/resetpass",
+		func(c *fiber.Ctx) error {
+			logAction := &middlewares.LoggerAction{
+				Menu:   "Account",
+				Action: "รีเซ็ตรหัสผ่าน",
+			}
+
+			return logger.LogRequest(c, logAction)
+		},
+		accConn.UpdatePass)
 
 	// get
 	authR.Get("/get-customer", accConn.GetAllDataCustomer)
