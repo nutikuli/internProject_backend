@@ -102,3 +102,15 @@ func (s *storeRepo) DeleteStoreById(ctx context.Context, storeId int64) error {
 
 	return nil
 }
+
+// GetStoreAccounts implements store.StoreRepository.
+func (s *storeRepo) GetStoreAccounts(ctx context.Context) ([]*entities.Store, error) {
+	var stores = make([]*entities.Store, 0)
+
+	err := s.db.SelectContext(ctx, &stores, repository_query.GetStoreAccounts)
+	if err != nil {
+		return nil, err
+	}
+
+	return stores, nil
+}

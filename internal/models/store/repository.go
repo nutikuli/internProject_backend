@@ -13,4 +13,5 @@ type StoreRepository interface {
 	UpdateStoreAccountPassword(ctx context.Context, req _accEntities.UpdatePass) error
 	UpdateStoreById(ctx context.Context, storeId int64, req entities.StoreUpdatedReq) error
 	DeleteStoreById(ctx context.Context, storeId int64) error
+	GetStoreAccounts(ctx context.Context) ([]*entities.Store, error)
 }

@@ -6,4 +6,5 @@ var (
 	UpdateStoreAccountPassword = `UPDATE Account SET password = ? WHERE id = ? AND role = ?`
 	UpdateStoreById            = `UPDATE Account SET email = ?, name = ?, phone = ?, location = ?,  status = ?, storeName = ?, storeLocation = ? WHERE id = ? AND role = ?`
 	DeleteStoreById            = `DELETE FROM Account WHERE id = ?`
+	GetStoreAccounts           = `SELECT id, email, password, name, phone, location, status, role, storeName, storeLocation FROM Account WHERE role = 'STORE'`
 )
