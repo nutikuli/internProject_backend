@@ -11,7 +11,7 @@ import (
 	"github.com/nutikuli/internProject_backend/internal/models/adminpermission"
 	"github.com/nutikuli/internProject_backend/internal/models/adminpermission/entities"
 	repositoryquery "github.com/nutikuli/internProject_backend/internal/models/adminpermission/repository/repository_query"
-	"github.com/nutikuli/internProject_backend/pkg/utils"
+	// "github.com/nutikuli/internProject_backend/pkg/utils"
 )
 
 type AdminPermissionRepo struct {
@@ -38,11 +38,6 @@ func (a *AdminPermissionRepo) GetAdminpermissiomById(ctx context.Context, id int
 
 func (a *AdminPermissionRepo) CreateAdminPermission(ctx context.Context, adminpermissiondata *entities.AdminPermissionCreatedReq) (*int64, error) {
 
-	// var adminPermissionData AdminPermissionCreatedReq
-	// err := json.Unmarshal(*adminpermissiondata, &adminPermissionData)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 
 	jsonData, err := json.Marshal(adminpermissiondata.MenuPermission)
 	if err != nil {
@@ -79,14 +74,20 @@ func (a *AdminPermissionRepo) GetAdminPermissions(ctx context.Context) (*entitie
 }
 
 func (a *AdminPermissionRepo) UpdateAdminPermissionById(ctx context.Context, Id int64, adminpermissiondata *entities.AdminPermissionUpdatedReq) error {
-	args := utils.Array{
-		adminpermissiondata.MenuPermission,
-		Id,
+	
+
+	// res, err := a.db.ExecContext(ctx, repositoryquery.SQL_get_adminpermission_by_id, adminpermissiondata.MenuPermission,Id)
+	jsonData, err := json.Marshal(adminpermissiondata.MenuPermission)
+	if err != nil {
+		log.Fatal(err)
+		return err
 	}
 
-	log.Info(args)
-
-	res, err := a.db.ExecContext(ctx, repositoryquery.SQL_get_adminpermission_by_id, args...)
+	// Perform the update operation
+	res, err := a.db.NamedExec(`UPDATE AdminPermission SET menuPermission = :json WHERE Id = :id`, map[string]interface{}{
+		"json": string(jsonData),
+		"id":   Id,
+	})
 	if err != nil {
 		log.Error(err)
 		return err
