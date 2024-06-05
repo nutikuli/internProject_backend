@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/jmoiron/sqlx"
@@ -11,6 +13,9 @@ import (
 	_adperRepo "github.com/nutikuli/internProject_backend/internal/models/adminpermission/repository"
 	_fileRepo "github.com/nutikuli/internProject_backend/internal/services/file/repository"
 	_fileUse "github.com/nutikuli/internProject_backend/internal/services/file/usecase"
+	"github.com/nutikuli/internProject_backend/pkg/middlewares"
+
+	_logRepo "github.com/nutikuli/internProject_backend/internal/models/logdata/repository"
 )
 
 func UseAdminRoute(db *sqlx.DB, app fiber.Router) {
@@ -18,6 +23,9 @@ func UseAdminRoute(db *sqlx.DB, app fiber.Router) {
 		log.Infof("admin : %v", c.Request().URI().String())
 		return c.Next()
 	})
+
+	logRepo := _logRepo.NewLoggerRepository(db)
+	logger := middlewares.NewLogger(logRepo)
 
 	fileRepo := _fileRepo.NewFileRepository(db)
 	adminRepo := repository.NewFileRepository(db)
@@ -31,9 +39,46 @@ func UseAdminRoute(db *sqlx.DB, app fiber.Router) {
 
 	AdminConn := NewAdminHandler(AdminUseCase)
 
-	authR.Post("/admin-register", AdminConn.RegisterAdminAccount)
-	authR.Get("/:admin_id", AdminConn.GetAdmineById)
+	authR.Post("/admin-register",
+		func(c *fiber.Ctx) error {
+			logAction := &middlewares.LoggerAction{
+				Menu:   "ผู้ดูแลระบบ",
+				Action: "สร้างข้อมูล",
+			}
+
+			return logger.LogRequest(c, logAction)
+		},
+		AdminConn.RegisterAdminAccount)
 	authR.Get("/getalladmin", AdminConn.GetAllAdmin)
-	authR.Patch("/:admin_id", AdminConn.UpdateAdminById)
-	authR.Delete("/:admin_id", AdminConn.DeletedAdminByID)
+	authR.Get("/:admin_id",
+		func(c *fiber.Ctx) error {
+			logAction := &middlewares.LoggerAction{
+				Menu:   "แอดมิน",
+				Action: fmt.Sprintf("ดูข้อมูล Admin Account หมายเลข  %s", c.Params("admin_id")),
+			}
+
+			return logger.LogRequest(c, logAction)
+		},
+
+		AdminConn.GetAdmineById)
+	authR.Patch("/:admin_id",
+		func(c *fiber.Ctx) error {
+			logAction := &middlewares.LoggerAction{
+				Menu:   "แอดมิน",
+				Action: fmt.Sprintf("อัพเดทข้อมูล Admin Account หมายเลข  %s", c.Params("admin_id")),
+			}
+
+			return logger.LogRequest(c, logAction)
+		},
+		AdminConn.UpdateAdminById)
+	authR.Delete("/:admin_id",
+		func(c *fiber.Ctx) error {
+			logAction := &middlewares.LoggerAction{
+				Menu:   "แอดมิน",
+				Action: fmt.Sprintf("ลบข้อมูล Admin Account หมายเลข  %s", c.Params("admin_id")),
+			}
+
+			return logger.LogRequest(c, logAction)
+		},
+		AdminConn.DeletedAdminByID)
 }
