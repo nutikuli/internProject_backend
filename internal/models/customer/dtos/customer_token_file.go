@@ -10,6 +10,6 @@ type CustomerAccountFileRes struct {
 }
 
 type CustomerTokenRes struct {
-	Customer *CustomerAccountFileRes `json:"customer"`
+	Customer *CustomerAccountFileRes `json:"account_data"`
 	Token    *dtos.UserToken         `json:"token"`
 }

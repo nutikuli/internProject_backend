@@ -1,6 +1,6 @@
 package dtos
 
 type AccountLoginRes struct {
-	UserToken   UserToken   `json:"user_token"`
+	UserToken   UserToken   `json:"token"`
 	AccountData interface{} `json:"account_data"`
 }

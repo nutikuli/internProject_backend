@@ -12,6 +12,6 @@ type StoreWithFileRes struct {
 }
 
 type StoreTokenFileRes struct {
-	Store *StoreWithFileRes `json:"store"`
+	Store *StoreWithFileRes `json:"account_data"`
 	Token *dtos.UserToken   `json:"token"`
 }
