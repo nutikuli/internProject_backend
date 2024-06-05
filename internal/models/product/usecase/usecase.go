@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/nutikuli/internProject_backend/internal/models/product"
+	product_category "github.com/nutikuli/internProject_backend/internal/models/product-category"
 	"github.com/nutikuli/internProject_backend/internal/models/product/dtos"
 	_prodEntities "github.com/nutikuli/internProject_backend/internal/models/product/entities"
 	"github.com/nutikuli/internProject_backend/internal/services/file"
@@ -15,17 +16,20 @@ import (
 
 type productUsecase struct {
 	productRepo product.ProductRepository
+	productCate product_category.ProductCategoryRepository
 	fileRepo    file.FileRepository
 	fileUse     file.FileUsecase
 }
 
 func NewProductUsecase(productRepo product.ProductRepository, fileRepo file.FileRepository,
 	fileUse file.FileUsecase,
+	productCate product_category.ProductCategoryRepository,
 ) product.ProductUsecase {
 	return &productUsecase{
 		productRepo: productRepo,
 		fileRepo:    fileRepo,
 		fileUse:     fileUse,
+		productCate: productCate,
 	}
 }
 
@@ -73,9 +77,15 @@ func (p *productUsecase) OnCreateProduct(c *fiber.Ctx, ctx context.Context, prod
 		return nil, http.StatusInternalServerError, err
 	}
 
+	prodCateRes, err := p.productCate.GetProductCategoryById(ctx, newProduct.CategoryId)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
 	return &dtos.ProductFileRes{
-		Product: newProduct,
-		Files:   filesRes,
+		Product:         newProduct,
+		ProductCategory: prodCateRes,
+		Files:           filesRes,
 	}, http.StatusCreated, nil
 }
 
@@ -98,9 +108,15 @@ func (p *productUsecase) OnGetAllProducts(ctx context.Context) ([]*dtos.ProductF
 			return nil, http.StatusInternalServerError, err
 		}
 
+		prodCateRes, err := p.productCate.GetProductCategoryById(ctx, product.CategoryId)
+		if err != nil {
+			return nil, http.StatusInternalServerError, err
+		}
+
 		productFileRes = append(productFileRes, &dtos.ProductFileRes{
-			Product: product,
-			Files:   files,
+			Product:         product,
+			ProductCategory: prodCateRes,
+			Files:           files,
 		})
 	}
 
@@ -124,9 +140,15 @@ func (p *productUsecase) OnGetProductById(ctx context.Context, productId int64) 
 		return nil, http.StatusInternalServerError, err
 	}
 
+	prodCateRes, err := p.productCate.GetProductCategoryById(ctx, product.CategoryId)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
 	return &dtos.ProductFileRes{
-		Product: product,
-		Files:   files,
+		Product:         product,
+		ProductCategory: prodCateRes,
+		Files:           files,
 	}, http.StatusOK, nil
 }
 
@@ -149,9 +171,15 @@ func (p *productUsecase) OnGetProductsByStoreId(ctx context.Context, storeId int
 			return nil, http.StatusInternalServerError, err
 		}
 
+		prodCateRes, err := p.productCate.GetProductCategoryById(ctx, product.CategoryId)
+		if err != nil {
+			return nil, http.StatusInternalServerError, err
+		}
+
 		productsFileRes = append(productsFileRes, &dtos.ProductFileRes{
-			Product: product,
-			Files:   files,
+			Product:         product,
+			ProductCategory: prodCateRes,
+			Files:           files,
 		})
 	}
 
@@ -187,9 +215,15 @@ func (p *productUsecase) OnGetProductsByOrderId(ctx context.Context, orderId int
 			return nil, http.StatusInternalServerError, err
 		}
 
+		prodCateRes, err := p.productCate.GetProductCategoryById(ctx, product.CategoryId)
+		if err != nil {
+			return nil, http.StatusInternalServerError, err
+		}
+
 		productsFileRes = append(productsFileRes, &dtos.ProductFileRes{
-			Product: product,
-			Files:   files,
+			Product:         product,
+			ProductCategory: prodCateRes,
+			Files:           files,
 		})
 	}
 
@@ -254,8 +288,14 @@ func (p *productUsecase) OnUpdateProductById(c *fiber.Ctx, ctx context.Context, 
 		return nil, http.StatusInternalServerError, err
 	}
 
+	prodCateRes, err := p.productCate.GetProductCategoryById(ctx, newProduct.CategoryId)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
 	return &dtos.ProductFileRes{
-		Product: newProduct,
-		Files:   filesRes,
+		Product:         newProduct,
+		ProductCategory: prodCateRes,
+		Files:           filesRes,
 	}, http.StatusOK, nil
 }

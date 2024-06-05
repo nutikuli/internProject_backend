@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/jmoiron/sqlx"
 	_logRepo "github.com/nutikuli/internProject_backend/internal/models/logdata/repository"
+	_prodCate "github.com/nutikuli/internProject_backend/internal/models/product-category/repository"
 	"github.com/nutikuli/internProject_backend/internal/models/product/repository"
 	"github.com/nutikuli/internProject_backend/internal/models/product/usecase"
 	_fileRepo "github.com/nutikuli/internProject_backend/internal/services/file/repository"
@@ -23,8 +24,10 @@ func UseProductRoute(db *sqlx.DB, app fiber.Router) {
 	fileRepo := _fileRepo.NewFileRepository(db)
 	fileUse := _fileUse.NewFileUsecase(fileRepo)
 
+	prodCateRepo := _prodCate.NewProductCategoryRepository(db)
+
 	prodRepo := repository.NewproductRepository(db)
-	prodUse := usecase.NewProductUsecase(prodRepo, fileRepo, fileUse)
+	prodUse := usecase.NewProductUsecase(prodRepo, fileRepo, fileUse, prodCateRepo)
 
 	logRepo := _logRepo.NewLoggerRepository(db)
 	logger := middlewares.NewLogger(logRepo)

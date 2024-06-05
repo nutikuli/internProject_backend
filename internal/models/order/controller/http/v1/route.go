@@ -13,6 +13,7 @@ import (
 	_orderProdUse "github.com/nutikuli/internProject_backend/internal/models/order-product/usecase"
 	"github.com/nutikuli/internProject_backend/internal/models/order/repository"
 	"github.com/nutikuli/internProject_backend/internal/models/order/usecase"
+	_prodCate "github.com/nutikuli/internProject_backend/internal/models/product-category/repository"
 	_prodUse "github.com/nutikuli/internProject_backend/internal/models/product/usecase"
 	"github.com/nutikuli/internProject_backend/pkg/middlewares"
 
@@ -34,8 +35,10 @@ func UseOrderRoute(db *sqlx.DB, app fiber.Router) {
 	fileRepo := _fileRepo.NewFileRepository(db)
 	fileUse := _fileUse.NewFileUsecase(fileRepo)
 
+	prodCateRepo := _prodCate.NewProductCategoryRepository(db)
+
 	prodRepo := _prodRepo.NewproductRepository(db)
-	prodUse := _prodUse.NewProductUsecase(prodRepo, fileRepo, fileUse)
+	prodUse := _prodUse.NewProductUsecase(prodRepo, fileRepo, fileUse, prodCateRepo)
 
 	orderProdRepo := _orderProdRepo.NewOrderProductRepository(db)
 	orderProdUse := _orderProdUse.NewOrderProductUsecase(orderProdRepo)
