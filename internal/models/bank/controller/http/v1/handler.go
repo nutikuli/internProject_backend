@@ -77,16 +77,16 @@ func (o *bankConn) CreateBank(c *fiber.Ctx) error {
 	bank, status, err := o.BankUse.OnCreateBank(c, ctx, req.BankData, req.FilesData)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
-			"status":      http.StatusText(status),
+			"status":      status,
 			"status_code": status,
 			"message":     err.Error(),
 			"result":      nil,
 		})
 	}
 
-	return c.Status(http.StatusOK).JSON(fiber.Map{
-		"status":      http.StatusText(http.StatusOK),
-		"status_code": http.StatusOK,
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"status":      fiber.StatusOK,
+		"status_code": fiber.StatusOK,
 		"message":     nil,
 		"result":      bank,
 	})
