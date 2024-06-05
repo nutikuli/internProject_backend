@@ -15,6 +15,7 @@ type StoreUsecase interface {
 	OnGetStoreById(ctx context.Context, storeId int64) (*_storeDtos.StoreWithFileRes, int, error)
 	OnUpdateStoreById(c *fiber.Ctx, ctx context.Context, storeId int64, storeDatReq *_storeEntities.StoreUpdatedReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_storeDtos.StoreWithFileRes, int, error)
 	OnDeleteStoreById(ctx context.Context, storeId int64) (int, error)
+	OnGetStoreAccounts(ctx context.Context) ([]*_storeDtos.StoreWithFileRes, int, error)
 
 	// Order
 	// Product

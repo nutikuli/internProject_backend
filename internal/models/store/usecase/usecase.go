@@ -171,3 +171,36 @@ func (s *storeUsecase) OnUpdateStoreById(c *fiber.Ctx, ctx context.Context, stor
 		FilesData: filesRes,
 	}, http.StatusOK, nil
 }
+
+// OnGetStoreAccounts implements store.StoreUsecase.
+func (s *storeUsecase) OnGetStoreAccounts(ctx context.Context) ([]*_storeDtos.StoreWithFileRes, int, error) {
+
+	stores, err := s.storeRepo.GetStoreAccounts(ctx)
+
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+	log.Debug("store : ", stores)
+
+	var res []*_storeDtos.StoreWithFileRes
+
+	for _, store := range stores {
+		fileEntity := &_fileEntities.FileEntityReq{
+			EntityType: "ACCOUNT",
+			EntityId:   store.Id,
+		}
+
+		filesRes, errOnGetFiles := s.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
+		if errOnGetFiles != nil {
+			return nil, http.StatusInternalServerError, errOnGetFiles
+		}
+
+		sFile := &_storeDtos.StoreWithFileRes{
+			StoreData: store,
+			FilesData: filesRes,
+		}
+
+		res = append(res, sFile)
+	}
+	return res, http.StatusOK, nil
+}
