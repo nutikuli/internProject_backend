@@ -69,16 +69,16 @@ func (c *CustomerRepo) CreateCustomerAccount(ctx context.Context, user *entities
 	return &userId, nil
 }
 
-func (c *CustomerRepo) UpdateCustomerPasswordById(ctx context.Context, admindata *_accountEntities.UpdatePass) error {
+func (c *CustomerRepo) UpdateCustomerPasswordById(ctx context.Context, customerdata *_accountEntities.UpdatePass) error {
 	args := utils.Array{
-		admindata.Id,
-		admindata.Password,
-		admindata.Role,
+		customerdata.Id,
+		customerdata.Password,
+		customerdata.Role,
 	}
 
 	log.Info(args)
 
-	res, err := c.db.ExecContext(ctx, repository_query.SQL_update_password_account_customer, args...)
+	res, err := c.db.ExecContext(ctx, repository_query.SQL_update_password_account_customer, customerdata.Password, customerdata.Id, customerdata.Role)
 	if err != nil {
 		log.Error(err)
 		return err
