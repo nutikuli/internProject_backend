@@ -6,7 +6,8 @@ import(
 
 
 type Admin struct {
-	PermissionID  string `db:"permissionId"`
+	
 	entities.Account
+	PermissionID  string `db:"permissionId"`
 }
 

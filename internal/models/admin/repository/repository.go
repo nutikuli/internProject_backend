@@ -24,9 +24,10 @@ func NewFileRepository(db *sqlx.DB) admin.AdminRepository {
 }
 
 func (a *AdminRepo) GetAccountAdmins(ctx context.Context) ([]*entities.Admin, error) {
-	var admin []*entities.Admin
+	var admin = make([]*entities.Admin, 0)
 
-	err := a.db.GetContext(ctx, &admin, repository_query.SQL_get_account_admin, "ADMIN")
+	err := a.db.SelectContext(ctx, &admin, repository_query.SQL_getall_account_admin)
+	log.Debug("err=====>", admin)
 	if err != nil {
 		log.Info(err)
 		return nil, err
@@ -36,15 +37,14 @@ func (a *AdminRepo) GetAccountAdmins(ctx context.Context) ([]*entities.Admin, er
 }
 
 func (a *AdminRepo) GetAccountAdminById(ctx context.Context, id int64) (*entities.Admin, error) {
-	 admin := &entities.Admin{}
+	admin := &entities.Admin{}
 
 	err := a.db.GetContext(ctx, admin, repository_query.SQL_get_account_adminid, id)
-	log.Debug("err=====>",err)
+	log.Debug("err=====>", err)
 	if err != nil {
 		log.Info(err)
 		return nil, err
-	} 
-	
+	}
 
 	return admin, nil
 }
@@ -54,7 +54,7 @@ func (a *AdminRepo) CreateAdmin(ctx context.Context, admindata *entities.AdminRe
 	adminrole := "ADMIN"
 	adminstatus := 1
 	res, err := a.db.ExecContext(ctx, repository_query.SQL_insert_account_admin, admindata.Name, admindata.Password,
-		admindata.Phone, admindata.Location, admindata.Email, adminrole, adminstatus,admindata.PermissionID)
+		admindata.Phone, admindata.Location, admindata.Email, adminrole, adminstatus, admindata.PermissionID)
 	if err != nil {
 		log.Info(err)
 		return nil, err
@@ -64,8 +64,7 @@ func (a *AdminRepo) CreateAdmin(ctx context.Context, admindata *entities.AdminRe
 		log.Info(err)
 		return nil, err
 	}
-	log.Debug("res=====>",res) 
-	
+	log.Debug("res=====>", res)
 
 	return &createdId, nil
 }
@@ -84,9 +83,8 @@ func (a *AdminRepo) UpdateAdminById(ctx context.Context, Id int64, admindata *en
 	}
 
 	log.Info(args)
-	
 
-	res, err := a.db.ExecContext(ctx, repository_query.SQL_update_account_admin, admindata.Name,admindata.Password,admindata.Phone,admindata.Location,admindata.Email,admindata.Status,Id)
+	res, err := a.db.ExecContext(ctx, repository_query.SQL_update_account_admin, admindata.Name, admindata.Password, admindata.Phone, admindata.Location, admindata.Email, admindata.Status, Id)
 	log.Debug(res)
 	if err != nil {
 		log.Error(err)
@@ -121,7 +119,7 @@ func (a *AdminRepo) UpdateAdminPasswordById(ctx context.Context, admindata *_acc
 
 	log.Info(args)
 
-	res, err := a.db.ExecContext(ctx, repository_query.SQL_update_password_account_admin, admindata.Password , admindata.Id , admindata.Role)
+	res, err := a.db.ExecContext(ctx, repository_query.SQL_update_password_account_admin, admindata.Password, admindata.Id, admindata.Role)
 	if err != nil {
 		log.Error(err)
 		return err
