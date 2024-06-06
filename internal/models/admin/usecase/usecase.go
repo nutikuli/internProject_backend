@@ -13,6 +13,7 @@ import (
 	"github.com/nutikuli/internProject_backend/internal/models/admin"
 	"github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
 	_adminDtos "github.com/nutikuli/internProject_backend/internal/models/admin/dtos"
+
 	// "github.com/nutikuli/internProject_backend/internal/models/admin/entities"
 	_adminEntities "github.com/nutikuli/internProject_backend/internal/models/admin/entities"
 	"github.com/nutikuli/internProject_backend/internal/models/adminpermission"
@@ -25,16 +26,16 @@ type adminUseCase struct {
 	fileRepo            file.FileRepository
 	accUsecase          account.AccountUsecase
 	adminpermissionRepo adminpermission.AdminPermissionRepository
-	fileUse         file.FileUsecase 
+	fileUse             file.FileUsecase
 }
 
-func NewAdminUsecase(adminRepo admin.AdminRepository, fileRepo file.FileRepository, accUsecase account.AccountUsecase, adminpermissionRepo adminpermission.AdminPermissionRepository,fileUse file.FileUsecase	) admin.AdminUseCase {
+func NewAdminUsecase(adminRepo admin.AdminRepository, fileRepo file.FileRepository, accUsecase account.AccountUsecase, adminpermissionRepo adminpermission.AdminPermissionRepository, fileUse file.FileUsecase) admin.AdminUseCase {
 	return &adminUseCase{
 		adminRepo:           adminRepo,
 		fileRepo:            fileRepo,
 		adminpermissionRepo: adminpermissionRepo,
 		accUsecase:          accUsecase,
-		fileUse: fileUse,
+		fileUse:             fileUse,
 	}
 }
 
@@ -62,10 +63,10 @@ func (a *adminUseCase) OnCreateAdminAccount(c *fiber.Ctx, ctx context.Context, a
 			PathUrl:    fDatReq.FileData,
 			Name:       fDatReq.FileName,
 			EntityType: "ACCOUNT",
-			AccountId:   newAdminId,
+			AccountId:  newAdminId,
 		}
 
-		_, fUrl, status ,errOnCreatedFile := file.EncodeBase64toFile(c, true)
+		_, fUrl, status, errOnCreatedFile := file.EncodeBase64toFile(c, true)
 		if errOnCreatedFile != nil {
 			return nil, nil, status, errOnCreatedFile
 		}
@@ -94,9 +95,9 @@ func (a *adminUseCase) OnCreateAdminAccount(c *fiber.Ctx, ctx context.Context, a
 }
 
 func (a *adminUseCase) OnGetAdminById(ctx context.Context, adminId int64) (*_adminDtos.AdminFileRes, int, error) {
-	
-	log.Debug("adminid=====>",adminId)
-	
+
+	log.Debug("adminid=====>", adminId)
+
 	fileEntity := &_fileEntities.FileEntityReq{
 		EntityType: "ACCOUNT",
 		EntityId:   adminId,
@@ -105,22 +106,20 @@ func (a *adminUseCase) OnGetAdminById(ctx context.Context, adminId int64) (*_adm
 	filesRes, errOnGetFiles := a.fileRepo.GetFilesByIdAndEntity(ctx, fileEntity)
 	if errOnGetFiles != nil {
 		return nil, http.StatusInternalServerError, errOnGetFiles
-	} 
+	}
 
-	log.Debug("fileres=====>",filesRes)
+	log.Debug("fileres=====>", filesRes)
 
 	adminRes, errOnGetAdmin := a.adminRepo.GetAccountAdminById(ctx, adminId)
 	if errOnGetAdmin != nil {
 		return nil, http.StatusInternalServerError, errOnGetAdmin
 	}
-	log.Debug("adminres=====>",adminRes)
+	log.Debug("adminres=====>", adminRes)
 
 	adminPermissionRes, errOnGetAdminPermission := a.adminpermissionRepo.GetAdminpermissiomById(ctx, adminId)
 	if errOnGetAdmin != nil {
 		return nil, http.StatusInternalServerError, errOnGetAdminPermission
-	} 
-
-	
+	}
 
 	return &_adminDtos.AdminFileRes{
 		AdminData:           adminRes,
@@ -189,14 +188,9 @@ func (a *adminUseCase) OnUpdateAdminById(c *fiber.Ctx, ctx context.Context, admi
 
 	return &dtos.AdminFileRes{
 		AdminData: newAdmin,
-		FilesData:   filesRes,
+		FilesData: filesRes,
 	}, http.StatusOK, nil
 }
-
-
-
-
-
 
 func (a *adminUseCase) AdminDeleted(ctx context.Context, Id int64) (int, error) {
 
@@ -207,12 +201,11 @@ func (a *adminUseCase) AdminDeleted(ctx context.Context, Id int64) (int, error) 
 	}
 
 	return http.StatusOK, nil
-} 
-
-
+}
 
 func (a *adminUseCase) OnGetAllUserAdmin(ctx context.Context) ([]*dtos.AdminFileRes, int, error) {
 	admins, err := a.adminRepo.GetAccountAdmins(ctx)
+	log.Debug(admins)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
@@ -221,7 +214,7 @@ func (a *adminUseCase) OnGetAllUserAdmin(ctx context.Context) ([]*dtos.AdminFile
 
 	for _, admin := range admins {
 		fEntity := &_fileEntities.FileEntityReq{
-			EntityType: "ADMIN",
+			EntityType: "ACCOUNT",
 			EntityId:   admin.Id, // Assuming product has an ID field
 		}
 
@@ -232,18 +225,9 @@ func (a *adminUseCase) OnGetAllUserAdmin(ctx context.Context) ([]*dtos.AdminFile
 
 		adminFileRes = append(adminFileRes, &dtos.AdminFileRes{
 			AdminData: admin,
-			FilesData:   files,
+			FilesData: files,
 		})
 	}
 
 	return adminFileRes, http.StatusOK, nil
-}  
-
-
-
-
-
-
-
-
-
+}

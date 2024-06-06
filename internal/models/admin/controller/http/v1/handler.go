@@ -192,6 +192,7 @@ func (a *adminConn) DeletedAdminByID(c *fiber.Ctx) error {
 } 
 
 func (a *adminConn) GetAllAdmin(c *fiber.Ctx) error {
+	log.Debug("suscess")
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
 	)
