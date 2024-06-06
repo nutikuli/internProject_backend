@@ -10,7 +10,7 @@ import (
 
 type AdminFileRes struct {
 	AdminData *_adminEntities.Admin `json:"admin_data"`
-	AdminpermissionData *_adminpermissionEntities.Adminpermission `json:"adminpermission_data"`
+	AdminpermissionData []*_adminpermissionEntities.Adminpermission `json:"adminpermission_data"`
 	FilesData []*_fileEntities.File `json:"files_data"`
 
 } 

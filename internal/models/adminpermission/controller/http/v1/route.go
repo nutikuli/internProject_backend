@@ -26,6 +26,7 @@ func UseAdminPermissionRoute(db *sqlx.DB, app fiber.Router) {
 
 	authR.Post("/adminper-register", AdminPermissionConn.CreateAdminPermissionAccount)
 	authR.Get("/:adminpermission_id", AdminPermissionConn.GetAdminePermissionById)
+	authR.Get("/getall/getallpermission",AdminPermissionConn.GetAdminePermissionAll)
 	authR.Patch("/:adminpermission_id",AdminPermissionConn.UpdateAdminpermissionById)
 	authR.Delete("/:adminpermission_id",AdminPermissionConn.DeletedAdminPermissionByID)
 

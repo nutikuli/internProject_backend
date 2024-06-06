@@ -43,23 +43,28 @@ func (a *adminpermissionUseCase) OnCreateAdminpermissionAccount(c *fiber.Ctx, ct
 	log.Debug("adres=====>",adminpermissionRes)
 
 	return &_adminpermissionDtos.AdminPermissionFileRes{
-		AdminpermissionData: adminpermissionRes,
+		AdminpermissionData: adminpermissionRes[0],
 		
 	}, http.StatusOK, nil
 
 }
 
-func (a *adminpermissionUseCase) OnGetAdminpermissionById(c *fiber.Ctx, ctx context.Context, adminpermissionId *int64) (*_adminpermissionDtos.AdminPermissionFileRes, int, error) {
+func (a *adminpermissionUseCase) OnGetAdminpermissionById(c *fiber.Ctx, ctx context.Context, adminpermissionId *int64) ([]*_adminpermissionDtos.AdminPermissionFileRes, int, error) {
 	
 	adminpermissionRes, errOnGetAdminpermission := a.adminpermissionRepo.GetAdminpermissiomById(ctx, *adminpermissionId)
 	if errOnGetAdminpermission != nil {
 		return nil, http.StatusInternalServerError, errOnGetAdminpermission
 	}
 
-	return &_adminpermissionDtos.AdminPermissionFileRes{
-		AdminpermissionData: adminpermissionRes,
-		
-	}, http.StatusOK, nil
+	var adminpermissionFileRes []*_adminpermissionDtos.AdminPermissionFileRes
+
+	for _, adminpermission := range adminpermissionRes {
+		adminpermissionFileRes = append(adminpermissionFileRes, &_adminpermissionDtos.AdminPermissionFileRes{
+			AdminpermissionData: adminpermission,
+		})
+	}
+
+	return adminpermissionFileRes, http.StatusOK, nil
 }
 
 
@@ -83,5 +88,26 @@ func (a *adminpermissionUseCase) OnDeletedAdminPermission(ctx context.Context, I
 	}
 
 	return http.StatusOK, nil
+} 
+
+
+
+
+func (a *adminpermissionUseCase) OnGetAdminpermissionAll(c *fiber.Ctx, ctx context.Context) ([]*_adminpermissionDtos.AdminPermissionFileRes, int, error) {
+	
+	adminpermissionRes, errOnGetAdminpermission := a.adminpermissionRepo.GetAdminpermissionALL(ctx)
+	if errOnGetAdminpermission != nil {
+		return nil, http.StatusInternalServerError, errOnGetAdminpermission
+	}
+
+	var adminpermissionFileRes []*_adminpermissionDtos.AdminPermissionFileRes
+
+	for _, adminpermission := range adminpermissionRes {
+		adminpermissionFileRes = append(adminpermissionFileRes, &_adminpermissionDtos.AdminPermissionFileRes{
+			AdminpermissionData: adminpermission,
+		})
+	}
+
+	return adminpermissionFileRes, http.StatusOK, nil
 }
 
