@@ -115,6 +115,7 @@ model Bank {
 model AdminPermission {
     id             Int      @id @default(autoincrement())
     menuPermission Json
+    roleName       String
     account        Account?
 }
 
