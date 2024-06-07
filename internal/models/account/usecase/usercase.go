@@ -151,11 +151,10 @@ func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersCredentia
 	log.Debug(user)
 	log.Debug(req.Password)
 	log.Debug(user.Password)
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		fmt.Println(err.Error())
-		return nil, nil, http.StatusInternalServerError, err
-	}
-
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+	if err != nil {
+		fmt.Println("Password does not match:", err)
+	} 
 	userToken, err := a.accountRepo.SignUsersAccessToken(&entities.UserSignToken{
 		Role:  user.Role,
 		Email: req.Email,
@@ -164,7 +163,7 @@ func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersCredentia
 		return nil, nil, http.StatusInternalServerError, err
 	}
 	log.Debug(userToken)
-	log.Debug("user : ",user)
+	log.Debug("user : ", user)
 	return user, userToken, http.StatusOK, nil
 }
 
@@ -175,7 +174,7 @@ func (a *AccountUsecase) Register(ctx context.Context, req entities.AccountCrede
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*req.GetPassword()), bcrypt.DefaultCost)
-	
+
 	if err != nil {
 		return nil, nil, http.StatusInternalServerError, err
 	}
@@ -202,7 +201,7 @@ func (a *AccountUsecase) Register(ctx context.Context, req entities.AccountCrede
 
 	// Authentication.
 	auth := smtp.PlainAuth("", os.Getenv("emailFrom"), os.Getenv("passwordMail"), os.Getenv("smtpHost"))
-	log.Debug("+++++++++++++++**********-----------------", auth)
+	log.Debug("Auth : ", auth)
 	// Sending email.
 	err = smtp.SendMail(os.Getenv("smtpHost")+":"+os.Getenv("smtpPort"), auth, os.Getenv("emailFrom"), []string{*to}, message)
 
@@ -251,7 +250,7 @@ func (a *AccountUsecase) CheckOTP(c *fiber.Ctx, ctx context.Context, req *entiti
 
 	// Authentication.
 	auth := smtp.PlainAuth("", os.Getenv("emailFrom"), os.Getenv("passwordMail"), os.Getenv("smtpHost"))
-	log.Debug("+++++++++++++++**********-----------------", auth)
+	log.Debug("Auth : ", auth)
 	// Sending email.
 	err = smtp.SendMail(os.Getenv("smtpHost")+":"+os.Getenv("smtpPort"), auth, os.Getenv("emailFrom"), []string{to}, otp)
 	OTPres := &_accDtos.OTPres{
@@ -275,7 +274,7 @@ func (a *AccountUsecase) ResetPassword(ctx context.Context, req *entities.UsersC
 		Password: string(hashedPassword),
 		Role:     user.Role,
 	}
-
+	log.Debug("Repass : ",repassRes," user :",user)
 	switch user.Role {
 	case "CUSTOMER":
 		err := a.customerUseRepo.UpdateCustomerPasswordById(ctx, repassRes)
