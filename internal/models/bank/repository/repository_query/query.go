@@ -10,7 +10,7 @@ var SQL_get_banks_by_store_id = `SELECT * FROM Bank WHERE storeId = ?;`
 var SQL_get_bank_by_id = `SELECT * FROM Bank WHERE id = ?;`
 
 // insert bank
-var SQL_insert_bank = `INSERT INTO Bank (name,accNumber,accName,status,avatarUrl,storeId) VALUE(?,?,?,?,?,?);`
+var SQL_insert_bank = `INSERT INTO Bank (name,accNumber,accName,avatarUrl,status,storeId) VALUE(?,?,?,?,?,?);`
 
 var SQL_delete_bank_by_id = `DELETE FROM Bank WHERE id = ?;`
 

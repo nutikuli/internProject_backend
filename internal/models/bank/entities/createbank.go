@@ -7,5 +7,5 @@ type BankCreatedReq struct {
 	AccName   string `json:"acc_name" from:"acc_name" binding:"required"`
 	AvatarUrl string `json:"avatar_url" from:"avatar_url" binding:"required"`
 	StoreId   int64  `json:"store_id" from:"store_id" binding:"required"`
-	Status    string `json:"status" from:"status" binding:"required"`
+	Status    bool   `json:"status" from:"status" binding:"required"`
 }

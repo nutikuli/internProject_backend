@@ -59,11 +59,11 @@ func (a *BankRepo) GetBankById(ctx context.Context, id int64) (*entities.Bank, e
 
 func (a *BankRepo) CreateBank(ctx context.Context, bankdata entities.BankCreatedReq) (*int64, error) {
 	args := utils.Array{
+		bankdata.Name,
 		bankdata.AccName,
 		bankdata.AccNumber,
 		bankdata.AvatarUrl,
 		bankdata.Status,
-		bankdata.Name,
 		bankdata.StoreId,
 	}
 	res, err := a.db.ExecContext(ctx, repository_query.SQL_insert_bank, args...)
@@ -104,13 +104,13 @@ func (a *BankRepo) DeleteBankById(ctx context.Context, bankId int64) error {
 // UpdateBankById implements bank.BankRepository.
 func (a *BankRepo) UpdateBankById(ctx context.Context, bankId int64, bankdata *entities.BankUpdateReq) error {
 	args := utils.Array{
-		bankId,
 		bankdata.Name,
 		bankdata.AccNumber,
 		bankdata.AccName,
 		bankdata.AvatarUrl,
 		bankdata.Status,
 		bankdata.StoreId,
+		bankId,
 	}
 	_, err := a.db.ExecContext(ctx, repository_query.SQL_update_bank_by_id, args...)
 	if err != nil {

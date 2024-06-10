@@ -159,7 +159,7 @@ func (a *bankUseCase) OnUpdateBankById(c *fiber.Ctx, ctx context.Context, bankId
 			BankId:     &bankId,
 		}
 
-		_, fUrl, status, errOnCreatedFile := file.EncodeBase64toFile(c, true)
+		_, fUrl, status, errOnCreatedFile := file.UpdateFile(c, true)
 		if errOnCreatedFile != nil {
 			return nil, status, errOnCreatedFile
 		}

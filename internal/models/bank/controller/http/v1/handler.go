@@ -39,7 +39,7 @@ func (o *bankConn) GetBanksByStoreId(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	customer, status, err := o.BankUse.OnGetBanksByStoreId(ctx, req)
+	banks, status, err := o.BankUse.OnGetBanksByStoreId(ctx, req)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
@@ -53,7 +53,7 @@ func (o *bankConn) GetBanksByStoreId(c *fiber.Ctx) error {
 		"status":      http.StatusText(http.StatusOK),
 		"status_code": http.StatusOK,
 		"message":     "",
-		"result":      customer,
+		"result":      banks,
 	})
 }
 

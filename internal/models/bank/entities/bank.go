@@ -6,7 +6,7 @@ type Bank struct {
 	AccNumber string `json:"acc_number" db:"accNumber"`
 	AccName   string `json:"acc_name" db:"accName"`
 	AvatarUrl string `json:"avatar_url" db:"avatarUrl"`
-	Status    string `json:"status" db:"status"`
+	Status    bool   `json:"status" db:"status"`
 	StoreId   int64  `json:"store_id" db:"storeId"`
 	CreatedAt string `json:"createdAt" db:"createdAt"`
 	UpdatedAt string `json:"updatedAt" db:"updatedAt"`
