@@ -218,16 +218,6 @@ func (p *prodCateConn) UpdateProductCategoryById(c *fiber.Ctx) error {
 		})
 	}
 
-	_, errOnValidate := utils.SchemaValidator(req)
-	if errOnValidate != nil {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"status":      http.StatusText(http.StatusBadRequest),
-			"status_code": http.StatusBadRequest,
-			"message":     errOnValidate,
-			"result":      nil,
-		})
-	}
-
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
 	)
