@@ -7,5 +7,5 @@ import (
 
 type StoreFileReq struct {
 	StoreRegisterData *_storeEntities.StoreRegisterReq `json:"store_register_data" form:"store_register_data" binding:"required"`
-	FilesData         []*_fileEntities.FileUploaderReq `json:"files_data" form:"files_data" binding:"required"`
+	FilesData         []*_fileEntities.FileUploaderReq `json:"files_data" form:"files_data"`
 }
