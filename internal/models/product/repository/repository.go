@@ -120,17 +120,9 @@ func (s *productRepo) UpdateProductById(ctx context.Context, productId int64, re
 		productId,
 	}
 
-	res, err := s.db.ExecContext(ctx, repository_query.UpdateProductById, args...)
+	_, err := s.db.ExecContext(ctx, repository_query.UpdateProductById, args...)
 	if err != nil {
 		return err
-	}
-
-	affected, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if affected == 0 {
-		return errors.New("Can't Update, Product not found or had been updated already")
 	}
 
 	return nil

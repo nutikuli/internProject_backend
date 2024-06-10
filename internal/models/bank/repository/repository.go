@@ -112,21 +112,10 @@ func (a *BankRepo) UpdateBankById(ctx context.Context, bankId int64, bankdata *e
 		bankdata.Status,
 		bankdata.StoreId,
 	}
-	res, err := a.db.ExecContext(ctx, repository_query.SQL_update_bank_by_id, args...)
+	_, err := a.db.ExecContext(ctx, repository_query.SQL_update_bank_by_id, args...)
 	if err != nil {
 		log.Info(err)
 		return err
-	}
-
-	affected, err := res.RowsAffected()
-	if err != nil {
-		log.Info(err)
-		return err
-	}
-
-	if affected == 0 {
-		log.Info("No bank was updated")
-		return nil
 	}
 
 	return nil
