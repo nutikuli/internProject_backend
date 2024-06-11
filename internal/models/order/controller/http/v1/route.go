@@ -8,6 +8,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_bankRepo "github.com/nutikuli/internProject_backend/internal/models/bank/repository"
 	_bankUse "github.com/nutikuli/internProject_backend/internal/models/bank/usecase"
+	_customerRepo "github.com/nutikuli/internProject_backend/internal/models/customer/repository"
 	_logRepo "github.com/nutikuli/internProject_backend/internal/models/logdata/repository"
 	_orderProdRepo "github.com/nutikuli/internProject_backend/internal/models/order-product/repository"
 	_orderProdUse "github.com/nutikuli/internProject_backend/internal/models/order-product/usecase"
@@ -46,8 +47,10 @@ func UseOrderRoute(db *sqlx.DB, app fiber.Router) {
 	bankRepo := _bankRepo.NewBankRepository(db)
 	bankUse := _bankUse.NewBankUsecase(bankRepo, fileRepo)
 
+	customerRepo := _customerRepo.NewCustomerRepository(db)
+
 	orderRepo := repository.NewOrderRepository(db)
-	orderUse := usecase.NewOrderUsecase(orderRepo, fileRepo, bankUse, prodUse, orderProdUse)
+	orderUse := usecase.NewOrderUsecase(orderRepo, fileRepo, bankUse, prodUse, orderProdUse, customerRepo)
 
 	orderConn := NewOrderHandler(orderUse)
 
