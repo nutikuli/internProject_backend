@@ -60,8 +60,8 @@ func (a *BankRepo) GetBankById(ctx context.Context, id int64) (*entities.Bank, e
 func (a *BankRepo) CreateBank(ctx context.Context, bankdata entities.BankCreatedReq) (*int64, error) {
 	args := utils.Array{
 		bankdata.Name,
-		bankdata.AccName,
 		bankdata.AccNumber,
+		bankdata.AccName,
 		bankdata.AvatarUrl,
 		bankdata.Status,
 		bankdata.StoreId,

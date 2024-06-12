@@ -8,7 +8,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	product_category "github.com/nutikuli/internProject_backend/internal/models/product-category"
 	"github.com/nutikuli/internProject_backend/internal/models/product-category/entities"
-	"github.com/nutikuli/internProject_backend/pkg/utils"
 )
 
 type prodCateConn struct {
@@ -46,17 +45,6 @@ func (p *prodCateConn) CreateProductCategory(c *fiber.Ctx) error {
 	}
 
 	storeId64 := int64(storeId)
-
-	_, errOnValidate := utils.SchemaValidator(req)
-	if errOnValidate != nil {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"status":      http.StatusText(http.StatusBadRequest),
-			"status_code": http.StatusBadRequest,
-			"message":     errOnValidate,
-			"result":      nil,
-		})
-	}
-
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
 	)
@@ -73,9 +61,9 @@ func (p *prodCateConn) CreateProductCategory(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(status).JSON(fiber.Map{
-		"status":      http.StatusText(status),
-		"status_code": status,
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"status":      http.StatusText(http.StatusOK),
+		"status_code": http.StatusOK,
 		"message":     nil,
 		"result": fiber.Map{
 			"product_category_id": res,
@@ -113,9 +101,9 @@ func (p *prodCateConn) GetProductCategoryById(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(status).JSON(fiber.Map{
-		"status":      http.StatusText(status),
-		"status_code": status,
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"status":      http.StatusText(http.StatusOK),
+		"status_code": http.StatusOK,
 		"message":     nil,
 		"result":      res,
 	})
@@ -150,9 +138,9 @@ func (p *prodCateConn) GetProductCategoriesByStoreId(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(status).JSON(fiber.Map{
-		"status":      http.StatusText(status),
-		"status_code": status,
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"status":      http.StatusText(http.StatusOK),
+		"status_code": http.StatusOK,
 		"message":     nil,
 		"result":      res,
 	})
@@ -187,9 +175,9 @@ func (p *prodCateConn) DeleteProductCategoryById(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(status).JSON(fiber.Map{
-		"status":      http.StatusText(status),
-		"status_code": status,
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"status":      http.StatusText(http.StatusOK),
+		"status_code": http.StatusOK,
 		"message":     nil,
 		"result":      nil,
 	})
@@ -234,9 +222,9 @@ func (p *prodCateConn) UpdateProductCategoryById(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(status).JSON(fiber.Map{
-		"status":      http.StatusText(status),
-		"status_code": status,
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"status":      http.StatusText(http.StatusOK),
+		"status_code": http.StatusOK,
 		"message":     nil,
 		"result":      nil,
 	})
