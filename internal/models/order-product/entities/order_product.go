@@ -1,13 +1,9 @@
 package entities
 
-import (
-	"time"
-)
-
 type OrderProduct struct {
-	OrderId   int64     `db:"orderId"`
-	ProductId int64     `db:"productId"`
-	Quantity  int64     `db:"quantity"`
-	CreatedAt time.Time `db:"createdAt"`
-	UpdatedAt time.Time `db:"UpdatedAt"`
+	OrderId   int64  `json:"order_id" db:"orderId"`
+	ProductId int64  `json:"product_id" db:"productId"`
+	Quantity  int64  `json:"quantity" db:"quantity"`
+	CreatedAt string `json:"created_at" db:"createdAt"`
+	UpdatedAt string `json:"updated_at" db:"updatedAt"`
 }
