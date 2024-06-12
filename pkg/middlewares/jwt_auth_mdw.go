@@ -23,7 +23,6 @@ func JwtAuthentication() fiber.Handler {
 				"message":     "unauthorized access",
 				"result":      nil,
 			})
-
 		}
 
 		secretKey := os.Getenv("JWT_SECRET_TOKEN")
