@@ -116,6 +116,12 @@ func (s *storeUsecase) OnGetStoreById(ctx context.Context, storeId int64) (*_sto
 }
 
 func (s *storeUsecase) OnUpdateStoreById(c *fiber.Ctx, ctx context.Context, storeId int64, storeDatReq *_storeEntities.StoreUpdatedReq, filesDatReq []*_fileEntities.FileUploaderReq) (*_storeDtos.StoreWithFileRes, int, error) {
+	err := s.storeRepo.UpdateStoreById(ctx, storeId, *storeDatReq)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+
+	}
+
 	fileEntity := &_fileEntities.FileEntityReq{
 		EntityType: "ACCOUNT",
 		EntityId:   storeId,

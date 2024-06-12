@@ -84,6 +84,8 @@ func (s *storeRepo) UpdateStoreById(ctx context.Context, storeId int64, req enti
 		req.Status,
 		req.StoreName,
 		req.StoreLocation,
+		storeId,
+		"STORE",
 	}
 
 	_, err := s.db.ExecContext(ctx, repository_query.UpdateStoreById, args...)
