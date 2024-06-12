@@ -9,27 +9,32 @@ import (
 	"github.com/nutikuli/internProject_backend/internal/models/product"
 	product_category "github.com/nutikuli/internProject_backend/internal/models/product-category"
 	"github.com/nutikuli/internProject_backend/internal/models/product/dtos"
+
+	order_product "github.com/nutikuli/internProject_backend/internal/models/order-product"
 	_prodEntities "github.com/nutikuli/internProject_backend/internal/models/product/entities"
 	"github.com/nutikuli/internProject_backend/internal/services/file"
 	_fileEntities "github.com/nutikuli/internProject_backend/internal/services/file/entities"
 )
 
 type productUsecase struct {
-	productRepo product.ProductRepository
-	productCate product_category.ProductCategoryRepository
-	fileRepo    file.FileRepository
-	fileUse     file.FileUsecase
+	productRepo      product.ProductRepository
+	productCate      product_category.ProductCategoryRepository
+	fileRepo         file.FileRepository
+	fileUse          file.FileUsecase
+	orderProductRepo order_product.OrderProductRepository
 }
 
 func NewProductUsecase(productRepo product.ProductRepository, fileRepo file.FileRepository,
 	fileUse file.FileUsecase,
 	productCate product_category.ProductCategoryRepository,
+	orderProductRepo order_product.OrderProductRepository,
 ) product.ProductUsecase {
 	return &productUsecase{
-		productRepo: productRepo,
-		fileRepo:    fileRepo,
-		fileUse:     fileUse,
-		productCate: productCate,
+		productRepo:      productRepo,
+		fileRepo:         fileRepo,
+		fileUse:          fileUse,
+		productCate:      productCate,
+		orderProductRepo: orderProductRepo,
 	}
 }
 
@@ -197,13 +202,13 @@ func (p *productUsecase) OnDeleteProductById(ctx context.Context, productId int6
 }
 
 // OnGetProductsByOrderId implements product.ProductUsecase.
-func (p *productUsecase) OnGetProductsByOrderId(ctx context.Context, orderId int64) ([]*dtos.ProductFileRes, int, error) {
+func (p *productUsecase) OnGetProductsByOrderId(ctx context.Context, orderId int64) ([]*dtos.ProductWithOrderProductFileRes, int, error) {
 	products, err := p.productRepo.GetProductsByOrderId(ctx, &orderId)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
 
-	var productsFileRes []*dtos.ProductFileRes
+	var productsFileRes []*dtos.ProductWithOrderProductFileRes
 	for _, product := range products {
 		fEntity := &_fileEntities.FileEntityReq{
 			EntityType: "PRODUCT",
@@ -220,10 +225,16 @@ func (p *productUsecase) OnGetProductsByOrderId(ctx context.Context, orderId int
 			return nil, http.StatusInternalServerError, err
 		}
 
-		productsFileRes = append(productsFileRes, &dtos.ProductFileRes{
-			Product:         product,
-			ProductCategory: prodCateRes,
-			Files:           files,
+		orderProduct, err := p.orderProductRepo.GetOrderProductByProductId(ctx, product.Id)
+		if err != nil {
+			return nil, http.StatusInternalServerError, err
+		}
+
+		productsFileRes = append(productsFileRes, &dtos.ProductWithOrderProductFileRes{
+			Product:          product,
+			ProductCategory:  prodCateRes,
+			Files:            files,
+			OrderProductData: orderProduct,
 		})
 	}
 
