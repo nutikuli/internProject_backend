@@ -9,11 +9,11 @@ import (
 )
 
 type OrderBankFilesRes struct {
-	OrderData         *_orderEntities.Order          `json:"order_data"`
-	CustomerData      *_customerEntities.Customer    `json:"customer_data"`
-	FilesData         []*_fileEntities.File          `json:"files_data"`
-	BanksData         *_bankDtos.BankFileRes         `json:"bank_payment"`
-	OrdersProductData []*_productDtos.ProductFileRes `json:"product_data"`
+	OrderData         *_orderEntities.Order                          `json:"order_data"`
+	CustomerData      *_customerEntities.Customer                    `json:"customer_data"`
+	FilesData         []*_fileEntities.File                          `json:"files_data"`
+	BanksData         *_bankDtos.BankFileRes                         `json:"bank_payment"`
+	OrdersProductData []*_productDtos.ProductWithOrderProductFileRes `json:"product_data"`
 }
 
 type OrderBanksFilesRes struct {

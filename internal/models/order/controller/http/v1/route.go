@@ -38,10 +38,13 @@ func UseOrderRoute(db *sqlx.DB, app fiber.Router) {
 
 	prodCateRepo := _prodCate.NewProductCategoryRepository(db)
 
-	prodRepo := _prodRepo.NewproductRepository(db)
-	prodUse := _prodUse.NewProductUsecase(prodRepo, fileRepo, fileUse, prodCateRepo)
+	orderRepo := repository.NewOrderRepository(db)
 
 	orderProdRepo := _orderProdRepo.NewOrderProductRepository(db)
+
+	prodRepo := _prodRepo.NewproductRepository(db)
+	prodUse := _prodUse.NewProductUsecase(prodRepo, fileRepo, fileUse, prodCateRepo, orderProdRepo)
+
 	orderProdUse := _orderProdUse.NewOrderProductUsecase(orderProdRepo)
 
 	bankRepo := _bankRepo.NewBankRepository(db)
@@ -49,7 +52,6 @@ func UseOrderRoute(db *sqlx.DB, app fiber.Router) {
 
 	customerRepo := _customerRepo.NewCustomerRepository(db)
 
-	orderRepo := repository.NewOrderRepository(db)
 	orderUse := usecase.NewOrderUsecase(orderRepo, fileRepo, bankUse, prodUse, orderProdUse, customerRepo)
 
 	orderConn := NewOrderHandler(orderUse)

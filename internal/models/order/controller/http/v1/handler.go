@@ -244,7 +244,7 @@ func (o *orderConn) UpdateOrderTransportDetailAndState(c *fiber.Ctx) error {
 		})
 	}
 
-	if req.StateData.State == "SEND" && req.TransportData != nil {
+	if req.StateData.State == "SUCCEED" && req.TransportData != nil {
 		status, err := o.OrderUse.OnUpdateOrderTransportDetail(ctx, orderIdReq, req.TransportData)
 		if err != nil {
 			return c.Status(status).JSON(fiber.Map{
