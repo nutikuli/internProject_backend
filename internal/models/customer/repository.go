@@ -14,5 +14,4 @@ type CustomerRepository interface {
 	UpdateCustomerPasswordById(ctx context.Context, customerdata *_accountEntities.UpdatePass) error
 	UpdateCustomerById(ctx context.Context, userId int64, user *entities.CustomerUpdateReq) error
 	DeleteCustomerById(ctx context.Context, Id int64) error
-	// GetAllCustomer(ctx context.Context, role string) ([]*_accountEntities.Account, error)
 }
