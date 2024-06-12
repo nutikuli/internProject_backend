@@ -68,7 +68,6 @@ func (u *customerUsecase) OnUpdateCustomerById(ctx context.Context, userId int64
 	if err != nil {
 		return http.StatusInternalServerError, fmt.Errorf("failed to update user by ID: %w", err)
 	}
-
 	return http.StatusOK, nil
 }
 
