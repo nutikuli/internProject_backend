@@ -151,10 +151,12 @@ func (a *AccountUsecase) Login(ctx context.Context, req *entities.UsersCredentia
 	log.Debug(user)
 	log.Debug(req.Password)
 	log.Debug(user.Password)
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password),[]byte(req.Password))
 	if err != nil {
 		fmt.Println("Password does not match:", err)
-	} 
+		return nil, nil, http.StatusInternalServerError, err
+		
+	}
 	userToken, err := a.accountRepo.SignUsersAccessToken(&entities.UserSignToken{
 		Role:  user.Role,
 		Email: req.Email,
@@ -267,14 +269,14 @@ func (a *AccountUsecase) ResetPassword(ctx context.Context, req *entities.UsersC
 		return nil, http.StatusInternalServerError, err
 	}
 	log.Debug("User Email : ", user)
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password),bcrypt.DefaultCost)
 
 	repassRes := &entities.UpdatePass{
 		Id:       user.Id,
 		Password: string(hashedPassword),
 		Role:     user.Role,
 	}
-	log.Debug("Repass : ",repassRes," user :",user)
+	log.Debug("Repass : ", repassRes, " user :", user)
 	switch user.Role {
 	case "CUSTOMER":
 		err := a.customerUseRepo.UpdateCustomerPasswordById(ctx, repassRes)
