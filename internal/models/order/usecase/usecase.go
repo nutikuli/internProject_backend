@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
@@ -46,6 +47,7 @@ func NewOrderUsecase(
 }
 
 func (s *orderUsecase) OnCreateOrder(c *fiber.Ctx, ctx context.Context, orderDatReq *_orderEntities.OrderCreate, filesDatReq []*_fileEntities.FileUploaderReq, orderProductsReq []*_orderProductEntities.OrderProductCreateReq) (*_orderDtos.OrderBankFilesRes, int, error) {
+	orderDatReq.SentDate = time.Now()
 	newOrderId, err := s.orderRepo.CreateOrder(ctx, orderDatReq)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
